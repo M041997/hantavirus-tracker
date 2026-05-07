@@ -26,6 +26,7 @@ import feedparser
 import requests
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = pathlib.Path(__file__).resolve().parent
 TEMPLATES = ROOT / "templates"
@@ -348,15 +349,168 @@ def build_spread_arcs(country_index: list[dict]) -> list[dict]:
     return arcs
 
 
+# ----- Site config -----
+# Site URL for canonical/OG/sitemap. Override via SITE_URL env var when DNS
+# moves to a custom domain (e.g. https://hantavirus.live).
+import os
+SITE_URL = os.environ.get(
+    "SITE_URL", "https://m041997.github.io/hantavirus-tracker"
+).rstrip("/")
+# GoatCounter analytics code; set GOATCOUNTER_CODE env var after signing up
+# at goatcounter.com to enable the snippet.
+ANALYTICS_CODE = os.environ.get("GOATCOUNTER_CODE", "").strip()
+
+
 # ----- Render -----
-def render(context: dict) -> str:
+def render(template_name: str, context: dict) -> str:
     env = Environment(
         loader=FileSystemLoader(TEMPLATES),
         autoescape=select_autoescape(["html", "xml"]),
     )
     env.filters["unescape"] = ihtml.unescape
-    tmpl = env.get_template("index.html.j2")
+    tmpl = env.get_template(template_name)
     return tmpl.render(**context)
+
+
+# ----- OG share image -----
+def _load_font(size: int) -> ImageFont.ImageFont:
+    """Try a few common system fonts; fall back to default."""
+    candidates = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/System/Library/Fonts/Helvetica.ttc",
+        "C:/Windows/Fonts/arialbd.ttf",
+    ]
+    for path in candidates:
+        if pathlib.Path(path).exists():
+            try:
+                return ImageFont.truetype(path, size)
+            except OSError:
+                continue
+    return ImageFont.load_default()
+
+
+def render_og_image(country_index: list[dict], outbreaks: list[dict],
+                     reports_today: int) -> Image.Image:
+    """Render a 1200x630 PNG share card matching the site's hero look."""
+    W, H = 1200, 630
+    img = Image.new("RGB", (W, H), (10, 14, 20))
+    draw = ImageDraw.Draw(img, "RGBA")
+
+    # Diagonal gradient panel
+    for y in range(H):
+        c = int(10 + 8 * (y / H))
+        draw.line([(0, y), (W, y)], fill=(c, c + 4, c + 10))
+
+    # Faint world-map silhouette band — abstract, evocative
+    band_y = H // 2 - 40
+    draw.rectangle([(0, band_y), (W, band_y + 120)],
+                   fill=(20, 32, 48, 90))
+
+    # Pulse dots representing active countries (max 5)
+    palette_red = (255, 59, 59)
+    for i, c in enumerate(sorted(
+        country_index, key=lambda c: c["count"], reverse=True
+    )[:6]):
+        # Map lng (-180..180) -> x (60..W-60), lat (90..-90) -> y in band
+        x = int(60 + (c["lng"] + 180) * (W - 120) / 360)
+        y = int(band_y + 60 + (-c["lat"] + 0) * 0.7)
+        r = max(8, min(28, 6 + c["count"] * 2))
+        # Glow
+        for rr, alpha in [(r * 2, 40), (int(r * 1.4), 90)]:
+            draw.ellipse([x - rr, y - rr, x + rr, y + rr],
+                         fill=(255, 59, 59, alpha))
+        draw.ellipse([x - r, y - r, x + r, y + r], fill=palette_red)
+
+    # Pulse marker for the title
+    dot_x, dot_y, dot_r = 80, 100, 14
+    draw.ellipse([dot_x - dot_r, dot_y - dot_r, dot_x + dot_r, dot_y + dot_r],
+                 fill=palette_red)
+    draw.ellipse([dot_x - dot_r - 8, dot_y - dot_r - 8,
+                  dot_x + dot_r + 8, dot_y + dot_r + 8],
+                 outline=(255, 59, 59, 120), width=4)
+
+    # Title
+    title_font = _load_font(72)
+    sub_font = _load_font(28)
+    stat_v_font = _load_font(58)
+    stat_k_font = _load_font(20)
+
+    draw.text((dot_x + 40, dot_y - 38), "HANTAVIRUS TRACKER",
+              font=title_font, fill=(232, 238, 245))
+    draw.text((dot_x + 42, dot_y + 36),
+              "Live global outbreak & news aggregator",
+              font=sub_font, fill=(138, 153, 171))
+
+    # Stat tiles (bottom)
+    stats = [
+        (f"{len(country_index)}", "ACTIVE COUNTRIES"),
+        (f"{reports_today}", "REPORTS TODAY"),
+        (f"{len(outbreaks)}", "CLUSTERS"),
+        ("35%", "US CFR · CDC"),
+    ]
+    tile_w, tile_h, gap = 240, 110, 24
+    total_w = len(stats) * tile_w + (len(stats) - 1) * gap
+    start_x = (W - total_w) // 2
+    y0 = H - tile_h - 70
+    for i, (v, k) in enumerate(stats):
+        x0 = start_x + i * (tile_w + gap)
+        draw.rounded_rectangle(
+            [x0, y0, x0 + tile_w, y0 + tile_h],
+            radius=14, fill=(20, 28, 38, 220),
+            outline=(40, 50, 62), width=1,
+        )
+        # Center the value horizontally in the tile
+        bbox = draw.textbbox((0, 0), v, font=stat_v_font)
+        vw = bbox[2] - bbox[0]
+        draw.text((x0 + (tile_w - vw) // 2, y0 + 12), v,
+                  font=stat_v_font,
+                  fill=(255, 59, 59) if i == 0 else (255, 184, 77)
+                  if i == 1 else (232, 238, 245))
+        bbox = draw.textbbox((0, 0), k, font=stat_k_font)
+        kw = bbox[2] - bbox[0]
+        draw.text((x0 + (tile_w - kw) // 2, y0 + 78), k,
+                  font=stat_k_font, fill=(138, 153, 171))
+
+    # Footer URL
+    foot_font = _load_font(22)
+    draw.text((60, H - 40),
+              SITE_URL.replace("https://", "").replace("http://", ""),
+              font=foot_font, fill=(138, 153, 171))
+
+    return img
+
+
+def write_og_image(path: pathlib.Path, country_index: list[dict],
+                   outbreaks: list[dict], reports_today: int) -> None:
+    img = render_og_image(country_index, outbreaks, reports_today)
+    img.save(path, "PNG", optimize=True)
+
+
+# ----- Sitemap + robots -----
+def write_sitemap(path: pathlib.Path, last_mod_iso: str) -> None:
+    pages = ["", "about.html"]
+    urls = "\n".join(
+        f"  <url><loc>{SITE_URL}/{p}</loc>"
+        f"<lastmod>{last_mod_iso[:10]}</lastmod></url>"
+        for p in pages
+    )
+    path.write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{urls}\n"
+        "</urlset>\n",
+        encoding="utf-8",
+    )
+
+
+def write_robots(path: pathlib.Path) -> None:
+    path.write_text(
+        "User-agent: *\n"
+        "Allow: /\n"
+        f"Sitemap: {SITE_URL}/sitemap.xml\n",
+        encoding="utf-8",
+    )
 
 
 def main() -> int:
@@ -396,9 +550,19 @@ def main() -> int:
         "news_count": len(news),
         "reports_today": reports_today,
         "active_country_count": len(country_index),
+        "site_url": SITE_URL,
+        "analytics_code": ANALYTICS_CODE,
     }
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "index.html").write_text(render(context), encoding="utf-8")
+    (OUT / "index.html").write_text(
+        render("index.html.j2", context), encoding="utf-8"
+    )
+    (OUT / "about.html").write_text(
+        render("about.html.j2", context), encoding="utf-8"
+    )
+    write_og_image(OUT / "og.png", country_index, outbreaks, reports_today)
+    write_sitemap(OUT / "sitemap.xml", context["build_time_iso"])
+    write_robots(OUT / "robots.txt")
     # Also write a JSON dump alongside for anyone who wants the raw data.
     payload = {
         "generated_at": context["build_time_iso"],

@@ -3,12 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hantavirus Tracker — global outbreak map</title>
-<meta name="description" content="Aggregated, hourly-updated tracker of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC surveillance.">
-<meta property="og:title" content="Hantavirus Tracker">
-<meta property="og:description" content="Hourly-updated global hantavirus outbreak and news aggregator.">
+<title>Hantavirus Tracker — live global outbreak map</title>
+<meta name="description" content="Live, hourly-updated map of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC surveillance. Track active clusters, recent reports, and documented spread routes.">
+<link rel="canonical" href="{{ site_url }}/">
+<meta property="og:title" content="Hantavirus Tracker — live global outbreak map">
+<meta property="og:description" content="Live, hourly-updated map of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="{{ site_url }}/">
+<meta property="og:image" content="{{ site_url }}/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hantavirus Tracker">
+<meta name="twitter:description" content="Live global map of hantavirus outbreaks and news.">
+<meta name="twitter:image" content="{{ site_url }}/og.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2250%22 font-size=%2256%22>&#129440;</text></svg>">
+{% if analytics_code %}
+<script data-goatcounter="https://{{ analytics_code }}.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+{% endif %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin="">
@@ -358,11 +371,12 @@
   </div>
 
   <footer>
+    <a href="about.html">About / disclaimer</a> ·
     Sources: <a href="https://promedmail.org/?s=hantavirus" target="_blank" rel="noopener">ProMED-mail</a>,
     <a href="https://news.google.com/search?q=hantavirus" target="_blank" rel="noopener">Google News</a>,
     <a href="{{ cdc.source_url }}" target="_blank" rel="noopener">CDC HPS surveillance</a>.
-    Raw aggregated data: <a href="data.json">data.json</a>.
-    Source: <a href="https://github.com/M041997/hantavirus-tracker" target="_blank" rel="noopener">GitHub</a>.
+    Raw data: <a href="data.json">data.json</a>.
+    Code: <a href="https://github.com/M041997/hantavirus-tracker" target="_blank" rel="noopener">GitHub</a>.
     Not a medical resource — see CDC for guidance.
   </footer>
 </div>
