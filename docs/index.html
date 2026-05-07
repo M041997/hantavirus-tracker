@@ -50,9 +50,9 @@
   }
   #map {
     height: 100%; width: 100%;
-    background: #0a1421;
+    background: #0a1828;
   }
-  .leaflet-container { background: #0a1421; outline: none; }
+  .leaflet-container { background: #0a1828; outline: none; }
   .leaflet-control-attribution {
     background: rgba(10,14,20,.7) !important;
     color: #6b7785 !important;
@@ -73,6 +73,13 @@
   .hud-tr { top: 14px; right: 14px; }
   .hud-bl { bottom: 14px; left: 14px; }
   .hud-br { bottom: 14px; right: 14px; }
+  .hud-bc {
+    bottom: 14px; left: 50%; transform: translateX(-50%);
+    color: var(--muted); font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(10,14,20,.6); padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--line);
+  }
 
   .title-card {
     background: linear-gradient(135deg, rgba(20,28,38,.92), rgba(15,20,28,.85));
@@ -267,7 +274,7 @@
     <div class="stat-strip">
       <div class="stat-tile"><div class="v alert">3</div>
         <div class="k">Active countries</div></div>
-      <div class="stat-tile"><div class="v warn">22</div>
+      <div class="stat-tile"><div class="v warn">21</div>
         <div class="k">Reports today</div></div>
       <div class="stat-tile"><div class="v">35</div>
         <div class="k">Items tracked</div></div>
@@ -281,6 +288,10 @@
       <div class="row"><span class="swatch"></span>Reported activity (last 60d)</div>
       <div class="row"><span class="swatch arc"></span>Documented spread route</div>
     </div>
+  </div>
+
+  <div class="hud hud-bc">
+    Click a marker · drag to pan · scroll to zoom
   </div>
 </div>
 
@@ -511,10 +522,40 @@
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxQMmdLTGZLOGVHV3hOdzZuNXU1ejV1SC1KekhkWVVBZngtMHNJclFLMWVjUXZfVVBUWlBvVFNXbmZST2tqN0lPUlJObHNZMXZsMkFLUVIzMnF3enVvT3BOLTIwRVRnWUJIa2xLUzZmMERSdTctWGdfcXZBUGEySm9jRVFkRDJwZkFoRmpqMVBnNHMzZ0RqSzZtTA?oc=5" target="_blank" rel="noopener">Authorities scramble to limit hantavirus outbreak, trace contacts around globe</a>
+            <a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNbVEwN1VaM1FpYnJBbTFzbkpCMjFKRmh3WVBCeW1sc2N5aDdBQlJwZG9HSlZ4ZXpXT2luNmcwV3ZVdEE0aldEcjZJeDAzNG5MdjgyV21qOGVtWWVIN19jc1E0LXdNdWpIQnNQV2xuWjh4T0txUTRnZW4zMTlSUWFVSGVlM3NDMG1sYnpTejlkeFlzREJXelR1SjUtR0hXMUowVVE?oc=5" target="_blank" rel="noopener">How a deadly hantavirus outbreak unfolded on a cruise ship for weeks before it was identified</a>
           </div>
           <div class="row">
-            <span class="src">Google News · The Washington Post</span>
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>15h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiggFBVV95cUxPTU9TN2lob0g1ZUQ4RFQ5dzlMY09oSnFJSTFtcjRtb1BRNkVXQll1MXBNSjluaXIyTDZIc2g4STl3dXpRMnJ2NFo1WVhndWcxLWdNdkRlX0J4am9mLTVBbTdNaWY0em14SDJOemdpYVZZcFlSSVE4VHJHdU1wV3R6ekxn?oc=5" target="_blank" rel="noopener">What to Know About the Hantavirus Outbreak on an Atlantic Cruise Ship</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The New York Times</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5WX3FzX3VwMlh5aWhGWFhKSWxrN3dlUDctSWpiVVNHeFZJM29qbUtJdWJYcGVJbGRVMGlzLVpUOTIyTTNKVUp2aHBLb2xhUENma0tvTUNLZ0llQQ?oc=5" target="_blank" rel="noopener">Hantavirus: Race to trace passengers who left MV Hondius at St Helena</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · BBC</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiswFBVV95cUxOMTZmZW8zQmZxTmsxLVNOc0d5N1NGMlk1R183LUQ0em9jMmtTeHlPNXRyRmZJX002S1phVVU1blA4Um9HRGcteE5JWjdRZmNDaGlXbi1wMEZpaGhDVHhCcExkYjl6M3RqdWV6THhnZTBEcThTaGVFYUpEVmZzUGJ3cldYVDhsMTN5Xy1BYlFVTm1qV25sNnBwdDdYbUw3TmJGUVFfV2FXd2VJcVpNY3NUUDlCTQ?oc=5" target="_blank" rel="noopener">Hantavirus ship passenger says ‘we were not well informed’</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · NBC News</span>
             <span>·</span><span>1h ago</span>
           </div>
         </li>
@@ -601,6 +642,16 @@
         
         <li>
           <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxQMmdLTGZLOGVHV3hOdzZuNXU1ejV1SC1KekhkWVVBZngtMHNJclFLMWVjUXZfVVBUWlBvVFNXbmZST2tqN0lPUlJObHNZMXZsMkFLUVIzMnF3enVvT3BOLTIwRVRnWUJIa2xLUzZmMERSdTctWGdfcXZBUGEySm9jRVFkRDJwZkFoRmpqMVBnNHMzZ0RqSzZtTA?oc=5" target="_blank" rel="noopener">Authorities scramble to limit hantavirus outbreak, trace contacts around globe</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The Washington Post</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
             <a href="https://news.google.com/rss/articles/CBMijwJBVV95cUxOSlFtUW11b3hCRVJiZVB4TEI2U2FTaVQ4WmdMWkQ1Z2tVZ25BSy02M2tjaVNpRWFNU2ExOGRKaDJra0dzaUw5N09sMlVZZm5CZDcwWUJ5MzJVTGtjMGt3VHVpUEp0b0V0bjBMd1dnUzhEdmQ3QzBwc3JPN2VFaG1RbG1ZdFYxNkpCb3dzOWt0Zko1bEhFM0QxN1RwVmlpUDhqWU9hZURoRF9tZVZueFJtVGV1UDF2RUJMNFFNNHV0ek9ubHQwRWd6YmlvdGlEZkhadnRkUk84eE05QmduWWllc2dtcE5URmhkY1VJS0FnaXlfMERSQ0x1SFRNQ05jc3hweHU1UXZhZ1ZWMExxRUNr0gGjAkFVX3lxTE9Bd3JPVWVCVGZ1UWM3V2cxYzlCMDhGYTFOSzdDQm11Ni1sQzg4ZTBzei10cVVyaTlVYkxFNzMxa3dKNG9LdHp5elFkQlEzeXA3RE81d0ktRlAzWXloc0JVVHZ5SnRtT1ZNd0NUNkIxUko3d1pKbWRlcHN0dGZRaktOX0Y4YkFhN1VpSmVnbGxkMU1zVUlkQXprTG5xcy0tWFRDOThoa2pzbWFrWjZhbkhNdTZDbFJRdnhZM0NScEhTUmNZVVkwakNaVzRmczJOYmd5Y2lRYjZuM1U5eEVvc1JfclNDU3QxZkdNMEhzcFl6dEVQTy1XdGZxRnpaNE1QQzNKTi1sS3lMSFdfdjFUU1dySTFVWElIYnZGdlk3SkpRamhZWQ?oc=5" target="_blank" rel="noopener">Cruise ship passengers trace the origin of the hantavirus outbreak: ‘It’s being said here that it may have been the Dutch couple’</a>
           </div>
           <div class="row">
@@ -669,6 +720,26 @@
           </div>
         </li>
         
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxNOF83TTNRRWpKNndvel9XcFhacHkxZHlYU095WWJDeUZpa1ZmTy0ybVFuWDVRd1c3R3lybFVIOVhWaGdoOUVXU19nNnBfcHQ2YjBIZXZsZkpqUS1fYXkwc0NUWDdsakRhR1ZJN3ZReEpSbDBxMk5rMllxNWQ1UGR1eWE3UHJLWDRpWmo4ZUNYOFJuaDRkZ01BUkJYMnRhZ1FmYzJzWWpWTG8?oc=5" target="_blank" rel="noopener">Inside the cruise ship at the center of a deadly hantavirus outbreak</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>1 day ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE8zWWNSSE1ySENvRVJRT0hwdHlvUW5qU3NYZE9RbE0tTTB4eHhGRmI2dkpHdmhGa0ZfMXhnYVh3T0VlNzJVX196cUtlT1RMZnBhNmNVUVFLYVFIUQ?oc=5" target="_blank" rel="noopener">Hantavirus: What is the cruise ship virus and how is it spread?</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · BBC</span>
+            <span>·</span><span>9h ago</span>
+          </div>
+        </li>
+        
       </ul>
       
     </div>
@@ -702,22 +773,30 @@
     maxBounds: [[-72, -200], [82, 200]],
   }).setView([20, 0], 2);
 
+  // Satellite imagery — clearly a globe (matches the Plague Inc. vibe).
   L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     {
-      subdomains: 'abcd',
-      attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> · © <a href="https://carto.com/attributions">CARTO</a>',
-      maxZoom: 19,
+      attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, GIS User Community',
+      maxZoom: 18,
     }
   ).addTo(map);
 
+  // Country boundaries + labels overlay so countries are unmistakable.
   L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
     {
-      subdomains: 'abcd',
-      pane: 'shadowPane',
       attribution: '',
+      maxZoom: 18,
+      opacity: 0.85,
     }
+  ).addTo(map);
+
+  // Subtle dark wash so red markers pop against bright satellite imagery.
+  const tint = L.rectangle(
+    [[-90, -360], [90, 360]],
+    { color: '#000', fillColor: '#0a1828', fillOpacity: 0.25, weight: 0,
+      interactive: false }
   ).addTo(map);
 
   // ----- Markers -----
