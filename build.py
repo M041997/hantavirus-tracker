@@ -196,24 +196,81 @@ def sort_by_date(items: list[Item]) -> list[Item]:
     return sorted(items, key=lambda i: i.published or epoch, reverse=True)
 
 
-def detect_active_outbreaks(items: list[Item]) -> list[dict]:
-    """Heuristic: cluster recent items by country mentioned in title."""
-    countries = [
-        "Argentina", "Chile", "Bolivia", "Brazil", "Paraguay", "Uruguay",
-        "Peru", "Panama", "USA", "United States", "Canada", "Mexico",
-        "China", "Korea", "Russia", "Germany", "Finland", "Sweden",
-        "Taiwan", "Japan",
-    ]
+# Approximate population-weighted centroids for countries we cluster on.
+# Used both for cluster detection and for placing map markers.
+COUNTRY_CENTROIDS: dict[str, tuple[float, float]] = {
+    "Argentina":      (-38.4, -63.6),
+    "Chile":          (-35.7, -71.5),
+    "Bolivia":        (-16.3, -63.6),
+    "Brazil":         (-14.2, -51.9),
+    "Paraguay":       (-23.4, -58.4),
+    "Uruguay":        (-32.5, -55.8),
+    "Peru":           (-9.2,  -75.0),
+    "Panama":         ( 8.5,  -80.8),
+    "Mexico":         (23.6, -102.5),
+    "USA":            (37.1,  -95.7),
+    "United States":  (37.1,  -95.7),
+    "Canada":         (56.1, -106.3),
+    "China":          (35.9,  104.2),
+    "Korea":          (35.9,  127.8),
+    "South Korea":    (35.9,  127.8),
+    "Russia":         (61.5,  105.3),
+    "Germany":        (51.2,   10.4),
+    "Finland":        (61.9,   25.7),
+    "Sweden":         (60.1,   18.6),
+    "Taiwan":         (23.7,  121.0),
+    "Japan":          (36.2,  138.3),
+}
+
+# Hardcoded "spread arcs" the news has reported clearly. Format:
+# (origin_country, dest_country, label). Origin must be in COUNTRY_CENTROIDS.
+SPREAD_ARCS: list[tuple[str, str, str]] = [
+    ("Argentina", "USA",   "Cruise passengers monitored on return"),
+    ("Argentina", "Chile", "Cruise stopover"),
+    ("Argentina", "Brazil","Cruise stopover"),
+]
+
+
+# Alias terms that imply a specific country in news titles. Order matters
+# only for matching efficiency; first match wins.
+COUNTRY_ALIASES: list[tuple[str, str]] = [
+    ("United States", "USA"),
+    ("U.S.",          "USA"),
+    ("California",    "USA"),
+    ("Florida",       "USA"),
+    ("Texas",         "USA"),
+    ("Arizona",       "USA"),
+    ("New Mexico",    "USA"),
+    ("Colorado",      "USA"),
+    ("Nevada",        "USA"),
+    ("Utah",          "USA"),
+    ("Yosemite",      "USA"),
+    ("South Korea",   "Korea"),
+    ("Republic of Korea", "Korea"),
+]
+
+
+def cluster_by_country(items: list[Item]) -> dict[str, list[Item]]:
     cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=60)
     clusters: dict[str, list[Item]] = {}
+    # Build lookup: term -> canonical country (centroid key)
+    term_to_country: list[tuple[str, str]] = []
+    for term, canon in COUNTRY_ALIASES:
+        term_to_country.append((term, canon))
+    for c in COUNTRY_CENTROIDS:
+        canon = "USA" if c == "United States" else c
+        term_to_country.append((c, canon))
     for item in items:
         if not item.published or item.published < cutoff:
             continue
-        for c in countries:
-            if re.search(rf"\b{re.escape(c)}\b", item.title, re.IGNORECASE):
-                clusters.setdefault(c, []).append(item)
+        for term, canon in term_to_country:
+            if re.search(rf"\b{re.escape(term)}\b", item.title, re.IGNORECASE):
+                clusters.setdefault(canon, []).append(item)
                 break
-    # Only return clusters with 2+ items (signal vs. noise).
+    return clusters
+
+
+def detect_active_outbreaks(clusters: dict[str, list[Item]]) -> list[dict]:
     out = []
     for country, cl in sorted(
         clusters.items(), key=lambda kv: len(kv[1]), reverse=True
@@ -231,6 +288,64 @@ def detect_active_outbreaks(items: list[Item]) -> list[dict]:
             }
         )
     return out
+
+
+def build_country_index(clusters: dict[str, list[Item]]) -> list[dict]:
+    """One entry per country with markers + recent items for the map."""
+    out = []
+    for country, cl in clusters.items():
+        if country not in COUNTRY_CENTROIDS:
+            continue
+        lat, lng = COUNTRY_CENTROIDS[country]
+        cl_sorted = sorted(
+            cl, key=lambda i: i.published or dt.datetime.min, reverse=True
+        )
+        latest = cl_sorted[0]
+        out.append(
+            {
+                "country": country,
+                "lat": lat,
+                "lng": lng,
+                "count": len(cl),
+                "latest_title": latest.title,
+                "latest_url": latest.url,
+                "latest_date": latest.published_human,
+                "items": [
+                    {
+                        "title": i.title,
+                        "url": i.url,
+                        "source": i.source,
+                        "published": i.published_human,
+                    }
+                    for i in cl_sorted[:6]
+                ],
+            }
+        )
+    out.sort(key=lambda c: c["count"], reverse=True)
+    return out
+
+
+def build_spread_arcs(country_index: list[dict]) -> list[dict]:
+    """Return arc dicts only for spread routes whose origin has activity."""
+    active = {c["country"] for c in country_index}
+    arcs: list[dict] = []
+    for origin, dest, label in SPREAD_ARCS:
+        if origin not in active:
+            continue
+        if origin not in COUNTRY_CENTROIDS or dest not in COUNTRY_CENTROIDS:
+            continue
+        o_lat, o_lng = COUNTRY_CENTROIDS[origin]
+        d_lat, d_lng = COUNTRY_CENTROIDS[dest]
+        arcs.append(
+            {
+                "from": origin,
+                "to": dest,
+                "from_latlng": [o_lat, o_lng],
+                "to_latlng": [d_lat, d_lng],
+                "label": label,
+            }
+        )
+    return arcs
 
 
 # ----- Render -----
@@ -254,7 +369,15 @@ def main() -> int:
     print(f"[build]   got {len(promed)} items", file=sys.stderr)
 
     all_items = sort_by_date(dedupe_by_title(promed + news))
-    outbreaks = detect_active_outbreaks(all_items)
+    clusters = cluster_by_country(all_items)
+    outbreaks = detect_active_outbreaks(clusters)
+    country_index = build_country_index(clusters)
+    spread_arcs = build_spread_arcs(country_index)
+
+    today = dt.datetime.now(dt.timezone.utc).date()
+    reports_today = sum(
+        1 for i in all_items if i.published and i.published.date() == today
+    )
 
     now = dt.datetime.now(dt.timezone.utc)
     context = {
@@ -264,9 +387,15 @@ def main() -> int:
         "news_items": news[:25],
         "all_items": all_items[:30],
         "outbreaks": outbreaks,
+        "country_index": country_index,
+        "spread_arcs": spread_arcs,
+        "country_index_json": json.dumps(country_index),
+        "spread_arcs_json": json.dumps(spread_arcs),
         "cdc": CDC_SNAPSHOT,
         "promed_count": len(promed),
         "news_count": len(news),
+        "reports_today": reports_today,
+        "active_country_count": len(country_index),
     }
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "index.html").write_text(render(context), encoding="utf-8")
@@ -274,6 +403,8 @@ def main() -> int:
     payload = {
         "generated_at": context["build_time_iso"],
         "outbreaks": outbreaks,
+        "country_index": country_index,
+        "spread_arcs": spread_arcs,
         "cdc_snapshot": CDC_SNAPSHOT,
         "items": [
             {
