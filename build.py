@@ -721,6 +721,8 @@ def main() -> int:
         file=sys.stderr,
     )
 
+    promed = sort_by_date(promed)
+    news = sort_by_date(news)
     all_items = sort_by_date(dedupe_by_title(promed + news))
     clusters = cluster_by_country(all_items)
     outbreaks = detect_active_outbreaks(clusters)
