@@ -187,6 +187,34 @@
     0%   { transform: scale(0.4); opacity: 0.9; }
     100% { transform: scale(1.6); opacity: 0; }
   }
+
+  /* Ship marker — orange-ringed pulse with a ship glyph */
+  .ship-marker {
+    position: relative;
+    width: 28px; height: 28px;
+  }
+  .ship-marker .body {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255, 184, 77, 0.95);
+    color: #1a1208;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 12px rgba(255, 184, 77, 0.85);
+    font-size: 16px; font-weight: 900;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    line-height: 1;
+  }
+  .ship-marker .ring {
+    position: absolute; inset: -10px; border-radius: 50%;
+    border: 2px solid #ffb84d;
+    opacity: 0;
+    animation: ring 2.6s ease-out infinite;
+  }
+  .legend .swatch.ship {
+    background: #ffb84d; border: 2px solid #fff;
+    box-shadow: 0 0 6px rgba(255,184,77,.7);
+  }
   @keyframes pulse {
     0%, 100% { box-shadow: 0 0 0 4px rgba(255,59,59,.18); }
     50%      { box-shadow: 0 0 0 10px rgba(255,59,59,0); }
@@ -300,6 +328,9 @@
     <div class="legend">
       <div class="row"><span class="swatch"></span>Reported activity (last 60d)</div>
       <div class="row"><span class="swatch arc"></span>Documented spread route</div>
+      {% if vessel_position %}
+      <div class="row"><span class="swatch ship"></span>MV Hondius (outbreak vessel)</div>
+      {% endif %}
     </div>
   </div>
 
@@ -310,6 +341,58 @@
 
 <div class="wrap">
   <div class="grid">
+    {% if vessel_position %}
+    <div class="card span-12" style="border-color: #4a3a1e;
+         background: linear-gradient(135deg, #2a2113, #1a1812);">
+      <h2 style="color: var(--accent-2);">Outbreak vessel · live AIS</h2>
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: baseline;">
+        <div style="flex: 1 1 240px;">
+          <div style="font-size: 22px; font-weight: 700;">
+            {{ vessel.name }}
+          </div>
+          <div style="color: var(--muted); font-size: 13px;">
+            {{ vessel.operator }} · IMO {{ vessel.imo }} · MMSI {{ vessel.mmsi }}
+            · flag {{ vessel.flag }}
+          </div>
+          <div style="color: var(--muted); font-size: 13px; margin-top: 4px;">
+            Departed {{ vessel.departed_from }} on {{ vessel.departed_at }}.
+          </div>
+        </div>
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Position</div>
+            <div style="font-size: 18px; font-variant-numeric: tabular-nums;">
+              {{ "%.3f"|format(vessel_position.lat) }}°,
+              {{ "%.3f"|format(vessel_position.lng) }}°
+            </div>
+          </div>
+          {% if vessel_position.heading_deg is not none %}
+          <div>
+            <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Heading</div>
+            <div style="font-size: 18px; font-variant-numeric: tabular-nums;">
+              {{ vessel_position.heading_deg|round|int }}°
+            </div>
+          </div>
+          {% endif %}
+          <div>
+            <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Last AIS fix</div>
+            <div style="font-size: 13px; color: var(--good);">
+              {{ vessel_position.fetched_at[:16].replace('T', ' ') }} UTC
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 12px; font-size: 12px; color: var(--muted);">
+        Position from
+        <a href="{{ vessel.tracker_url }}" target="_blank" rel="noopener">CruiseMapper</a>,
+        cross-check on
+        <a href="{{ vessel.vesselfinder_url }}" target="_blank" rel="noopener">VesselFinder</a>
+        and <a href="{{ vessel.marinetraffic_url }}" target="_blank" rel="noopener">MarineTraffic</a>.
+        Refreshes hourly with the rest of the site.
+      </div>
+    </div>
+    {% endif %}
+
     <div class="card span-8">
       <h2>ProMED-mail · official outbreak alerts</h2>
       {% if promed_items %}
@@ -385,7 +468,8 @@
   // Server-rendered data dump for the map.
   window.HANTA = {
     countries: {{ country_index_json|safe }},
-    arcs:      {{ spread_arcs_json|safe }}
+    arcs:      {{ spread_arcs_json|safe }},
+    vessel:    {{ vessel_json|safe }}
   };
 </script>
 <script>
@@ -495,9 +579,67 @@
       .addTo(map);
   });
 
+  // ----- MV Hondius live position -----
+  if (window.HANTA.vessel && window.HANTA.vessel.position) {
+    const v = window.HANTA.vessel;
+    const p = v.position;
+    const shipIcon = L.divIcon({
+      className: '',
+      html: `<div class="ship-marker"
+                  ${p.heading_deg != null
+                    ? `style="transform: rotate(${p.heading_deg}deg)"` : ''}>
+               <div class="ring"></div><div class="body">⚓</div>
+             </div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14],
+    });
+    const fetched = p.fetched_at
+      ? new Date(p.fetched_at).toUTCString().replace('GMT', 'UTC')
+      : '';
+    const heading = p.heading_deg != null
+      ? `${Math.round(p.heading_deg)}°` : '—';
+    L.marker([p.lat, p.lng], {
+      icon: shipIcon,
+      title: `${v.name} · last AIS ${fetched}`,
+      zIndexOffset: 1000,
+    })
+      .bindPopup(`
+        <div class="popup-title">${escape(v.name)}</div>
+        <div class="popup-meta">
+          ${escape(v.operator)} · IMO ${escape(v.imo)} · MMSI ${escape(v.mmsi)}
+        </div>
+        <div style="font-size: 12px; line-height: 1.6;">
+          <div><strong>Position:</strong> ${p.lat.toFixed(3)}°,
+            ${p.lng.toFixed(3)}°</div>
+          <div><strong>Heading:</strong> ${heading}</div>
+          <div><strong>Last AIS fix:</strong> ${escape(fetched)}</div>
+          <div><strong>Departed:</strong>
+            ${escape(v.departed_from)} · ${escape(v.departed_at)}</div>
+          <div style="margin-top: 8px;">
+            <a href="${escape(v.tracker_url)}" target="_blank" rel="noopener">
+              CruiseMapper</a> ·
+            <a href="${escape(v.vesselfinder_url)}" target="_blank" rel="noopener">
+              VesselFinder</a> ·
+            <a href="${escape(v.marinetraffic_url)}" target="_blank" rel="noopener">
+              MarineTraffic</a>
+          </div>
+        </div>
+      `, { maxWidth: 320 })
+      .addTo(map);
+  }
+
   // Fit to data bounds if any markers, else default world view.
-  if (window.HANTA.countries.length) {
-    const bounds = L.latLngBounds(window.HANTA.countries.map(c => [c.lat, c.lng]));
+  const allPoints = [
+    ...window.HANTA.countries.map(c => [c.lat, c.lng]),
+  ];
+  if (window.HANTA.vessel && window.HANTA.vessel.position) {
+    allPoints.push([
+      window.HANTA.vessel.position.lat,
+      window.HANTA.vessel.position.lng,
+    ]);
+  }
+  if (allPoints.length) {
+    const bounds = L.latLngBounds(allPoints);
     map.fitBounds(bounds.pad(0.4), { maxZoom: 3 });
   }
 })();

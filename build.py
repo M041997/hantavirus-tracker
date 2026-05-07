@@ -57,6 +57,71 @@ CDC_SNAPSHOT = {
 }
 
 
+# ----- Outbreak vessel: MV Hondius -----
+# Operated by Oceanwide Expeditions; departed Ushuaia 2026-04-01 with the
+# Andes-virus cluster. CruiseMapper embeds current AIS position as JSON in
+# the page HTML, so we can scrape it without a JS engine.
+HONDIUS_VESSEL = {
+    "name": "MV Hondius",
+    "operator": "Oceanwide Expeditions",
+    "imo": "9818709",
+    "mmsi": "244327000",
+    "flag": "Netherlands",
+    "departed_from": "Ushuaia, Argentina",
+    "departed_at": "2026-04-01",
+    "tracker_url": "https://www.cruisemapper.com/ships/MV-Hondius-1624",
+    "vesselfinder_url": "https://www.vesselfinder.com/vessels/details/9818709",
+    "marinetraffic_url": (
+        "https://www.marinetraffic.com/en/ais/details/ships/"
+        "shipid:5873599/mmsi:244327000/imo:9818709/vessel:HONDIUS"
+    ),
+}
+
+
+def fetch_hondius_position() -> dict | None:
+    """Scrape CruiseMapper for the Hondius's current AIS position.
+
+    Returns a dict {lat, lng, heading_deg, fetched_at} or None if the page
+    layout changed and we can't parse it.
+    """
+    url = HONDIUS_VESSEL["tracker_url"]
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"[hondius] fetch failed: {exc}", file=sys.stderr)
+        return None
+    m = re.search(
+        r'"shipCurrentPositionMap"\s*:\s*\{([^}]+)\}', r.text
+    )
+    if not m:
+        print("[hondius] position blob not found in HTML", file=sys.stderr)
+        return None
+    blob = "{" + m.group(1) + "}"
+    try:
+        data = json.loads(blob)
+    except json.JSONDecodeError as exc:
+        print(f"[hondius] JSON decode failed: {exc}", file=sys.stderr)
+        return None
+    lat = data.get("lat")
+    lng = data.get("lon")
+    rotation = data.get("rotation")  # radians
+    if lat is None or lng is None:
+        return None
+    heading_deg = None
+    if rotation is not None:
+        import math
+        heading_deg = round((math.degrees(float(rotation)) + 360) % 360, 1)
+    return {
+        "lat": float(lat),
+        "lng": float(lng),
+        "heading_deg": heading_deg,
+        "fetched_at": dt.datetime.now(dt.timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        ),
+    }
+
+
 @dataclasses.dataclass
 class Item:
     title: str
@@ -522,6 +587,17 @@ def main() -> int:
     promed = fetch_promed()
     print(f"[build]   got {len(promed)} items", file=sys.stderr)
 
+    print("[build] fetching MV Hondius position...", file=sys.stderr)
+    hondius_pos = fetch_hondius_position()
+    if hondius_pos:
+        print(
+            f"[build]   Hondius @ {hondius_pos['lat']:.3f}, "
+            f"{hondius_pos['lng']:.3f}",
+            file=sys.stderr,
+        )
+    else:
+        print("[build]   Hondius position unavailable", file=sys.stderr)
+
     all_items = sort_by_date(dedupe_by_title(promed + news))
     clusters = cluster_by_country(all_items)
     outbreaks = detect_active_outbreaks(clusters)
@@ -552,6 +628,11 @@ def main() -> int:
         "active_country_count": len(country_index),
         "site_url": SITE_URL,
         "analytics_code": ANALYTICS_CODE,
+        "vessel": HONDIUS_VESSEL,
+        "vessel_position": hondius_pos,
+        "vessel_json": json.dumps(
+            {**HONDIUS_VESSEL, "position": hondius_pos} if hondius_pos else None
+        ),
     }
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "index.html").write_text(
@@ -569,6 +650,7 @@ def main() -> int:
         "outbreaks": outbreaks,
         "country_index": country_index,
         "spread_arcs": spread_arcs,
+        "vessel": {**HONDIUS_VESSEL, "position": hondius_pos},
         "cdc_snapshot": CDC_SNAPSHOT,
         "items": [
             {
