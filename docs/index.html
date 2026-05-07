@@ -3,20 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hantavirus Tracker — global outbreak feed</title>
+<title>Hantavirus Tracker — global outbreak map</title>
 <meta name="description" content="Aggregated, hourly-updated tracker of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC surveillance.">
 <meta property="og:title" content="Hantavirus Tracker">
 <meta property="og:description" content="Hourly-updated global hantavirus outbreak and news aggregator.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2250%22 font-size=%2256%22>&#129440;</text></svg>">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
 <style>
   :root {
-    --bg: #0c1116;
-    --panel: #161d26;
+    --bg: #0a0e14;
+    --panel: #131a23;
     --panel-2: #1d2632;
     --ink: #e8eef5;
     --muted: #8a99ab;
-    --accent: #ff5757;
+    --accent: #ff3b3b;
     --accent-2: #ffb84d;
     --good: #58c897;
     --line: #28323e;
@@ -32,87 +38,197 @@
   }
   a { color: #7cc1ff; text-decoration: none; }
   a:hover { text-decoration: underline; }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
-  header {
-    display: flex; align-items: baseline; justify-content: space-between;
-    flex-wrap: wrap; gap: 12px; margin-bottom: 24px;
+
+  /* ---------- HERO MAP ---------- */
+  .hero {
+    position: relative;
+    height: 70vh;
+    min-height: 520px;
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
   }
-  header h1 {
-    margin: 0; font-size: 28px; letter-spacing: -0.02em;
+  #map {
+    height: 100%; width: 100%;
+    background: #0a1421;
   }
-  header h1 .dot {
-    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
-    background: var(--accent); margin-right: 10px;
-    box-shadow: 0 0 0 4px rgba(255,87,87,.18);
+  .leaflet-container { background: #0a1421; outline: none; }
+  .leaflet-control-attribution {
+    background: rgba(10,14,20,.7) !important;
+    color: #6b7785 !important;
+    font-size: 10px !important;
+  }
+  .leaflet-control-attribution a { color: #8a99ab !important; }
+  .leaflet-control-zoom a {
+    background: rgba(20,28,38,.85) !important;
+    color: #e8eef5 !important;
+    border: 1px solid var(--line) !important;
+  }
+
+  /* HUD overlays */
+  .hud {
+    position: absolute; pointer-events: none; z-index: 500;
+  }
+  .hud-tl { top: 14px; left: 14px; }
+  .hud-tr { top: 14px; right: 14px; }
+  .hud-bl { bottom: 14px; left: 14px; }
+  .hud-br { bottom: 14px; right: 14px; }
+
+  .title-card {
+    background: linear-gradient(135deg, rgba(20,28,38,.92), rgba(15,20,28,.85));
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 16px;
+    pointer-events: auto;
+  }
+  .title-card h1 {
+    margin: 0; font-size: 18px; letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .title-card h1 .dot {
+    display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); margin-right: 8px;
+    box-shadow: 0 0 0 4px rgba(255,59,59,.18);
     animation: pulse 2.4s ease-in-out infinite;
+    vertical-align: middle;
+  }
+  .title-card .sub {
+    color: var(--muted); font-size: 12px; margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-strip {
+    display: flex; gap: 8px; pointer-events: auto;
+  }
+  .stat-tile {
+    background: rgba(20,28,38,.92);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 110px;
+  }
+  .stat-tile .v {
+    font-size: 22px; font-weight: 700; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-tile .v.alert { color: var(--accent); }
+  .stat-tile .v.warn  { color: var(--accent-2); }
+  .stat-tile .k {
+    color: var(--muted); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.08em; margin-top: 4px;
+  }
+
+  .legend {
+    background: rgba(20,28,38,.92);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: var(--muted); font-size: 11px;
+    pointer-events: auto;
+  }
+  .legend .row { display: flex; align-items: center; gap: 8px; }
+  .legend .row + .row { margin-top: 4px; }
+  .legend .swatch {
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,59,59,.25);
+  }
+  .legend .swatch.arc {
+    width: 18px; height: 2px; border-radius: 0;
+    background: var(--accent-2); box-shadow: none;
+  }
+
+  /* Pulse marker (HTML divIcon) */
+  .pulse-marker {
+    position: relative;
+    width: 14px; height: 14px;
+  }
+  .pulse-marker .core {
+    position: absolute; inset: 0; margin: auto;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px rgba(255,59,59,.9);
+  }
+  .pulse-marker .ring {
+    position: absolute; inset: -8px; border-radius: 50%;
+    border: 2px solid var(--accent);
+    opacity: 0;
+    animation: ring 2.2s ease-out infinite;
+  }
+  .pulse-marker.large .core {
+    width: 14px; height: 14px;
+    box-shadow: 0 0 14px rgba(255,59,59,1);
+  }
+  .pulse-marker.large .ring { inset: -12px; border-width: 3px; }
+  @keyframes ring {
+    0%   { transform: scale(0.4); opacity: 0.9; }
+    100% { transform: scale(1.6); opacity: 0; }
   }
   @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 4px rgba(255,87,87,.18); }
-    50%      { box-shadow: 0 0 0 10px rgba(255,87,87,0); }
+    0%, 100% { box-shadow: 0 0 0 4px rgba(255,59,59,.18); }
+    50%      { box-shadow: 0 0 0 10px rgba(255,59,59,0); }
   }
-  .meta { color: var(--muted); font-size: 13px; }
-  .meta code { background: var(--panel); padding: 2px 6px; border-radius: 4px; }
 
-  .grid {
-    display: grid; gap: 18px;
-    grid-template-columns: repeat(12, 1fr);
+  /* Animated dashed spread arcs */
+  @keyframes dash {
+    to { stroke-dashoffset: -40; }
   }
+  .leaflet-overlay-pane path.spread-arc {
+    stroke: var(--accent-2);
+    stroke-width: 2;
+    stroke-dasharray: 6 6;
+    fill: none;
+    opacity: 0.85;
+    animation: dash 1.6s linear infinite;
+  }
+
+  /* Popup styling */
+  .leaflet-popup-content-wrapper {
+    background: #131a23 !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 10px !important;
+  }
+  .leaflet-popup-tip { background: #131a23 !important; border: 1px solid var(--line) !important; }
+  .leaflet-popup-content { margin: 12px 14px !important; min-width: 240px; }
+  .popup-title {
+    font-weight: 700; font-size: 15px; margin-bottom: 6px;
+    color: var(--accent-2); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .popup-meta { color: var(--muted); font-size: 11px; margin-bottom: 8px; }
+  .popup-list { padding: 0; margin: 0; list-style: none; }
+  .popup-list li { padding: 6px 0; border-top: 1px solid var(--line); font-size: 12px; }
+  .popup-list li:first-child { border-top: 0; }
+  .popup-list .src { color: var(--good); font-size: 10px; text-transform: uppercase; }
+
+  /* ---------- BELOW-MAP CONTENT ---------- */
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
+  .grid { display: grid; gap: 18px; grid-template-columns: repeat(12, 1fr); }
   .card {
     background: var(--panel); border: 1px solid var(--line);
     border-radius: 12px; padding: 18px 20px;
   }
   .card h2 {
-    margin: 0 0 12px; font-size: 16px; letter-spacing: 0.02em;
+    margin: 0 0 12px; font-size: 14px; letter-spacing: 0.04em;
     text-transform: uppercase; color: var(--muted);
   }
   .span-12 { grid-column: span 12; }
   .span-8  { grid-column: span 8; }
-  .span-6  { grid-column: span 6; }
   .span-4  { grid-column: span 4; }
   @media (max-width: 800px) {
-    .span-8, .span-6, .span-4 { grid-column: span 12; }
+    .span-8, .span-4 { grid-column: span 12; }
+    .stat-strip { flex-wrap: wrap; }
+    .stat-tile { min-width: 95px; padding: 8px 10px; }
+    .stat-tile .v { font-size: 18px; }
+    .hero { height: 60vh; min-height: 420px; }
+    .hud-bl { display: none; }
   }
 
-  /* Outbreak strip */
-  .outbreaks {
-    display: flex; flex-wrap: wrap; gap: 10px;
-  }
-  .outbreak {
-    flex: 1 1 220px;
-    background: linear-gradient(135deg, #2a1316, #1d1218);
-    border: 1px solid #4a1e22;
-    border-radius: 10px; padding: 12px 14px;
-  }
-  .outbreak .country {
-    font-weight: 700; color: var(--accent-2); letter-spacing: 0.02em;
-  }
-  .outbreak .count {
-    float: right; background: rgba(255,87,87,.12);
-    color: var(--accent); padding: 2px 8px; border-radius: 999px;
-    font-size: 12px; font-weight: 600;
-  }
-  .outbreak .latest {
-    margin-top: 8px; font-size: 13px; color: var(--ink);
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .outbreak .when { color: var(--muted); font-size: 12px; margin-top: 6px; }
-
-  /* Stat tiles */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .stat {
-    background: var(--panel-2); border-radius: 10px; padding: 12px 14px;
-  }
-  .stat .v { font-size: 22px; font-weight: 700; }
-  .stat .k { color: var(--muted); font-size: 12px; text-transform: uppercase;
-             letter-spacing: 0.06em; margin-top: 2px; }
-  @media (max-width: 600px) { .stats { grid-template-columns: repeat(2, 1fr); } }
-
-  /* Item lists */
   ul.items { list-style: none; padding: 0; margin: 0; }
-  ul.items li {
-    padding: 10px 0; border-bottom: 1px solid var(--line);
-  }
+  ul.items li { padding: 10px 0; border-bottom: 1px solid var(--line); }
   ul.items li:last-child { border-bottom: 0; }
   ul.items .title { font-weight: 600; line-height: 1.35; }
   ul.items .row {
@@ -122,6 +238,12 @@
   ul.items .src { color: var(--good); }
   ul.items .src.promed { color: var(--accent-2); }
 
+  .stats-mini { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stats-mini .stat { background: var(--panel-2); border-radius: 10px; padding: 12px 14px; }
+  .stats-mini .v { font-size: 22px; font-weight: 700; }
+  .stats-mini .k { color: var(--muted); font-size: 12px; text-transform: uppercase;
+                   letter-spacing: 0.06em; margin-top: 2px; }
+
   footer {
     margin-top: 40px; color: var(--muted); font-size: 12px;
     border-top: 1px solid var(--line); padding-top: 16px;
@@ -130,32 +252,39 @@
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1><span class="dot"></span>Hantavirus Tracker</h1>
-    <div class="meta">
-      Updated <code>2026-05-07 13:47 UTC</code> · rebuilds hourly
-    </div>
-  </header>
 
-  
-  <div class="card span-12" style="margin-bottom: 18px;">
-    <h2>Active clusters (last 60 days)</h2>
-    <div class="outbreaks">
-      
-      <div class="outbreak">
-        <span class="count">10 reports</span>
-        <div class="country">Argentina</div>
-        <div class="latest">
-          <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxOTkljVjlJUW1IOXdhQTIza1pudHVyS3VrRlpJUXl0V1RUWTVaSjh6RXRXQlR1WG1oNzhRMDJ4SlMtQ2FmSVNpYmpkXzVRQmRTT2NDZEdvTlJfTjlEcm9wdEo0bHRzSFE1dlprNHQxSTBzc3NESW1HX3BnWUUwS0FpMDY3R0FZMURPUGdNODhEUnkwaFNuSW1sSy1sZE01WUFfcHRHakRaX3VWeUFmcjNQN3BB?oc=5" target="_blank" rel="noopener">Hantavirus on the rise in Argentina, where MV Hondius cruise ship set sail</a>
-        </div>
-        <div class="when">latest: 5h ago</div>
-      </div>
-      
+<div class="hero">
+  <div id="map"></div>
+
+  <div class="hud hud-tl">
+    <div class="title-card">
+      <h1><span class="dot"></span>Hantavirus Tracker</h1>
+      <div class="sub">Updated 2026-05-07 13:54 UTC · rebuilds hourly</div>
     </div>
   </div>
-  
 
+  <div class="hud hud-tr">
+    <div class="stat-strip">
+      <div class="stat-tile"><div class="v alert">3</div>
+        <div class="k">Active countries</div></div>
+      <div class="stat-tile"><div class="v warn">22</div>
+        <div class="k">Reports today</div></div>
+      <div class="stat-tile"><div class="v">35</div>
+        <div class="k">Items tracked</div></div>
+      <div class="stat-tile"><div class="v alert">35%</div>
+        <div class="k">US CFR · CDC</div></div>
+    </div>
+  </div>
+
+  <div class="hud hud-bl">
+    <div class="legend">
+      <div class="row"><span class="swatch"></span>Reported activity (last 60d)</div>
+      <div class="row"><span class="swatch arc"></span>Documented spread route</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
   <div class="grid">
     <div class="card span-8">
       <h2>ProMED-mail · official outbreak alerts</h2>
@@ -268,7 +397,7 @@
 
     <div class="card span-4">
       <h2>CDC US snapshot</h2>
-      <div class="stats">
+      <div class="stats-mini">
         <div class="stat"><div class="v">890</div>
           <div class="k">Total cases</div></div>
         <div class="stat"><div class="v">35%</div>
@@ -278,7 +407,7 @@
         <div class="stat"><div class="v">94%</div>
           <div class="k">West of Miss.</div></div>
       </div>
-      <p class="meta" style="margin-top:12px;">
+      <p style="color: var(--muted); margin-top:12px; font-size: 12px;">
         Surveillance period 1993 – 2023.
         Median age 38, 62% male.
         <a href="https://www.cdc.gov/hantavirus/data-research/cases/index.html" target="_blank" rel="noopener">Source: CDC</a>.
@@ -322,11 +451,31 @@
         
         <li>
           <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMilwFBVV95cUxPb0FiM2x4NmY4VF9leUdBZXBMSFh2TnJaUW5vSHNRWU9HcS14WEJEaEFKNzhYTHFGVzRkbzliRW0xb1NCUHB1QUhLMDlTRU5mZzFqbHo2WkJWaTk5aW9oaENXWEVHR21wXzViUnE0Tjc1d1VjQWlFSFMwclhWSGIxOE5YV2hKeTc1N0RaMnVGWm01akY1VTJR?oc=5" target="_blank" rel="noopener">Hantavirus is on the rise in Argentina, where a stricken cruise ship began its journey</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>8h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiggFBVV95cUxPTU9TN2lob0g1ZUQ4RFQ5dzlMY09oSnFJSTFtcjRtb1BRNkVXQll1MXBNSjluaXIyTDZIc2g4STl3dXpRMnJ2NFo1WVhndWcxLWdNdkRlX0J4am9mLTVBbTdNaWY0em14SDJOemdpYVZZcFlSSVE4VHJHdU1wV3R6ekxn?oc=5" target="_blank" rel="noopener">What to Know About the Hantavirus Outbreak on an Atlantic Cruise Ship</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The New York Times</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
             <a href="https://news.google.com/rss/articles/CBMivwFBVV95cUxNU09KTExTUDV0M3BOSjBMcVBmVDZhZkVuRV9taUFRWW5mRFA0RWxZUUhYSDVyZ0d6SmVGaWJHWWhZdHdKYjZjZXZhcVdIVkdsa2ZrRnM3ZTZDWkczSnV3ZFBqWnQwRGQ4V2t5R3hqeHpXWUFHYnJJMFZ2blNLYXl0clJMeW45QkYzQi1pQ1psdm9fbWxfS0k4TncxU3lKNTN6aUVGa05aZjBtaHV6d2h4UmVhdURmdXAyRm1lUWsybw?oc=5" target="_blank" rel="noopener">U.S. monitoring hantavirus cruise passengers; dozens left ship after 1st death</a>
           </div>
           <div class="row">
             <span class="src">Google News · NBC News</span>
-            <span>·</span><span>1h ago</span>
+            <span>·</span><span>2h ago</span>
           </div>
         </li>
         
@@ -346,17 +495,7 @@
           </div>
           <div class="row">
             <span class="src">Google News · statnews.com</span>
-            <span>·</span><span>3h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMimwFBVV95cUxOSi1BdTlac293c2RtWXNYNmYzWXBaQXFjaEZWbmxEdjlTQXpZV25TQ2VnX0dHWWFzVVFVVU5rbUNKT05DbGNkLVY3T0pISGtpVG1tTkhUYXMzRUNHa3h2eGdWNVdQODJ1d3JaQjZhRDVld2JkeTN1cFQ4cUN6LXVsY1Job3k5enhObTNPenVUZ20tSkxHSE8ycXFacw?oc=5" target="_blank" rel="noopener">What to know about hantavirus, the illness linked to a cruise ship outbreak</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · AP News</span>
-            <span>·</span><span>1 day ago</span>
+            <span>·</span><span>4h ago</span>
           </div>
         </li>
         
@@ -382,21 +521,21 @@
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiggFBVV95cUxPTU9TN2lob0g1ZUQ4RFQ5dzlMY09oSnFJSTFtcjRtb1BRNkVXQll1MXBNSjluaXIyTDZIc2g4STl3dXpRMnJ2NFo1WVhndWcxLWdNdkRlX0J4am9mLTVBbTdNaWY0em14SDJOemdpYVZZcFlSSVE4VHJHdU1wV3R6ekxn?oc=5" target="_blank" rel="noopener">What to Know About the Hantavirus Outbreak on an Atlantic Cruise Ship</a>
+            <a href="https://news.google.com/rss/articles/CBMimwFBVV95cUxOSi1BdTlac293c2RtWXNYNmYzWXBaQXFjaEZWbmxEdjlTQXpZV25TQ2VnX0dHWWFzVVFVVU5rbUNKT05DbGNkLVY3T0pISGtpVG1tTkhUYXMzRUNHa3h2eGdWNVdQODJ1d3JaQjZhRDVld2JkeTN1cFQ4cUN6LXVsY1Job3k5enhObTNPenVUZ20tSkxHSE8ycXFacw?oc=5" target="_blank" rel="noopener">What to know about hantavirus, the illness linked to a cruise ship outbreak</a>
           </div>
           <div class="row">
-            <span class="src">Google News · The New York Times</span>
-            <span>·</span><span>1h ago</span>
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>1 day ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTFB4ejFDMy1sV3hqYUU2M0t4ck90UDdqLTU0V2dmWjZxYTRnaVJoeDdOcFlkMGZ6MlVBWVpCTVBXVTE1R2ZubVRCY0FhWDJDNHVSby1QUUp1ZV9PUQ?oc=5" target="_blank" rel="noopener">Hantavirus-hit cruise ship on way to Canary Islands after three evacuated</a>
+            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5WX3FzX3VwMlh5aWhGWFhKSWxrN3dlUDctSWpiVVNHeFZJM29qbUtJdWJYcGVJbGRVMGlzLVpUOTIyTTNKVUp2aHBLb2xhUENma0tvTUNLZ0llQQ?oc=5" target="_blank" rel="noopener">Hantavirus: Race to trace passengers who left MV Hondius at St Helena</a>
           </div>
           <div class="row">
             <span class="src">Google News · BBC</span>
-            <span>·</span><span>4h ago</span>
+            <span>·</span><span>1h ago</span>
           </div>
         </li>
         
@@ -412,11 +551,21 @@
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5WX3FzX3VwMlh5aWhGWFhKSWxrN3dlUDctSWpiVVNHeFZJM29qbUtJdWJYcGVJbGRVMGlzLVpUOTIyTTNKVUp2aHBLb2xhUENma0tvTUNLZ0llQQ?oc=5" target="_blank" rel="noopener">Hantavirus: Race to trace passengers who left MV Hondius at St Helena</a>
+            <a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNbVEwN1VaM1FpYnJBbTFzbkpCMjFKRmh3WVBCeW1sc2N5aDdBQlJwZG9HSlZ4ZXpXT2luNmcwV3ZVdEE0aldEcjZJeDAzNG5MdjgyV21qOGVtWWVIN19jc1E0LXdNdWpIQnNQV2xuWjh4T0txUTRnZW4zMTlSUWFVSGVlM3NDMG1sYnpTejlkeFlzREJXelR1SjUtR0hXMUowVVE?oc=5" target="_blank" rel="noopener">How a deadly hantavirus outbreak unfolded on a cruise ship for weeks before it was identified</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>15h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTFB4ejFDMy1sV3hqYUU2M0t4ck90UDdqLTU0V2dmWjZxYTRnaVJoeDdOcFlkMGZ6MlVBWVpCTVBXVTE1R2ZubVRCY0FhWDJDNHVSby1QUUp1ZV9PUQ?oc=5" target="_blank" rel="noopener">Hantavirus-hit cruise ship on way to Canary Islands after three evacuated</a>
           </div>
           <div class="row">
             <span class="src">Google News · BBC</span>
-            <span>·</span><span>1h ago</span>
+            <span>·</span><span>4h ago</span>
           </div>
         </li>
         
@@ -452,16 +601,6 @@
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxOTkljVjlJUW1IOXdhQTIza1pudHVyS3VrRlpJUXl0V1RUWTVaSjh6RXRXQlR1WG1oNzhRMDJ4SlMtQ2FmSVNpYmpkXzVRQmRTT2NDZEdvTlJfTjlEcm9wdEo0bHRzSFE1dlprNHQxSTBzc3NESW1HX3BnWUUwS0FpMDY3R0FZMURPUGdNODhEUnkwaFNuSW1sSy1sZE01WUFfcHRHakRaX3VWeUFmcjNQN3BB?oc=5" target="_blank" rel="noopener">Hantavirus on the rise in Argentina, where MV Hondius cruise ship set sail</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · France 24</span>
-            <span>·</span><span>5h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
             <a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxQMlRaellHNWVFdHlvN3FwYUYtUGdVa3Jub1dIVmdhNUZrbWFXS3dvdDFhd1lIZzZSLWxVU1VkeVh3ZHdZWWhuTmh1Qk04LTdMMm1lMk5kQjFwV1U5LUJKZnZnOFJqUVRsX1U2S0lSbUZjQWV4a0lyN09SWlpCSWJLREl4ZC1wbFZqc05VREVubVBlYUhKMWJpSEpOY0lOeDB5Q3hpVm4yRXo5S0NHNmRrSnZKRUtUWUprWmc?oc=5" target="_blank" rel="noopener">Hantavirus being monitored in US. Latest on illnesses, cruise outbreak</a>
           </div>
           <div class="row">
@@ -492,21 +631,31 @@
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxOejVqcGhnTGp2dmhpcGZPRXpEdjYxN1hQb21MeUVhUm1ValZ2aWt5NlRuaHhNQ3cwLVVCT0pnU2IzeGU1ZVdfMDhZWkdKR1Y0LVByU3lib0NoSmFRem1oRGlZYjRtT1J4elFKb1c0a3lFVi00T2g2M25aeGZSZTkzaEcyNVZGQ2lqT05EMmZtR3I4MGpuM2NzVzhFWW1TaWhEZG1zd2V1YU5XV1RP?oc=5" target="_blank" rel="noopener">Cruise ship with hantavirus outbreak heads to Canary Islands after 3 are evacuated</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · AP News</span>
-            <span>·</span><span>15h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
             <a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxNOF83TTNRRWpKNndvel9XcFhacHkxZHlYU095WWJDeUZpa1ZmTy0ybVFuWDVRd1c3R3lybFVIOVhWaGdoOUVXU19nNnBfcHQ2YjBIZXZsZkpqUS1fYXkwc0NUWDdsakRhR1ZJN3ZReEpSbDBxMk5rMllxNWQ1UGR1eWE3UHJLWDRpWmo4ZUNYOFJuaDRkZ01BUkJYMnRhZ1FmYzJzWWpWTG8?oc=5" target="_blank" rel="noopener">Inside the cruise ship at the center of a deadly hantavirus outbreak</a>
           </div>
           <div class="row">
             <span class="src">Google News · AP News</span>
             <span>·</span><span>1 day ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxQTFFhRUpGVzJIMzY0dGh0VW5WSFJPVDd3R2NtMEZCby1ENVA3UlFVOUxiakhHUEgxczdoZkVHM1ExWmhWZkYwbTBFdnVXX1B2R3FsX1ZhamdtU2xMeEN4Q2N2VGs4dHhCbDRybHJyM3k0eVpNUDlYSjdrbTdUNVVxZE5tbklweXlOOEJnS05LQlFFbWhzQU8ySDdrWDU2NkJqUlE?oc=5" target="_blank" rel="noopener">Daily Briefing: Is hantavirus in the US?</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · USA Today</span>
+            <span>·</span><span>2h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxOejVqcGhnTGp2dmhpcGZPRXpEdjYxN1hQb21MeUVhUm1ValZ2aWt5NlRuaHhNQ3cwLVVCT0pnU2IzeGU1ZVdfMDhZWkdKR1Y0LVByU3lib0NoSmFRem1oRGlZYjRtT1J4elFKb1c0a3lFVi00T2g2M25aeGZSZTkzaEcyNVZGQ2lqT05EMmZtR3I4MGpuM2NzVzhFWW1TaWhEZG1zd2V1YU5XV1RP?oc=5" target="_blank" rel="noopener">Cruise ship with hantavirus outbreak heads to Canary Islands after 3 are evacuated</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>15h ago</span>
           </div>
         </li>
         
@@ -520,26 +669,6 @@
           </div>
         </li>
         
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxQTDQ3cXVNMGdPY1ZFclBMUVZXQzVTRzBwYXV0RGFHR0VGeXAxbGZFRmxLSEgtWUt1WEllUENRTlZDRWtqcldnTzV6M1dOVXhHc252SzN6eXpTLTVWWXVfZmc3OWhudHFnTmlVVE84SDJHcTZ0Ty1EY3VXX0JzQm16cTRCZUJFdEF3dHdEZEVzMmttWWx5dUh6ckhlSlBWdE1Ta0t6WGhmaUk?oc=5" target="_blank" rel="noopener">The hantavirus cruise ship outbreak is a dangerous experiment</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · Scientific American</span>
-            <span>·</span><span>17h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxQZ1NvWi1FNDJ6WHQ5dVhmdkpjLTYxZjdpWDRNOHVIQ2t5ZTNhWmt0aWo1YUFUVF9tTWVIQV9yV3FIcnBrTk1iemhhbThYc2VsY25tTHd5Ym1BNHNYVWtTaExISUpoMnBUb2R2ZjlkZDlQenlKZXhiNTI4Z0g5ZGdPV1o5MVBuSFViMHhORjRteGR0ems2MzdZVXlqa3RsUE1tUkh3a2x1LTJzcGlhcHNxamlTYUFlTGJFME94UXIzdHB5X0gxejQ4dQ?oc=5" target="_blank" rel="noopener">I’ve investigated a hantavirus outbreak. Here’s what I can tell you about the cruise ship cluster</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · The Conversation</span>
-            <span>·</span><span>8h ago</span>
-          </div>
-        </li>
-        
       </ul>
       
     </div>
@@ -550,8 +679,123 @@
     <a href="https://news.google.com/search?q=hantavirus" target="_blank" rel="noopener">Google News</a>,
     <a href="https://www.cdc.gov/hantavirus/data-research/cases/index.html" target="_blank" rel="noopener">CDC HPS surveillance</a>.
     Raw aggregated data: <a href="data.json">data.json</a>.
+    Source: <a href="https://github.com/M041997/hantavirus-tracker" target="_blank" rel="noopener">GitHub</a>.
     Not a medical resource — see CDC for guidance.
   </footer>
 </div>
+
+<script>
+  // Server-rendered data dump for the map.
+  window.HANTA = {
+    countries: [{"country": "Argentina", "lat": -38.4, "lng": -63.6, "count": 10, "latest_title": "Hantavirus is on the rise in Argentina, where a stricken cruise ship began its journey", "latest_url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPb0FiM2x4NmY4VF9leUdBZXBMSFh2TnJaUW5vSHNRWU9HcS14WEJEaEFKNzhYTHFGVzRkbzliRW0xb1NCUHB1QUhLMDlTRU5mZzFqbHo2WkJWaTk5aW9oaENXWEVHR21wXzViUnE0Tjc1d1VjQWlFSFMwclhWSGIxOE5YV2hKeTc1N0RaMnVGWm01akY1VTJR?oc=5", "latest_date": "8h ago", "items": [{"title": "Hantavirus is on the rise in Argentina, where a stricken cruise ship began its journey", "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPb0FiM2x4NmY4VF9leUdBZXBMSFh2TnJaUW5vSHNRWU9HcS14WEJEaEFKNzhYTHFGVzRkbzliRW0xb1NCUHB1QUhLMDlTRU5mZzFqbHo2WkJWaTk5aW9oaENXWEVHR21wXzViUnE0Tjc1d1VjQWlFSFMwclhWSGIxOE5YV2hKeTc1N0RaMnVGWm01akY1VTJR?oc=5", "source": "Google News \u00b7 AP News", "published": "8h ago"}, {"title": "HANTAVIRUS (04) \u2013 ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO, CONFIRMACI\u00d3N DE VIRUS ANDES", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "13h ago"}, {"title": "HANTAVIRUS - ARGENTINA (15): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, WHO SUMMARY", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "1 day ago"}, {"title": "HANTAVIRUS (03) \u2013 ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO, AUMENTO DE CASOS", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "2 days ago"}, {"title": "HANTAVIRUS (02) \u2013 ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO, CASOS SOSPECHOSOS,", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "2 days ago"}, {"title": "HANTAVIRUS - ARGENTINA (14): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, REQUEST FOR INFORMATION", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "2 days ago"}]}, {"country": "USA", "lat": 37.1, "lng": -95.7, "count": 1, "latest_title": "California among 3 states monitoring residents who were aboard hantavirus cruise ship", "latest_url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPYWMzbWxtNmVsTmtKM0VIMHVYM2Z1Tm81S29vdlNiMG9qQ3E2ekpnXy1tLXRLSTZPb3VnMHM1Sk1nOExWRkZTOEppQXA3cXdQNWtGTUZzZEdUR2p4WnBxUVhGOHA5Ymh3SmRCV0wzZGhlRzFoaXBKQlN6ZmVNMThqdDFfZEloZk4zcmgtZlQ5b01leFVvblNRNGlFVGpwVnpqbHg0Um5OdFNBUjNvcl9JektQQdIBuAFBVV95cUxPN3pjNUdUMl9SRVZ4ZXVMaEdpUUxUdDAwVlRjQVdIdDdwSlNndkpOdkhFV0lyWU1DYWF4MEVKMHBTWndjLVFIak41anZ1NWRraC1UMm1nV2haZkdXV0hLaTV1MzhGOFNtYUQ1aHlybXdBa0I4THZyMW10U3ZZSGQ5VlJqc1hDU2J2M29vM3RxWl9EcEVvdThIMXJUSExKSW41U0xTaFAzTllnWF9sd1JvR0Q4RlpVRVhp?oc=5", "latest_date": "1h ago", "items": [{"title": "California among 3 states monitoring residents who were aboard hantavirus cruise ship", "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPYWMzbWxtNmVsTmtKM0VIMHVYM2Z1Tm81S29vdlNiMG9qQ3E2ekpnXy1tLXRLSTZPb3VnMHM1Sk1nOExWRkZTOEppQXA3cXdQNWtGTUZzZEdUR2p4WnBxUVhGOHA5Ymh3SmRCV0wzZGhlRzFoaXBKQlN6ZmVNMThqdDFfZEloZk4zcmgtZlQ5b01leFVvblNRNGlFVGpwVnpqbHg0Um5OdFNBUjNvcl9JektQQdIBuAFBVV95cUxPN3pjNUdUMl9SRVZ4ZXVMaEdpUUxUdDAwVlRjQVdIdDdwSlNndkpOdkhFV0lyWU1DYWF4MEVKMHBTWndjLVFIak41anZ1NWRraC1UMm1nV2haZkdXV0hLaTV1MzhGOFNtYUQ1aHlybXdBa0I4THZyMW10U3ZZSGQ5VlJqc1hDU2J2M29vM3RxWl9EcEVvdThIMXJUSExKSW41U0xTaFAzTllnWF9sd1JvR0Q4RlpVRVhp?oc=5", "source": "Google News \u00b7 ABC7 Los Angeles", "published": "1h ago"}]}, {"country": "Taiwan", "lat": 23.7, "lng": 121.0, "count": 1, "latest_title": "HANTAVIRUS - TAIWAN (02): SECOND CASE OF THE YEAR", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "4 days ago", "items": [{"title": "HANTAVIRUS - TAIWAN (02): SECOND CASE OF THE YEAR", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "4 days ago"}]}],
+    arcs:      [{"from": "Argentina", "to": "USA", "from_latlng": [-38.4, -63.6], "to_latlng": [37.1, -95.7], "label": "Cruise passengers monitored on return"}, {"from": "Argentina", "to": "Chile", "from_latlng": [-38.4, -63.6], "to_latlng": [-35.7, -71.5], "label": "Cruise stopover"}, {"from": "Argentina", "to": "Brazil", "from_latlng": [-38.4, -63.6], "to_latlng": [-14.2, -51.9], "label": "Cruise stopover"}]
+  };
+</script>
+<script>
+(() => {
+  const map = L.map('map', {
+    zoomControl: true,
+    attributionControl: true,
+    worldCopyJump: true,
+    minZoom: 2,
+    maxZoom: 6,
+    maxBounds: [[-72, -200], [82, 200]],
+  }).setView([20, 0], 2);
+
+  L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+    {
+      subdomains: 'abcd',
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OSM</a> · © <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom: 19,
+    }
+  ).addTo(map);
+
+  L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
+    {
+      subdomains: 'abcd',
+      pane: 'shadowPane',
+      attribution: '',
+    }
+  ).addTo(map);
+
+  // ----- Markers -----
+  const maxCount = Math.max(1, ...window.HANTA.countries.map(c => c.count));
+
+  const escape = s => String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[c]);
+
+  const popupHtml = (c) => {
+    const items = c.items.map(i => `
+      <li>
+        <div class="src">${escape(i.source)} · ${escape(i.published || '')}</div>
+        <a href="${escape(i.url)}" target="_blank" rel="noopener">${escape(i.title)}</a>
+      </li>`).join('');
+    return `
+      <div class="popup-title">${escape(c.country)}</div>
+      <div class="popup-meta">${c.count} reports · last ${escape(c.latest_date || '')}</div>
+      <ul class="popup-list">${items}</ul>`;
+  };
+
+  window.HANTA.countries.forEach(c => {
+    const big = c.count >= Math.max(3, maxCount * 0.5);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div class="pulse-marker ${big ? 'large' : ''}">
+               <div class="ring"></div><div class="core"></div>
+             </div>`,
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+    });
+    L.marker([c.lat, c.lng], { icon, title: `${c.country} · ${c.count} reports` })
+      .bindPopup(popupHtml(c), { maxWidth: 320 })
+      .addTo(map);
+  });
+
+  // ----- Spread arcs (great-circle approximation) -----
+  const greatCircle = (a, b, segs = 64) => {
+    // Convert to radians
+    const toRad = d => d * Math.PI / 180;
+    const toDeg = r => r * 180 / Math.PI;
+    const [lat1, lon1] = a.map(toRad);
+    const [lat2, lon2] = b.map(toRad);
+    const d = 2 * Math.asin(Math.sqrt(
+      Math.sin((lat2 - lat1)/2) ** 2 +
+      Math.cos(lat1) * Math.cos(lat2) * Math.sin((lon2 - lon1)/2) ** 2
+    ));
+    if (d === 0) return [a, b];
+    const pts = [];
+    for (let i = 0; i <= segs; i++) {
+      const f = i / segs;
+      const A = Math.sin((1 - f) * d) / Math.sin(d);
+      const B = Math.sin(f * d) / Math.sin(d);
+      const x = A * Math.cos(lat1) * Math.cos(lon1) + B * Math.cos(lat2) * Math.cos(lon2);
+      const y = A * Math.cos(lat1) * Math.sin(lon1) + B * Math.cos(lat2) * Math.sin(lon2);
+      const z = A * Math.sin(lat1) + B * Math.sin(lat2);
+      const lat = Math.atan2(z, Math.sqrt(x*x + y*y));
+      const lon = Math.atan2(y, x);
+      pts.push([toDeg(lat), toDeg(lon)]);
+    }
+    return pts;
+  };
+
+  window.HANTA.arcs.forEach(arc => {
+    const path = greatCircle(arc.from_latlng, arc.to_latlng);
+    L.polyline(path, { className: 'spread-arc' })
+      .bindTooltip(`${arc.from} → ${arc.to}<br><span style="color:#8a99ab">${arc.label}</span>`, {
+        direction: 'top', sticky: true, opacity: 0.95,
+      })
+      .addTo(map);
+  });
+
+  // Fit to data bounds if any markers, else default world view.
+  if (window.HANTA.countries.length) {
+    const bounds = L.latLngBounds(window.HANTA.countries.map(c => [c.lat, c.lng]));
+    map.fitBounds(bounds.pad(0.4), { maxZoom: 3 });
+  }
+})();
+</script>
 </body>
 </html>
