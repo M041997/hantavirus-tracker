@@ -41,10 +41,19 @@ jobs:
           git add docs/index.html docs/data.json
           if git diff --cached --quiet; then
             echo "No content changes."
-          else
-            git commit -m "build: refresh feed $(date -u +%Y-%m-%dT%H:%MZ)"
-            git push
+            exit 0
           fi
+          git commit -m "build: refresh feed $(date -u +%Y-%m-%dT%H:%MZ)"
+          # Race with manual pushes: rebase + retry up to 3 times.
+          for i in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "push failed (attempt $i), rebasing onto remote..."
+            git fetch origin main
+            git rebase --strategy-option=ours origin/main || git rebase --abort
+          done
+          # Don't fail the workflow: artifact upload + Pages deploy still work
+          # from the locally-built docs/ even without the commit landing.
+          echo "::warning::Could not push commit after retries; site will still deploy from artifact."
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
