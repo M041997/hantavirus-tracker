@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hantavirus Tracker — global outbreak feed</title>
+<meta name="description" content="Aggregated, hourly-updated tracker of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC surveillance.">
+<meta property="og:title" content="Hantavirus Tracker">
+<meta property="og:description" content="Hourly-updated global hantavirus outbreak and news aggregator.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2250%22 font-size=%2256%22>&#129440;</text></svg>">
+<style>
+  :root {
+    --bg: #0c1116;
+    --panel: #161d26;
+    --panel-2: #1d2632;
+    --ink: #e8eef5;
+    --muted: #8a99ab;
+    --accent: #ff5757;
+    --accent-2: #ffb84d;
+    --good: #58c897;
+    --line: #28323e;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: #7cc1ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
+  header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 24px;
+  }
+  header h1 {
+    margin: 0; font-size: 28px; letter-spacing: -0.02em;
+  }
+  header h1 .dot {
+    display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent); margin-right: 10px;
+    box-shadow: 0 0 0 4px rgba(255,87,87,.18);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(255,87,87,.18); }
+    50%      { box-shadow: 0 0 0 10px rgba(255,87,87,0); }
+  }
+  .meta { color: var(--muted); font-size: 13px; }
+  .meta code { background: var(--panel); padding: 2px 6px; border-radius: 4px; }
+
+  .grid {
+    display: grid; gap: 18px;
+    grid-template-columns: repeat(12, 1fr);
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 20px;
+  }
+  .card h2 {
+    margin: 0 0 12px; font-size: 16px; letter-spacing: 0.02em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .span-12 { grid-column: span 12; }
+  .span-8  { grid-column: span 8; }
+  .span-6  { grid-column: span 6; }
+  .span-4  { grid-column: span 4; }
+  @media (max-width: 800px) {
+    .span-8, .span-6, .span-4 { grid-column: span 12; }
+  }
+
+  /* Outbreak strip */
+  .outbreaks {
+    display: flex; flex-wrap: wrap; gap: 10px;
+  }
+  .outbreak {
+    flex: 1 1 220px;
+    background: linear-gradient(135deg, #2a1316, #1d1218);
+    border: 1px solid #4a1e22;
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .outbreak .country {
+    font-weight: 700; color: var(--accent-2); letter-spacing: 0.02em;
+  }
+  .outbreak .count {
+    float: right; background: rgba(255,87,87,.12);
+    color: var(--accent); padding: 2px 8px; border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+  }
+  .outbreak .latest {
+    margin-top: 8px; font-size: 13px; color: var(--ink);
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .outbreak .when { color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+  /* Stat tiles */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .stat {
+    background: var(--panel-2); border-radius: 10px; padding: 12px 14px;
+  }
+  .stat .v { font-size: 22px; font-weight: 700; }
+  .stat .k { color: var(--muted); font-size: 12px; text-transform: uppercase;
+             letter-spacing: 0.06em; margin-top: 2px; }
+  @media (max-width: 600px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+  /* Item lists */
+  ul.items { list-style: none; padding: 0; margin: 0; }
+  ul.items li {
+    padding: 10px 0; border-bottom: 1px solid var(--line);
+  }
+  ul.items li:last-child { border-bottom: 0; }
+  ul.items .title { font-weight: 600; line-height: 1.35; }
+  ul.items .row {
+    display: flex; gap: 8px; align-items: center; margin-top: 4px;
+    color: var(--muted); font-size: 12px; flex-wrap: wrap;
+  }
+  ul.items .src { color: var(--good); }
+  ul.items .src.promed { color: var(--accent-2); }
+
+  footer {
+    margin-top: 40px; color: var(--muted); font-size: 12px;
+    border-top: 1px solid var(--line); padding-top: 16px;
+  }
+  footer a { color: var(--muted); text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="dot"></span>Hantavirus Tracker</h1>
+    <div class="meta">
+      Updated <code>2026-05-07 13:46 UTC</code> · rebuilds hourly
+    </div>
+  </header>
+
+  
+  <div class="card span-12" style="margin-bottom: 18px;">
+    <h2>Active clusters (last 60 days)</h2>
+    <div class="outbreaks">
+      
+      <div class="outbreak">
+        <span class="count">10 reports</span>
+        <div class="country">Argentina</div>
+        <div class="latest">
+          <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxOTkljVjlJUW1IOXdhQTIza1pudHVyS3VrRlpJUXl0V1RUWTVaSjh6RXRXQlR1WG1oNzhRMDJ4SlMtQ2FmSVNpYmpkXzVRQmRTT2NDZEdvTlJfTjlEcm9wdEo0bHRzSFE1dlprNHQxSTBzc3NESW1HX3BnWUUwS0FpMDY3R0FZMURPUGdNODhEUnkwaFNuSW1sSy1sZE01WUFfcHRHakRaX3VWeUFmcjNQN3BB?oc=5" target="_blank" rel="noopener">Hantavirus on the rise in Argentina, where MV Hondius cruise ship set sail</a>
+        </div>
+        <div class="when">latest: 5h ago</div>
+      </div>
+      
+    </div>
+  </div>
+  
+
+  <div class="grid">
+    <div class="card span-8">
+      <h2>ProMED-mail · official outbreak alerts</h2>
+      
+      <ul class="items">
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS (04) – ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO, CONFIRMACIÓN DE VIRUS ANDES</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>13h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - ARGENTINA (15): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, WHO SUMMARY</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>1 day ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS (03) – ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO, AUMENTO DE CASOS</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>2 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS (02) – ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO, CASOS SOSPECHOSOS,</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>2 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - ARGENTINA (14): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, REQUEST FOR INFORMATION</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>2 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - ARGENTINA (13: CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, ADDITIONAL DETAILS</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>2 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - ARGENTINA (12): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, REQUEST FOR INFORMATION</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>3 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - ARGENTINA (11): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, REQUEST FOR INFORMATION</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>3 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS – ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>4 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - TAIWAN (02): SECOND CASE OF THE YEAR</a>
+          </div>
+          <div class="row">
+            <span class="src promed">ProMED-mail</span>
+            <span>·</span><span>4 days ago</span>
+          </div>
+        </li>
+        
+      </ul>
+      
+    </div>
+
+    <div class="card span-4">
+      <h2>CDC US snapshot</h2>
+      <div class="stats">
+        <div class="stat"><div class="v">890</div>
+          <div class="k">Total cases</div></div>
+        <div class="stat"><div class="v">35%</div>
+          <div class="k">Fatality rate</div></div>
+        <div class="stat"><div class="v">859</div>
+          <div class="k">HPS cases</div></div>
+        <div class="stat"><div class="v">94%</div>
+          <div class="k">West of Miss.</div></div>
+      </div>
+      <p class="meta" style="margin-top:12px;">
+        Surveillance period 1993 – 2023.
+        Median age 38, 62% male.
+        <a href="https://www.cdc.gov/hantavirus/data-research/cases/index.html" target="_blank" rel="noopener">Source: CDC</a>.
+      </p>
+    </div>
+
+    <div class="card span-12">
+      <h2>News &amp; press · last 25 items</h2>
+      
+      <ul class="items">
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMif0FVX3lxTFB3a3JoR281RFBZYWUzalFFX0ZSUFNCQ2tmVFhMX24yRy1kWGJUTjRzZTU4c3dEb0ZPa0h4TUdLSUl2TGtqY3RKMTJPN2RRSEJmN3RDc0lZaUZVdk8wZzZrQVdMbjNWQkVJN0ZYS2kycFJPZW5UdzBza1FSX3NXYms?oc=5" target="_blank" rel="noopener">Inside the Global Effort to Figure Out Where Hantavirus Will Strike Next</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · WSJ</span>
+            <span>·</span><span>2h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQbGpxMGc1dFg2Skl4QjluSWFWeHdzbTNTa1l1R3RuUmtOelY1RTFDR0Y2RHM2U2dBbUEyOS02REFRUHpUM3h1dExKb1JrM2xaWlU1cG5Bd3Q4Q3lfVjk1NXAwMzhtQVVHU1JJcVlyeGkxdy1OYjlFSGhKTktHdzRXYWtEaUFCVVVycWtScW9LYlZJWnc5N09CRnB4NFNJN3dv?oc=5" target="_blank" rel="noopener">Hantavirus outbreak: Flight attendant hospitalized</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · NBC News</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5fOXdPSXg0Tm9HQ2RWRHJzUGgwc25lR29aZngxeHpSZE1kY0I3MnZNWXg4Y05SakJxZGJSNXB6Q2dfcV9tWEN3dXBIaUxZeHkxQkpFV3dwc29WQQ?oc=5" target="_blank" rel="noopener">How worried should we be about hantavirus?</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · BBC</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiggFBVV95cUxPTU9TN2lob0g1ZUQ4RFQ5dzlMY09oSnFJSTFtcjRtb1BRNkVXQll1MXBNSjluaXIyTDZIc2g4STl3dXpRMnJ2NFo1WVhndWcxLWdNdkRlX0J4am9mLTVBbTdNaWY0em14SDJOemdpYVZZcFlSSVE4VHJHdU1wV3R6ekxn?oc=5" target="_blank" rel="noopener">What to Know About the Hantavirus Outbreak on an Atlantic Cruise Ship</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The New York Times</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMivwFBVV95cUxNU09KTExTUDV0M3BOSjBMcVBmVDZhZkVuRV9taUFRWW5mRFA0RWxZUUhYSDVyZ0d6SmVGaWJHWWhZdHdKYjZjZXZhcVdIVkdsa2ZrRnM3ZTZDWkczSnV3ZFBqWnQwRGQ4V2t5R3hqeHpXWUFHYnJJMFZ2blNLYXl0clJMeW45QkYzQi1pQ1psdm9fbWxfS0k4TncxU3lKNTN6aUVGa05aZjBtaHV6d2h4UmVhdURmdXAyRm1lUWsybw?oc=5" target="_blank" rel="noopener">U.S. monitoring hantavirus cruise passengers; dozens left ship after 1st death</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · NBC News</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMimwFBVV95cUxOSi1BdTlac293c2RtWXNYNmYzWXBaQXFjaEZWbmxEdjlTQXpZV25TQ2VnX0dHWWFzVVFVVU5rbUNKT05DbGNkLVY3T0pISGtpVG1tTkhUYXMzRUNHa3h2eGdWNVdQODJ1d3JaQjZhRDVld2JkeTN1cFQ4cUN6LXVsY1Job3k5enhObTNPenVUZ20tSkxHSE8ycXFacw?oc=5" target="_blank" rel="noopener">What to know about hantavirus, the illness linked to a cruise ship outbreak</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>1 day ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxPQkZmcmRHMXJvTzAyMDhJa0lDbUg0NEg4NHJXeEJ3SDBSdUhUbThHUDFjZXZldkhsZXI4ZUdsYjlhMmNVZUJrWEROeWlvaVl0dWlUb0wzRlBYNGZiMmZJbnVLNVRVOVNlbVcxREZCMTI4MnBDdG1tbERtbEdPbFBvZWVNcGJGYm04UUtIX0RwaFpVay0wWDhGWmVVOEtkX051Rmc?oc=5" target="_blank" rel="noopener">Public health experts are worried about the cruise ship hantavirus outbreak, but not for the reason you might think</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · statnews.com</span>
+            <span>·</span><span>3h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMigwFBVV95cUxNRUt3dklNYURBOV8wNmR4T0k4a212MWlveE9uMUxtRFlEdzlaZ3RaUlNSVkF5ODNtaTUxbVY2SUFibHlwU3pqS2hBTGpRZjRqc1k2YmFDOEx6dm9HRFVfT1FGMEN1VTBoLUQ3YlY4eV9HZ2I0UkhCRWw0aHNsU1RjdnJLZw?oc=5" target="_blank" rel="noopener">What Countries Are Linked to the Hantavirus Outbreak?</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · Time Magazine</span>
+            <span>·</span><span>4h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiswFBVV95cUxPYWMzbWxtNmVsTmtKM0VIMHVYM2Z1Tm81S29vdlNiMG9qQ3E2ekpnXy1tLXRLSTZPb3VnMHM1Sk1nOExWRkZTOEppQXA3cXdQNWtGTUZzZEdUR2p4WnBxUVhGOHA5Ymh3SmRCV0wzZGhlRzFoaXBKQlN6ZmVNMThqdDFfZEloZk4zcmgtZlQ5b01leFVvblNRNGlFVGpwVnpqbHg0Um5OdFNBUjNvcl9JektQQdIBuAFBVV95cUxPN3pjNUdUMl9SRVZ4ZXVMaEdpUUxUdDAwVlRjQVdIdDdwSlNndkpOdkhFV0lyWU1DYWF4MEVKMHBTWndjLVFIak41anZ1NWRraC1UMm1nV2haZkdXV0hLaTV1MzhGOFNtYUQ1aHlybXdBa0I4THZyMW10U3ZZSGQ5VlJqc1hDU2J2M29vM3RxWl9EcEVvdThIMXJUSExKSW41U0xTaFAzTllnWF9sd1JvR0Q4RlpVRVhp?oc=5" target="_blank" rel="noopener">California among 3 states monitoring residents who were aboard hantavirus cruise ship</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · ABC7 Los Angeles</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMimAFBVV95cUxQMmdLTGZLOGVHV3hOdzZuNXU1ejV1SC1KekhkWVVBZngtMHNJclFLMWVjUXZfVVBUWlBvVFNXbmZST2tqN0lPUlJObHNZMXZsMkFLUVIzMnF3enVvT3BOLTIwRVRnWUJIa2xLUzZmMERSdTctWGdfcXZBUGEySm9jRVFkRDJwZkFoRmpqMVBnNHMzZ0RqSzZtTA?oc=5" target="_blank" rel="noopener">Authorities scramble to limit hantavirus outbreak, trace contacts around globe</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The Washington Post</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTFB4ejFDMy1sV3hqYUU2M0t4ck90UDdqLTU0V2dmWjZxYTRnaVJoeDdOcFlkMGZ6MlVBWVpCTVBXVTE1R2ZubVRCY0FhWDJDNHVSby1QUUp1ZV9PUQ?oc=5" target="_blank" rel="noopener">Hantavirus-hit cruise ship on way to Canary Islands after three evacuated</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · BBC</span>
+            <span>·</span><span>4h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxPbEpVbXdaN3Z2bXFyVlBOWkFvTm9ESzVBTFBYS1lJWnYzenJUSnJXNmRvaDBTT2RKVGI3X2d6bDduQnZ6QzYxeGtQdjVIdGZELXMzVGktN2Z6bllzaWRfLWpFS01zOHU3Q1RxQy16OEpMTWlTUndCb1BXYmNOU2lTcmJZYVFhVUZMajFUWA?oc=5" target="_blank" rel="noopener">Dutch Flight Attendant Is Tested for Hantavirus</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The New York Times</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5WX3FzX3VwMlh5aWhGWFhKSWxrN3dlUDctSWpiVVNHeFZJM29qbUtJdWJYcGVJbGRVMGlzLVpUOTIyTTNKVUp2aHBLb2xhUENma0tvTUNLZ0llQQ?oc=5" target="_blank" rel="noopener">Hantavirus: Race to trace passengers who left MV Hondius at St Helena</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · BBC</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMid0FVX3lxTE5fWm5ya2s4bXFVRWVLWU4zVFl3aHI3VmExeFBlb1d1VFNYZ29SY3h2bWFvcGNaOTZJeFRoUVZyVUFKQVA2Mjh6Q1Ffb0F3WGkyN1o1MFlldkx2UzQtTFVWSURmdC1WakVSeF93YzJ6QndyUUVoLTBZ?oc=5" target="_blank" rel="noopener">Hantavirus Patients Land in Amsterdam With More Cruise Ship Evacuations Planned</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The New York Times</span>
+            <span>·</span><span>8h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMijwJBVV95cUxOSlFtUW11b3hCRVJiZVB4TEI2U2FTaVQ4WmdMWkQ1Z2tVZ25BSy02M2tjaVNpRWFNU2ExOGRKaDJra0dzaUw5N09sMlVZZm5CZDcwWUJ5MzJVTGtjMGt3VHVpUEp0b0V0bjBMd1dnUzhEdmQ3QzBwc3JPN2VFaG1RbG1ZdFYxNkpCb3dzOWt0Zko1bEhFM0QxN1RwVmlpUDhqWU9hZURoRF9tZVZueFJtVGV1UDF2RUJMNFFNNHV0ek9ubHQwRWd6YmlvdGlEZkhadnRkUk84eE05QmduWWllc2dtcE5URmhkY1VJS0FnaXlfMERSQ0x1SFRNQ05jc3hweHU1UXZhZ1ZWMExxRUNr0gGjAkFVX3lxTE9Bd3JPVWVCVGZ1UWM3V2cxYzlCMDhGYTFOSzdDQm11Ni1sQzg4ZTBzei10cVVyaTlVYkxFNzMxa3dKNG9LdHp5elFkQlEzeXA3RE81d0ktRlAzWXloc0JVVHZ5SnRtT1ZNd0NUNkIxUko3d1pKbWRlcHN0dGZRaktOX0Y4YkFhN1VpSmVnbGxkMU1zVUlkQXprTG5xcy0tWFRDOThoa2pzbWFrWjZhbkhNdTZDbFJRdnhZM0NScEhTUmNZVVkwakNaVzRmczJOYmd5Y2lRYjZuM1U5eEVvc1JfclNDU3QxZkdNMEhzcFl6dEVQTy1XdGZxRnpaNE1QQzNKTi1sS3lMSFdfdjFUU1dySTFVWElIYnZGdlk3SkpRamhZWQ?oc=5" target="_blank" rel="noopener">Cruise ship passengers trace the origin of the hantavirus outbreak: ‘It’s being said here that it may have been the Dutch couple’</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · EL PAÍS English</span>
+            <span>·</span><span>4h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiogFBVV95cUxNZmNZejZKdFYtbGQ1b0poNC1wdmo3cUVmZUI5OWoyOWt3RVh4VkNSNWdGa1FyVFE5dDBrcHFQM0c1MjlzS0xxbkREUXkycEZjZ2NhU2w4ejB4LUxqR3Q1V2tCS054cXg1UTVQdk9oSnI0aUtnLVNQNWN2dHFJY3VNNzh6cWsyNEd4ejRQYlFJMFF3MHBEUnpZNGFPLUJGclBNenc?oc=5" target="_blank" rel="noopener">Hantavirus scare on cruise ship prompts WHO response</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · News-Medical</span>
+            <span>·</span><span>2h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMi8gFBVV95cUxPMlQ0NjFWREhEcEY1aGxPdGVaWEZoYXhyTkR0UEV4YWw2Y3JfNEVrS2ZhWl9iQ3JPeWlVR3VoOGpOdXlxY05NUTR3NjZKendwS3I2NUpLQzNCaF9Tc2hTU29CTUxZeVh6aTZxQ01iWHdRTk9LQTMwMldWSDNVSjU5VEI4ZUw0bXB1ZEFzdzJaWVR1ZHd0Q0p2dUdzQ3ktMktYcWtWNDF5WGhlS1BHU0dwSWF1WkhxalkxRUlzM21oN1lqVTkyV1U4MnVhU1R1SURFWUxFS0xTb1M4a0xlaEd5cVpYUFRqODg3Z1B2anFFcWNmUQ?oc=5" target="_blank" rel="noopener">29 Passengers Got Off Hantavirus Cruise Ship After First Death—Flight Attendant Hospitalized With Symptoms</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · Forbes</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxOTkljVjlJUW1IOXdhQTIza1pudHVyS3VrRlpJUXl0V1RUWTVaSjh6RXRXQlR1WG1oNzhRMDJ4SlMtQ2FmSVNpYmpkXzVRQmRTT2NDZEdvTlJfTjlEcm9wdEo0bHRzSFE1dlprNHQxSTBzc3NESW1HX3BnWUUwS0FpMDY3R0FZMURPUGdNODhEUnkwaFNuSW1sSy1sZE01WUFfcHRHakRaX3VWeUFmcjNQN3BB?oc=5" target="_blank" rel="noopener">Hantavirus on the rise in Argentina, where MV Hondius cruise ship set sail</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · France 24</span>
+            <span>·</span><span>5h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxNOF83TTNRRWpKNndvel9XcFhacHkxZHlYU095WWJDeUZpa1ZmTy0ybVFuWDVRd1c3R3lybFVIOVhWaGdoOUVXU19nNnBfcHQ2YjBIZXZsZkpqUS1fYXkwc0NUWDdsakRhR1ZJN3ZReEpSbDBxMk5rMllxNWQ1UGR1eWE3UHJLWDRpWmo4ZUNYOFJuaDRkZ01BUkJYMnRhZ1FmYzJzWWpWTG8?oc=5" target="_blank" rel="noopener">Inside the cruise ship at the center of a deadly hantavirus outbreak</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>1 day ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiugFBVV95cUxQMlRaellHNWVFdHlvN3FwYUYtUGdVa3Jub1dIVmdhNUZrbWFXS3dvdDFhd1lIZzZSLWxVU1VkeVh3ZHdZWWhuTmh1Qk04LTdMMm1lMk5kQjFwV1U5LUJKZnZnOFJqUVRsX1U2S0lSbUZjQWV4a0lyN09SWlpCSWJLREl4ZC1wbFZqc05VREVubVBlYUhKMWJpSEpOY0lOeDB5Q3hpVm4yRXo5S0NHNmRrSnZKRUtUWUprWmc?oc=5" target="_blank" rel="noopener">Hantavirus being monitored in US. Latest on illnesses, cruise outbreak</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · USA Today</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE8zWWNSSE1ySENvRVJRT0hwdHlvUW5qU3NYZE9RbE0tTTB4eHhGRmI2dkpHdmhGa0ZfMXhnYVh3T0VlNzJVX196cUtlT1RMZnBhNmNVUVFLYVFIUQ?oc=5" target="_blank" rel="noopener">Hantavirus: What is the cruise ship virus and how is it spread?</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · BBC</span>
+            <span>·</span><span>9h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxOejVqcGhnTGp2dmhpcGZPRXpEdjYxN1hQb21MeUVhUm1ValZ2aWt5NlRuaHhNQ3cwLVVCT0pnU2IzeGU1ZVdfMDhZWkdKR1Y0LVByU3lib0NoSmFRem1oRGlZYjRtT1J4elFKb1c0a3lFVi00T2g2M25aeGZSZTkzaEcyNVZGQ2lqT05EMmZtR3I4MGpuM2NzVzhFWW1TaWhEZG1zd2V1YU5XV1RP?oc=5" target="_blank" rel="noopener">Cruise ship with hantavirus outbreak heads to Canary Islands after 3 are evacuated</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · AP News</span>
+            <span>·</span><span>15h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiwwFBVV95cUxPZWI3TEtmWlRBbzlRRmRSbWpRTm1raTJJNnI0N2lhNEhCak5nUjZfSjVNS3duWXpqWEpaT1hoVEtiYTZCeDFfcW5GODdEdm1IaDBIU2dsSVRpcEFSM2RrYTBnMXEtdmhleWZteW0xWEt6RmhxZFljQXdQd2hhXzJCUHRpZGctSGY3VFlsaHVwRWhzeFRkbG1LYWhsaENfdDYxWDExbTlOcTZqRnY0QUx1cjRIMFNQdF90Mjd6bUFWRWc2Qk0?oc=5" target="_blank" rel="noopener">US monitoring passengers returning from ship in hantavirus outbreak</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · USA Today</span>
+            <span>·</span><span>1h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxQTDQ3cXVNMGdPY1ZFclBMUVZXQzVTRzBwYXV0RGFHR0VGeXAxbGZFRmxLSEgtWUt1WEllUENRTlZDRWtqcldnTzV6M1dOVXhHc252SzN6eXpTLTVWWXVfZmc3OWhudHFnTmlVVE84SDJHcTZ0Ty1EY3VXX0JzQm16cTRCZUJFdEF3dHdEZEVzMmttWWx5dUh6ckhlSlBWdE1Ta0t6WGhmaUk?oc=5" target="_blank" rel="noopener">The hantavirus cruise ship outbreak is a dangerous experiment</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · Scientific American</span>
+            <span>·</span><span>17h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiyAFBVV95cUxQZ1NvWi1FNDJ6WHQ5dVhmdkpjLTYxZjdpWDRNOHVIQ2t5ZTNhWmt0aWo1YUFUVF9tTWVIQV9yV3FIcnBrTk1iemhhbThYc2VsY25tTHd5Ym1BNHNYVWtTaExISUpoMnBUb2R2ZjlkZDlQenlKZXhiNTI4Z0g5ZGdPV1o5MVBuSFViMHhORjRteGR0ems2MzdZVXlqa3RsUE1tUkh3a2x1LTJzcGlhcHNxamlTYUFlTGJFME94UXIzdHB5X0gxejQ4dQ?oc=5" target="_blank" rel="noopener">I’ve investigated a hantavirus outbreak. Here’s what I can tell you about the cruise ship cluster</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The Conversation</span>
+            <span>·</span><span>8h ago</span>
+          </div>
+        </li>
+        
+      </ul>
+      
+    </div>
+  </div>
+
+  <footer>
+    Sources: <a href="https://promedmail.org/?s=hantavirus" target="_blank" rel="noopener">ProMED-mail</a>,
+    <a href="https://news.google.com/search?q=hantavirus" target="_blank" rel="noopener">Google News</a>,
+    <a href="https://www.cdc.gov/hantavirus/data-research/cases/index.html" target="_blank" rel="noopener">CDC HPS surveillance</a>.
+    Raw aggregated data: <a href="data.json">data.json</a>.
+    Not a medical resource — see CDC for guidance.
+  </footer>
+</div>
+</body>
+</html>
