@@ -78,6 +78,120 @@ HONDIUS_VESSEL = {
 }
 
 
+WHO_DON_URL = (
+    "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599"
+)
+# Final fallback if WHO scrape fails — figures from WHO DON599 (4 May 2026).
+HONDIUS_OUTBREAK_FALLBACK = {
+    "cases_total": 7,
+    "cases_confirmed": 2,
+    "cases_suspected": 5,
+    "deaths": 3,
+    "critical": 1,
+    "on_board": 147,
+    "passengers": 88,
+    "crew": 59,
+    "as_of": "2026-05-04",
+    "source": "WHO DON599",
+    "source_url": WHO_DON_URL,
+}
+
+WORD_NUMBERS = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+    "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14,
+    "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+    "nineteen": 19, "twenty": 20,
+}
+
+
+def _to_int(s: str) -> int | None:
+    s = s.strip().lower()
+    if s.isdigit():
+        return int(s)
+    return WORD_NUMBERS.get(s)
+
+
+def fetch_hondius_outbreak_counts() -> dict:
+    """Scrape WHO DON599 for current Hondius cluster counts.
+
+    Returns the parsed dict, or HONDIUS_OUTBREAK_FALLBACK if scraping or
+    parsing fails (so the site never shows blank counters).
+    """
+    try:
+        r = requests.get(WHO_DON_URL, headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"[who] fetch failed, using fallback: {exc}", file=sys.stderr)
+        return HONDIUS_OUTBREAK_FALLBACK
+    text = BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True)
+    out = dict(HONDIUS_OUTBREAK_FALLBACK)
+
+    # "seven cases (two laboratory confirmed cases of hantavirus and five
+    #  suspected cases) have been identified, including three deaths,
+    #  one critically ill patient ..."
+    m = re.search(
+        r"([A-Za-z]+|\d+)\s+cases?\s*\(\s*([A-Za-z]+|\d+)\s+laboratory\s+"
+        r"confirmed[^()]*?([A-Za-z]+|\d+)\s+suspected",
+        text,
+        re.IGNORECASE,
+    )
+    if m:
+        total = _to_int(m.group(1))
+        conf = _to_int(m.group(2))
+        susp = _to_int(m.group(3))
+        if total is not None: out["cases_total"] = total
+        if conf is not None:  out["cases_confirmed"] = conf
+        if susp is not None:  out["cases_suspected"] = susp
+
+    m = re.search(
+        r"including\s+([A-Za-z]+|\d+)\s+deaths?",
+        text, re.IGNORECASE,
+    )
+    if m:
+        d = _to_int(m.group(1))
+        if d is not None: out["deaths"] = d
+
+    m = re.search(
+        r"([A-Za-z]+|\d+)\s+critically\s+ill",
+        text, re.IGNORECASE,
+    )
+    if m:
+        c = _to_int(m.group(1))
+        if c is not None: out["critical"] = c
+
+    m = re.search(
+        r"total of\s+(\d+)\s+individuals?,?\s+including\s+(\d+)\s+passengers"
+        r"\s+and\s+(\d+)\s+crew",
+        text, re.IGNORECASE,
+    )
+    if m:
+        out["on_board"]   = int(m.group(1))
+        out["passengers"] = int(m.group(2))
+        out["crew"]       = int(m.group(3))
+
+    # "As of 4 May 2026" — extract date
+    m = re.search(
+        r"[Aa]s of (\d{1,2})\s+"
+        r"(January|February|March|April|May|June|July|August|"
+        r"September|October|November|December)\s+(\d{4})",
+        text,
+    )
+    if m:
+        try:
+            d = dt.datetime.strptime(
+                f"{m.group(1)} {m.group(2)} {m.group(3)}", "%d %B %Y"
+            )
+            out["as_of"] = d.strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+
+    out["fetched_at"] = dt.datetime.now(dt.timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+    return out
+
+
 def fetch_hondius_position() -> dict | None:
     """Scrape CruiseMapper for the Hondius's current AIS position.
 
@@ -598,6 +712,15 @@ def main() -> int:
     else:
         print("[build]   Hondius position unavailable", file=sys.stderr)
 
+    print("[build] fetching WHO DON599 outbreak counts...", file=sys.stderr)
+    hondius_counts = fetch_hondius_outbreak_counts()
+    print(
+        f"[build]   cases={hondius_counts['cases_total']} "
+        f"deaths={hondius_counts['deaths']} "
+        f"as_of={hondius_counts['as_of']}",
+        file=sys.stderr,
+    )
+
     all_items = sort_by_date(dedupe_by_title(promed + news))
     clusters = cluster_by_country(all_items)
     outbreaks = detect_active_outbreaks(clusters)
@@ -630,8 +753,11 @@ def main() -> int:
         "analytics_code": ANALYTICS_CODE,
         "vessel": HONDIUS_VESSEL,
         "vessel_position": hondius_pos,
+        "vessel_counts": hondius_counts,
         "vessel_json": json.dumps(
-            {**HONDIUS_VESSEL, "position": hondius_pos} if hondius_pos else None
+            {**HONDIUS_VESSEL,
+             "position": hondius_pos,
+             "counts": hondius_counts} if hondius_pos else None
         ),
     }
     OUT.mkdir(parents=True, exist_ok=True)
@@ -650,7 +776,11 @@ def main() -> int:
         "outbreaks": outbreaks,
         "country_index": country_index,
         "spread_arcs": spread_arcs,
-        "vessel": {**HONDIUS_VESSEL, "position": hondius_pos},
+        "vessel": {
+            **HONDIUS_VESSEL,
+            "position": hondius_pos,
+            "counts": hondius_counts,
+        },
         "cdc_snapshot": CDC_SNAPSHOT,
         "items": [
             {

@@ -313,14 +313,26 @@
 
   <div class="hud hud-tr">
     <div class="stat-strip">
-      <div class="stat-tile"><div class="v alert">{{ active_country_count }}</div>
-        <div class="k">Active countries</div></div>
-      <div class="stat-tile"><div class="v warn">{{ reports_today }}</div>
-        <div class="k">Reports today</div></div>
-      <div class="stat-tile"><div class="v">{{ promed_count + news_count }}</div>
-        <div class="k">Items tracked</div></div>
-      <div class="stat-tile"><div class="v alert">{{ cdc.case_fatality_rate_pct }}%</div>
-        <div class="k">US CFR · CDC</div></div>
+      <div class="stat-tile"
+           title="Hondius cluster — confirmed + suspected — WHO DON599">
+        <div class="v warn">{{ vessel_counts.cases_total }}</div>
+        <div class="k">Cases · Hondius</div>
+      </div>
+      <div class="stat-tile"
+           title="Hondius cluster fatalities — WHO DON599">
+        <div class="v alert">{{ vessel_counts.deaths }}</div>
+        <div class="k">Deaths · Hondius</div>
+      </div>
+      <div class="stat-tile"
+           title="Active countries with reports in last 60 days">
+        <div class="v">{{ active_country_count }}</div>
+        <div class="k">Active countries</div>
+      </div>
+      <div class="stat-tile"
+           title="US case fatality rate, all hantavirus 1993–2023">
+        <div class="v alert">{{ cdc.case_fatality_rate_pct }}%</div>
+        <div class="k">US CFR · CDC</div>
+      </div>
     </div>
   </div>
 
@@ -344,8 +356,36 @@
     {% if vessel_position %}
     <div class="card span-12" style="border-color: #4a3a1e;
          background: linear-gradient(135deg, #2a2113, #1a1812);">
-      <h2 style="color: var(--accent-2);">Outbreak vessel · live AIS</h2>
-      <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: baseline;">
+      <h2 style="color: var(--accent-2);">Outbreak vessel · live counters</h2>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
+        <div class="stat-tile" style="background: rgba(255,184,77,0.08); border-color: #4a3a1e;">
+          <div class="v warn">{{ vessel_counts.cases_total }}</div>
+          <div class="k">Total cases</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(88,200,151,0.08); border-color: #1e4a35;">
+          <div class="v" style="color: var(--good);">{{ vessel_counts.cases_confirmed }}</div>
+          <div class="k">Lab confirmed</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,184,77,0.05); border-color: #3a2e1a;">
+          <div class="v warn">{{ vessel_counts.cases_suspected }}</div>
+          <div class="k">Suspected</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,59,59,0.10); border-color: #4a1e22;">
+          <div class="v alert">{{ vessel_counts.deaths }}</div>
+          <div class="k">Deaths</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,59,59,0.05); border-color: #3a1c1f;">
+          <div class="v alert">{{ vessel_counts.critical }}</div>
+          <div class="k">Critical</div>
+        </div>
+        <div class="stat-tile">
+          <div class="v">{{ vessel_counts.on_board }}</div>
+          <div class="k">On board ({{ vessel_counts.passengers }}+{{ vessel_counts.crew }})</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: baseline; margin-bottom: 10px;">
         <div style="flex: 1 1 240px;">
           <div style="font-size: 22px; font-weight: 700;">
             {{ vessel.name }}
@@ -382,13 +422,16 @@
           </div>
         </div>
       </div>
-      <div style="margin-top: 12px; font-size: 12px; color: var(--muted);">
+
+      <div style="font-size: 12px; color: var(--muted);">
+        Counters as of {{ vessel_counts.as_of }}, scraped from
+        <a href="{{ vessel_counts.source_url }}" target="_blank" rel="noopener">{{ vessel_counts.source }}</a>.
         Position from
-        <a href="{{ vessel.tracker_url }}" target="_blank" rel="noopener">CruiseMapper</a>,
+        <a href="{{ vessel.tracker_url }}" target="_blank" rel="noopener">CruiseMapper</a>;
         cross-check on
         <a href="{{ vessel.vesselfinder_url }}" target="_blank" rel="noopener">VesselFinder</a>
-        and <a href="{{ vessel.marinetraffic_url }}" target="_blank" rel="noopener">MarineTraffic</a>.
-        Refreshes hourly with the rest of the site.
+        / <a href="{{ vessel.marinetraffic_url }}" target="_blank" rel="noopener">MarineTraffic</a>.
+        Refreshes hourly.
       </div>
     </div>
     {% endif %}

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T15:15:08Z",
+  "generated_at": "2026-05-07T15:24:58Z",
   "outbreaks": [
     {
       "country": "Argentina",
@@ -7,6 +7,13 @@
       "latest_title": "Hantavirus is on the rise in Argentina, where a stricken cruise ship began its journey",
       "latest_url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPb0FiM2x4NmY4VF9leUdBZXBMSFh2TnJaUW5vSHNRWU9HcS14WEJEaEFKNzhYTHFGVzRkbzliRW0xb1NCUHB1QUhLMDlTRU5mZzFqbHo2WkJWaTk5aW9oaENXWEVHR21wXzViUnE0Tjc1d1VjQWlFSFMwclhWSGIxOE5YV2hKeTc1N0RaMnVGWm01akY1VTJR?oc=5",
       "latest_date": "9h ago"
+    },
+    {
+      "country": "USA",
+      "count": 3,
+      "latest_title": "Has Texas seen any Hantavirus cases over the years? Here\u2019s what state records show",
+      "latest_url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNUW9DY0dHbEFXblV2RHZMdXduYUdzZ3ltdGNRVWpDOENNc1VDU1A1Y09xRUh1R1RIOUlaZmtBMllRZF9LX3NXVkM3RE42V0d3TngycFA5bkFIcWxUdEljN24tTXpHbzRYczg5OFJEc0ZoTjBVSEpwVTRGOVQxMXQ2cl9RdnpKdjJGZWZOTXEwNVZRYkx0aTFpUUx0Nk5DTTlCeUR0dkNaTjJrb3AzancxRzBHaTR0QkF2MzVySTBIVkw0cWtLV0tVWEJGNl8ydw?oc=5",
+      "latest_date": "1h ago"
     }
   ],
   "country_index": [
@@ -61,11 +68,23 @@
       "country": "USA",
       "lat": 37.1,
       "lng": -95.7,
-      "count": 1,
-      "latest_title": "California among 3 states monitoring residents who were aboard hantavirus cruise ship",
-      "latest_url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPYWMzbWxtNmVsTmtKM0VIMHVYM2Z1Tm81S29vdlNiMG9qQ3E2ekpnXy1tLXRLSTZPb3VnMHM1Sk1nOExWRkZTOEppQXA3cXdQNWtGTUZzZEdUR2p4WnBxUVhGOHA5Ymh3SmRCV0wzZGhlRzFoaXBKQlN6ZmVNMThqdDFfZEloZk4zcmgtZlQ5b01leFVvblNRNGlFVGpwVnpqbHg0Um5OdFNBUjNvcl9JektQQdIBuAFBVV95cUxPN3pjNUdUMl9SRVZ4ZXVMaEdpUUxUdDAwVlRjQVdIdDdwSlNndkpOdkhFV0lyWU1DYWF4MEVKMHBTWndjLVFIak41anZ1NWRraC1UMm1nV2haZkdXV0hLaTV1MzhGOFNtYUQ1aHlybXdBa0I4THZyMW10U3ZZSGQ5VlJqc1hDU2J2M29vM3RxWl9EcEVvdThIMXJUSExKSW41U0xTaFAzTllnWF9sd1JvR0Q4RlpVRVhp?oc=5",
-      "latest_date": "2h ago",
+      "count": 3,
+      "latest_title": "Has Texas seen any Hantavirus cases over the years? Here\u2019s what state records show",
+      "latest_url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNUW9DY0dHbEFXblV2RHZMdXduYUdzZ3ltdGNRVWpDOENNc1VDU1A1Y09xRUh1R1RIOUlaZmtBMllRZF9LX3NXVkM3RE42V0d3TngycFA5bkFIcWxUdEljN24tTXpHbzRYczg5OFJEc0ZoTjBVSEpwVTRGOVQxMXQ2cl9RdnpKdjJGZWZOTXEwNVZRYkx0aTFpUUx0Nk5DTTlCeUR0dkNaTjJrb3AzancxRzBHaTR0QkF2MzVySTBIVkw0cWtLV0tVWEJGNl8ydw?oc=5",
+      "latest_date": "1h ago",
       "items": [
+        {
+          "title": "Has Texas seen any Hantavirus cases over the years? Here\u2019s what state records show",
+          "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNUW9DY0dHbEFXblV2RHZMdXduYUdzZ3ltdGNRVWpDOENNc1VDU1A1Y09xRUh1R1RIOUlaZmtBMllRZF9LX3NXVkM3RE42V0d3TngycFA5bkFIcWxUdEljN24tTXpHbzRYczg5OFJEc0ZoTjBVSEpwVTRGOVQxMXQ2cl9RdnpKdjJGZWZOTXEwNVZRYkx0aTFpUUx0Nk5DTTlCeUR0dkNaTjJrb3AzancxRzBHaTR0QkF2MzVySTBIVkw0cWtLV0tVWEJGNl8ydw?oc=5",
+          "source": "Google News \u00b7 Click2Houston",
+          "published": "1h ago"
+        },
+        {
+          "title": "U.S. Health Authorities Monitor Hantavirus Cruise Passengers in Georgia, California and Arizona",
+          "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9NUVFBVEEyQ0hTTnU3UTh4T0VtMlZtV29CcGVYZ1MwUEdxMWpjLUtfWlJHLUJESUViM1ZfTGhoTjY5MU0tMVJmamJwN3lqbjQ4WHZFRm0xUjRyWWduLXV3bS1rTlQzM0VlQUcxc251QmloM3p4c3FQRnZfeW1nSkE?oc=5",
+          "source": "Google News \u00b7 The New York Times",
+          "published": "2h ago"
+        },
         {
           "title": "California among 3 states monitoring residents who were aboard hantavirus cruise ship",
           "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPYWMzbWxtNmVsTmtKM0VIMHVYM2Z1Tm81S29vdlNiMG9qQ3E2ekpnXy1tLXRLSTZPb3VnMHM1Sk1nOExWRkZTOEppQXA3cXdQNWtGTUZzZEdUR2p4WnBxUVhGOHA5Ymh3SmRCV0wzZGhlRzFoaXBKQlN6ZmVNMThqdDFfZEloZk4zcmgtZlQ5b01leFVvblNRNGlFVGpwVnpqbHg0Um5OdFNBUjNvcl9JektQQdIBuAFBVV95cUxPN3pjNUdUMl9SRVZ4ZXVMaEdpUUxUdDAwVlRjQVdIdDdwSlNndkpOdkhFV0lyWU1DYWF4MEVKMHBTWndjLVFIak41anZ1NWRraC1UMm1nV2haZkdXV0hLaTV1MzhGOFNtYUQ1aHlybXdBa0I4THZyMW10U3ZZSGQ5VlJqc1hDU2J2M29vM3RxWl9EcEVvdThIMXJUSExKSW41U0xTaFAzTllnWF9sd1JvR0Q4RlpVRVhp?oc=5",
@@ -148,7 +167,21 @@
       "lat": 18.32293,
       "lng": -21.45414,
       "heading_deg": 29.0,
-      "fetched_at": "2026-05-07T15:15:08Z"
+      "fetched_at": "2026-05-07T15:24:58Z"
+    },
+    "counts": {
+      "cases_total": 7,
+      "cases_confirmed": 2,
+      "cases_suspected": 5,
+      "deaths": 3,
+      "critical": 1,
+      "on_board": 147,
+      "passengers": 88,
+      "crew": 59,
+      "as_of": "2026-05-04",
+      "source": "WHO DON599",
+      "source_url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599",
+      "fetched_at": "2026-05-07T15:24:58Z"
     }
   },
   "cdc_snapshot": {
@@ -164,6 +197,18 @@
     "source_url": "https://www.cdc.gov/hantavirus/data-research/cases/index.html"
   },
   "items": [
+    {
+      "title": "Authorities scramble to limit hantavirus outbreak, trace contacts around globe",
+      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQMmdLTGZLOGVHV3hOdzZuNXU1ejV1SC1KekhkWVVBZngtMHNJclFLMWVjUXZfVVBUWlBvVFNXbmZST2tqN0lPUlJObHNZMXZsMkFLUVIzMnF3enVvT3BOLTIwRVRnWUJIa2xLUzZmMERSdTctWGdfcXZBUGEySm9jRVFkRDJwZkFoRmpqMVBnNHMzZ0RqSzZtTA?oc=5",
+      "source": "Google News \u00b7 The Washington Post",
+      "published": "2026-05-07"
+    },
+    {
+      "title": "Has Texas seen any Hantavirus cases over the years? Here\u2019s what state records show",
+      "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNUW9DY0dHbEFXblV2RHZMdXduYUdzZ3ltdGNRVWpDOENNc1VDU1A1Y09xRUh1R1RIOUlaZmtBMllRZF9LX3NXVkM3RE42V0d3TngycFA5bkFIcWxUdEljN24tTXpHbzRYczg5OFJEc0ZoTjBVSEpwVTRGOVQxMXQ2cl9RdnpKdjJGZWZOTXEwNVZRYkx0aTFpUUx0Nk5DTTlCeUR0dkNaTjJrb3AzancxRzBHaTR0QkF2MzVySTBIVkw0cWtLV0tVWEJGNl8ydw?oc=5",
+      "source": "Google News \u00b7 Click2Houston",
+      "published": "2026-05-07"
+    },
     {
       "title": "Could the Hantavirus Cruise Ship Outbreak Lead to a Pandemic? Experts Explain the Risk Level",
       "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQWUZRT2N4bk50ektlXzVleXpReEhpTWxBSGRCdFlTMGE2ODM2MGNEbFltX0VUdEJ3QjJnREJGOFREcmxTTHVTemRkR1NNQVVIX19QRV8yZC1xTnMxV0F5aUU4WW9jSG9kcHdWUXNxNUFVZ05wQ2FGckMtWlh5QjVhLXVZdXF5VXBIWlowZU9hTkt0YlZQRlhj?oc=5",
@@ -183,12 +228,6 @@
       "published": "2026-05-07"
     },
     {
-      "title": "Authorities scramble to limit hantavirus outbreak, trace contacts around globe",
-      "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQMmdLTGZLOGVHV3hOdzZuNXU1ejV1SC1KekhkWVVBZngtMHNJclFLMWVjUXZfVVBUWlBvVFNXbmZST2tqN0lPUlJObHNZMXZsMkFLUVIzMnF3enVvT3BOLTIwRVRnWUJIa2xLUzZmMERSdTctWGdfcXZBUGEySm9jRVFkRDJwZkFoRmpqMVBnNHMzZ0RqSzZtTA?oc=5",
-      "source": "Google News \u00b7 The Washington Post",
-      "published": "2026-05-07"
-    },
-    {
       "title": "Hantavirus being monitored in US. Latest on cruise ship outbreak",
       "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxQMlRaellHNWVFdHlvN3FwYUYtUGdVa3Jub1dIVmdhNUZrbWFXS3dvdDFhd1lIZzZSLWxVU1VkeVh3ZHdZWWhuTmh1Qk04LTdMMm1lMk5kQjFwV1U5LUJKZnZnOFJqUVRsX1U2S0lSbUZjQWV4a0lyN09SWlpCSWJLREl4ZC1wbFZqc05VREVubVBlYUhKMWJpSEpOY0lOeDB5Q3hpVm4yRXo5S0NHNmRrSnZKRUtUWUprWmc?oc=5",
       "source": "Google News \u00b7 USA Today",
@@ -201,27 +240,9 @@
       "published": "2026-05-07"
     },
     {
-      "title": "Hantavirus survivor said sickness was 'hell on earth'",
-      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE9VQ29NY3d4UXJrMjZSd0dVd3dvTlVSLVRqakgtU2JYM0RXWkx4OHVUY3Y4bnIyQnhqNndIWmlLRFNTWjZJWExlR0hCNEVRTmhXU3c2Rlpicm5hUQ?oc=5",
-      "source": "Google News \u00b7 BBC",
-      "published": "2026-05-07"
-    },
-    {
       "title": "U.S. monitoring hantavirus cruise passengers; dozens left ship after 1st death",
       "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxNU09KTExTUDV0M3BOSjBMcVBmVDZhZkVuRV9taUFRWW5mRFA0RWxZUUhYSDVyZ0d6SmVGaWJHWWhZdHdKYjZjZXZhcVdIVkdsa2ZrRnM3ZTZDWkczSnV3ZFBqWnQwRGQ4V2t5R3hqeHpXWUFHYnJJMFZ2blNLYXl0clJMeW45QkYzQi1pQ1psdm9fbWxfS0k4TncxU3lKNTN6aUVGa05aZjBtaHV6d2h4UmVhdURmdXAyRm1lUWsybw?oc=5",
       "source": "Google News \u00b7 NBC News",
-      "published": "2026-05-07"
-    },
-    {
-      "title": "Hantavirus ship passenger says \u2018we were not well informed\u2019",
-      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOMTZmZW8zQmZxTmsxLVNOc0d5N1NGMlk1R183LUQ0em9jMmtTeHlPNXRyRmZJX002S1phVVU1blA4Um9HRGcteE5JWjdRZmNDaGlXbi1wMEZpaGhDVHhCcExkYjl6M3RqdWV6THhnZTBEcThTaGVFYUpEVmZzUGJ3cldYVDhsMTN5Xy1BYlFVTm1qV25sNnBwdDdYbUw3TmJGUVFfV2FXd2VJcVpNY3NUUDlCTQ?oc=5",
-      "source": "Google News \u00b7 NBC News",
-      "published": "2026-05-07"
-    },
-    {
-      "title": "Dozens of passengers left hantavirus-stricken cruise ship after 1st fatality",
-      "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNTkZNNFdUQzd4ZzVkYjhMVVhqMndFeEk1UjN3a2FSYV9uZ2ZuNEtwMDJrY2VOaTFONTNaRzBmc2RrLW8yQ3hBeGNnSUR4Nl9WSXhrQmctYkhCZW14ZjdsRVk1c1hkQ3ZYWEI0QlZxVFFrTlpVUDlCRFJvWlJ0V1NKMmpsdWZZVHFQYlV4S3lEZ0Q0M2Y0OHVN?oc=5",
-      "source": "Google News \u00b7 AP News",
       "published": "2026-05-07"
     },
     {
@@ -234,6 +255,12 @@
       "title": "Britons on hantavirus cruise ship face 45 days of self-isolation",
       "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5SalFnSmVNeWplX1M2ZW9oaVYtVWM2WTBXekFHMVltOVZzclU0T2tzMThsRExtVE5SeGZZVDlHU2tfcE1sSXVNdjBhNFpYN21CRjFWUzBGdXA1dw?oc=5",
       "source": "Google News \u00b7 BBC",
+      "published": "2026-05-07"
+    },
+    {
+      "title": "U.S. Health Authorities Monitor Hantavirus Cruise Passengers in Georgia, California and Arizona",
+      "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTE9NUVFBVEEyQ0hTTnU3UTh4T0VtMlZtV29CcGVYZ1MwUEdxMWpjLUtfWlJHLUJESUViM1ZfTGhoTjY5MU0tMVJmamJwN3lqbjQ4WHZFRm0xUjRyWWduLXV3bS1rTlQzM0VlQUcxc251QmloM3p4c3FQRnZfeW1nSkE?oc=5",
+      "source": "Google News \u00b7 The New York Times",
       "published": "2026-05-07"
     },
     {
@@ -261,6 +288,12 @@
       "published": "2026-05-07"
     },
     {
+      "title": "Concerns Grow Over Hantavirus Spread After Cruise Outbreak",
+      "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxOR0ZMWkthZktrU25PRzZuRlNWc1hURmU5LVhwamUzSkFEaXM3dUtoYnVxa0k1b0ZDNVJOUGgtWjBmM09PRkE4WWp1LS1iYm9NVDVNb3BYZHpZTDNmV1I4a3hLUXVScWVqVDAxdDc0UE1UR0l5dTVhSVNFY3R3N0h4VUNaZ0wzV0RvSXpyWjVFMkZUcTBLeUhqek1zT281Vkt2b0c1TDA2aw?oc=5",
+      "source": "Google News \u00b7 TODAY.com",
+      "published": "2026-05-07"
+    },
+    {
       "title": "Inside the Global Effort to Figure Out Where Hantavirus Will Strike Next",
       "url": "https://news.google.com/rss/articles/CBMif0FVX3lxTFB3a3JoR281RFBZYWUzalFFX0ZSUFNCQ2tmVFhMX24yRy1kWGJUTjRzZTU4c3dEb0ZPa0h4TUdLSUl2TGtqY3RKMTJPN2RRSEJmN3RDc0lZaUZVdk8wZzZrQVdMbjNWQkVJN0ZYS2kycFJPZW5UdzBza1FSX3NXYms?oc=5",
       "source": "Google News \u00b7 WSJ",
@@ -270,6 +303,12 @@
       "title": "Cruise ship hantavirus outbreak worries experts, though they discount pandemic fears",
       "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPQkZmcmRHMXJvTzAyMDhJa0lDbUg0NEg4NHJXeEJ3SDBSdUhUbThHUDFjZXZldkhsZXI4ZUdsYjlhMmNVZUJrWEROeWlvaVl0dWlUb0wzRlBYNGZiMmZJbnVLNVRVOVNlbVcxREZCMTI4MnBDdG1tbERtbEdPbFBvZWVNcGJGYm04UUtIX0RwaFpVay0wWDhGWmVVOEtkX051Rmc?oc=5",
       "source": "Google News \u00b7 statnews.com",
+      "published": "2026-05-07"
+    },
+    {
+      "title": "Hantavirus-hit cruise ship on way to Canary Islands after three evacuated",
+      "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFB4ejFDMy1sV3hqYUU2M0t4ck90UDdqLTU0V2dmWjZxYTRnaVJoeDdOcFlkMGZ6MlVBWVpCTVBXVTE1R2ZubVRCY0FhWDJDNHVSby1QUUp1ZV9PUQ?oc=5",
+      "source": "Google News \u00b7 BBC",
       "published": "2026-05-07"
     },
     {
@@ -301,12 +340,6 @@
       "url": "https://www.promedmail.org/?s=hantavirus",
       "source": "ProMED-mail",
       "published": "2026-05-07"
-    },
-    {
-      "title": "How a deadly hantavirus outbreak unfolded on a cruise ship for weeks before it was identified",
-      "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxNbVEwN1VaM1FpYnJBbTFzbkpCMjFKRmh3WVBCeW1sc2N5aDdBQlJwZG9HSlZ4ZXpXT2luNmcwV3ZVdEE0aldEcjZJeDAzNG5MdjgyV21qOGVtWWVIN19jc1E0LXdNdWpIQnNQV2xuWjh4T0txUTRnZW4zMTlSUWFVSGVlM3NDMG1sYnpTejlkeFlzREJXelR1SjUtR0hXMUowVVE?oc=5",
-      "source": "Google News \u00b7 AP News",
-      "published": "2026-05-06"
     },
     {
       "title": "Pictured: British ex-police officer evacuated from rat-virus ship",
