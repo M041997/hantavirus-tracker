@@ -236,6 +236,68 @@ def fetch_hondius_position() -> dict | None:
     }
 
 
+# ----- Hondius track persistence -----
+# The site itself is the persistent store: each build pulls the previously
+# deployed track over HTTP, appends a new fix if movement is meaningful,
+# and writes the updated file back into docs/ for the next run to read.
+TRACK_FETCH_URL = "https://hantavirusonline.org/hondius_track.json"
+TRACK_MAX_DAYS = 14
+TRACK_MAX_POINTS = 400
+TRACK_MIN_MOVE_DEG = 0.05      # ~3 nautical miles
+TRACK_MIN_AGE_MINUTES = 30     # always record at least once per ~30 min
+
+
+def load_existing_track(local_path: pathlib.Path) -> list[dict]:
+    """Prefer the deployed site — it's always the freshest copy because CI
+    doesn't commit generated files back. Fall back to the local file only
+    when the network is unavailable (e.g. local dev offline, first build).
+    """
+    try:
+        r = requests.get(TRACK_FETCH_URL, headers=HEADERS, timeout=TIMEOUT)
+        if r.ok:
+            data = r.json()
+            if isinstance(data, list):
+                return data
+    except (requests.RequestException, json.JSONDecodeError, ValueError):
+        pass
+    if local_path.exists():
+        try:
+            return json.loads(local_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+    return []
+
+
+def _parse_iso(s: str) -> dt.datetime | None:
+    try:
+        return dt.datetime.fromisoformat(s.replace("Z", "+00:00"))
+    except (ValueError, AttributeError):
+        return None
+
+
+def update_track(track: list[dict], pos: dict | None) -> list[dict]:
+    if not pos:
+        return track
+    entry = {"lat": pos["lat"], "lng": pos["lng"],
+             "fetched_at": pos["fetched_at"]}
+    if track:
+        last = track[-1]
+        last_dt = _parse_iso(last.get("fetched_at", ""))
+        cur_dt = _parse_iso(entry["fetched_at"]) or dt.datetime.now(dt.timezone.utc)
+        moved = (abs(entry["lat"] - last["lat"]) > TRACK_MIN_MOVE_DEG
+                 or abs(entry["lng"] - last["lng"]) > TRACK_MIN_MOVE_DEG)
+        old_enough = (last_dt is None
+                      or (cur_dt - last_dt).total_seconds() / 60
+                      >= TRACK_MIN_AGE_MINUTES)
+        if not (moved or old_enough):
+            return track
+    track.append(entry)
+    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=TRACK_MAX_DAYS)
+    pruned = [e for e in track
+              if (e_dt := _parse_iso(e.get("fetched_at", ""))) and e_dt >= cutoff]
+    return pruned[-TRACK_MAX_POINTS:]
+
+
 @dataclasses.dataclass
 class Item:
     title: str
@@ -741,6 +803,8 @@ def main() -> int:
     promed = fetch_promed()
     print(f"[build]   got {len(promed)} items", file=sys.stderr)
 
+    track_path = OUT / "hondius_track.json"
+
     print("[build] fetching MV Hondius position...", file=sys.stderr)
     hondius_pos = fetch_hondius_position()
     if hondius_pos:
@@ -751,6 +815,9 @@ def main() -> int:
         )
     else:
         print("[build]   Hondius position unavailable", file=sys.stderr)
+
+    hondius_track = update_track(load_existing_track(track_path), hondius_pos)
+    print(f"[build]   track length: {len(hondius_track)} points", file=sys.stderr)
 
     print("[build] fetching WHO DON599 outbreak counts...", file=sys.stderr)
     hondius_counts = fetch_hondius_outbreak_counts()
@@ -799,7 +866,8 @@ def main() -> int:
         "vessel_json": json.dumps(
             {**HONDIUS_VESSEL,
              "position": hondius_pos,
-             "counts": hondius_counts} if hondius_pos else None
+             "counts": hondius_counts,
+             "track": hondius_track} if hondius_pos else None
         ),
     }
     OUT.mkdir(parents=True, exist_ok=True)
@@ -835,6 +903,7 @@ def main() -> int:
         ],
     }
     (OUT / "data.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    track_path.write_text(json.dumps(hondius_track), encoding="utf-8")
     print(f"[build] wrote {OUT/'index.html'} and {OUT/'data.json'}", file=sys.stderr)
     return 0
 

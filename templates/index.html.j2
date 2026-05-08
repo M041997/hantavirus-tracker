@@ -626,6 +626,16 @@
   if (window.HANTA.vessel && window.HANTA.vessel.position) {
     const v = window.HANTA.vessel;
     const p = v.position;
+    if (Array.isArray(v.track) && v.track.length >= 2) {
+      const trackPoints = v.track.map(t => [t.lat, t.lng]);
+      L.polyline(trackPoints, {
+        color: '#ffb84d',
+        weight: 2,
+        opacity: 0.7,
+        dashArray: '4 5',
+        className: 'ship-track',
+      }).addTo(map);
+    }
     const shipIcon = L.divIcon({
       className: '',
       html: `<div class="ship-marker"
