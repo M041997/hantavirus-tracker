@@ -428,6 +428,8 @@ COUNTRY_ALIASES: list[tuple[str, str]] = [
     ("Nebraska",      "USA"),
     ("Omaha",         "USA"),
     ("Georgia",       "USA"),
+    ("New Jersey",    "USA"),
+    ("NJDOH",         "USA"),
     ("South Korea",   "Korea"),
     ("Republic of Korea", "Korea"),
 ]
