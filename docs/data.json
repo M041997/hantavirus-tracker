@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-08T21:02:09Z",
+  "generated_at": "2026-05-08T21:09:10Z",
   "outbreaks": [
     {
       "country": "Argentina",
@@ -9,10 +9,10 @@
       "latest_date": "21h ago"
     },
     {
-      "country": "USA",
-      "count": 3,
-      "latest_title": "American passengers on cruise ship with hantavirus outbreak may be headed to Omaha",
-      "latest_url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNNDdYemF4dWE5VVM3RFIyZV82ZVRYdFVYOE9tT0hMOWtDZHdFWnhwTEdWLXBBZFk1TU04TTd2QTN0OENpWUVhM25uZWIxTGNnclJDRDl4Q0dDa2NKWVMwRC0xbGltQU5ETzM4V21YTlppcGNqLV90UGRsSWpNZGNndXZjYWZrRTRON3o4TmhObVV0eXotU2JnVW1xMDh2bFR0T0xidjRFUUZFQWhRRFh3dUZhel9XU0I3cWJOaGdxZm1xbi1pVWZlU0wzNkEybnpLSDVJ?oc=5",
+      "country": "New Jersey",
+      "count": 2,
+      "latest_title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+      "latest_url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
       "latest_date": "3h ago"
     }
   ],
@@ -65,20 +65,14 @@
       ]
     },
     {
-      "country": "USA",
-      "lat": 37.1,
-      "lng": -95.7,
-      "count": 3,
-      "latest_title": "American passengers on cruise ship with hantavirus outbreak may be headed to Omaha",
-      "latest_url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNNDdYemF4dWE5VVM3RFIyZV82ZVRYdFVYOE9tT0hMOWtDZHdFWnhwTEdWLXBBZFk1TU04TTd2QTN0OENpWUVhM25uZWIxTGNnclJDRDl4Q0dDa2NKWVMwRC0xbGltQU5ETzM4V21YTlppcGNqLV90UGRsSWpNZGNndXZjYWZrRTRON3o4TmhObVV0eXotU2JnVW1xMDh2bFR0T0xidjRFUUZFQWhRRFh3dUZhel9XU0I3cWJOaGdxZm1xbi1pVWZlU0wzNkEybnpLSDVJ?oc=5",
+      "country": "New Jersey",
+      "lat": 40.2,
+      "lng": -74.5,
+      "count": 2,
+      "latest_title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+      "latest_url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
       "latest_date": "3h ago",
       "items": [
-        {
-          "title": "American passengers on cruise ship with hantavirus outbreak may be headed to Omaha",
-          "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNNDdYemF4dWE5VVM3RFIyZV82ZVRYdFVYOE9tT0hMOWtDZHdFWnhwTEdWLXBBZFk1TU04TTd2QTN0OENpWUVhM25uZWIxTGNnclJDRDl4Q0dDa2NKWVMwRC0xbGltQU5ETzM4V21YTlppcGNqLV90UGRsSWpNZGNndXZjYWZrRTRON3o4TmhObVV0eXotU2JnVW1xMDh2bFR0T0xidjRFUUZFQWhRRFh3dUZhel9XU0I3cWJOaGdxZm1xbi1pVWZlU0wzNkEybnpLSDVJ?oc=5",
-          "source": "Google News \u00b7 Nebraska Public Media",
-          "published": "3h ago"
-        },
         {
           "title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
           "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
@@ -90,6 +84,108 @@
           "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPUmg2MVoySWNLQ25ZY1Jkc0UtekZqcVhOS2FLRG1CMmtvOW00NWlCNEZJbklzbDU4N3lOOGYtZUVHSHBYN3FxbW9pb0UydlJFd3FGajVuQUFidTlyeDhfdFVxYVp6STN6TENHOUN5M0I2cHU4d1pMUDJ0M0RDaHNYQ29nX0dNYTZDMkhCdE5RaVZaVG5BX2tNdm9qWG5PcC1NZ2lkN1pWakl4SWlvZGJvNnBZb2hHTHdZZmhHS016bUZBcWd0Z1BRel9Xc1Zud9IB0wFBVV95cUxQQkFBd2lyRGJIWlpwWnJ1Rko1RlNKWW8zTVdYNk1NRTFLQ24yNUtlX1RidVVTUzNoNnZzUWdodnl6Y0xDRFc0Wi1kNnA5eTk0YlpkelZjLTM5OVQ2ckMzWnlFQ05rbC0yNEtUQ3lpN2tmcU1TdUs4dmZPeGRSZlB5SlV2dDVJajJNaUVqWmRwWDNOUHlQUEh1aUo5SXJ5bWIxTXJzSjRKLVFneEdXSjZlTnJkT2Y3RjlRYnZ0bDJpQjljWWJJNmh1OUdaTFhSNWR5akV3?oc=5",
           "source": "Google News \u00b7 ABC7 New York",
           "published": "4h ago"
+        }
+      ]
+    },
+    {
+      "country": "Nebraska",
+      "lat": 41.5,
+      "lng": -99.8,
+      "count": 1,
+      "latest_title": "American passengers on cruise ship with hantavirus outbreak may be headed to Omaha",
+      "latest_url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNNDdYemF4dWE5VVM3RFIyZV82ZVRYdFVYOE9tT0hMOWtDZHdFWnhwTEdWLXBBZFk1TU04TTd2QTN0OENpWUVhM25uZWIxTGNnclJDRDl4Q0dDa2NKWVMwRC0xbGltQU5ETzM4V21YTlppcGNqLV90UGRsSWpNZGNndXZjYWZrRTRON3o4TmhObVV0eXotU2JnVW1xMDh2bFR0T0xidjRFUUZFQWhRRFh3dUZhel9XU0I3cWJOaGdxZm1xbi1pVWZlU0wzNkEybnpLSDVJ?oc=5",
+      "latest_date": "3h ago",
+      "items": [
+        {
+          "title": "American passengers on cruise ship with hantavirus outbreak may be headed to Omaha",
+          "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxNNDdYemF4dWE5VVM3RFIyZV82ZVRYdFVYOE9tT0hMOWtDZHdFWnhwTEdWLXBBZFk1TU04TTd2QTN0OENpWUVhM25uZWIxTGNnclJDRDl4Q0dDa2NKWVMwRC0xbGltQU5ETzM4V21YTlppcGNqLV90UGRsSWpNZGNndXZjYWZrRTRON3o4TmhObVV0eXotU2JnVW1xMDh2bFR0T0xidjRFUUZFQWhRRFh3dUZhel9XU0I3cWJOaGdxZm1xbi1pVWZlU0wzNkEybnpLSDVJ?oc=5",
+          "source": "Google News \u00b7 Nebraska Public Media",
+          "published": "3h ago"
+        }
+      ]
+    },
+    {
+      "country": "California",
+      "lat": 36.8,
+      "lng": -119.4,
+      "count": 1,
+      "latest_title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+      "latest_url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+      "latest_date": "3h ago",
+      "items": [
+        {
+          "title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+          "source": "Google News \u00b7 ABC7 Chicago",
+          "published": "3h ago"
+        }
+      ]
+    },
+    {
+      "country": "Texas",
+      "lat": 31.5,
+      "lng": -99.3,
+      "count": 1,
+      "latest_title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+      "latest_url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+      "latest_date": "3h ago",
+      "items": [
+        {
+          "title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+          "source": "Google News \u00b7 ABC7 Chicago",
+          "published": "3h ago"
+        }
+      ]
+    },
+    {
+      "country": "Arizona",
+      "lat": 34.2,
+      "lng": -111.7,
+      "count": 1,
+      "latest_title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+      "latest_url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+      "latest_date": "3h ago",
+      "items": [
+        {
+          "title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+          "source": "Google News \u00b7 ABC7 Chicago",
+          "published": "3h ago"
+        }
+      ]
+    },
+    {
+      "country": "Virginia",
+      "lat": 37.9,
+      "lng": -78.0,
+      "count": 1,
+      "latest_title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+      "latest_url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+      "latest_date": "3h ago",
+      "items": [
+        {
+          "title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+          "source": "Google News \u00b7 ABC7 Chicago",
+          "published": "3h ago"
+        }
+      ]
+    },
+    {
+      "country": "Georgia (US)",
+      "lat": 32.6,
+      "lng": -83.4,
+      "count": 1,
+      "latest_title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+      "latest_url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+      "latest_date": "3h ago",
+      "items": [
+        {
+          "title": "US Hantavirus map: Texas, New Jersey, Georgia, California, Virginia, Arizona monitoring 9 amid Hantavirus cruise ship outbreak",
+          "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNWHFUZ25QYkhzQUNFQm1CVEJsSjFNVnVFelU3SG1MY2J4NXRJZ3czMmVNbU5iampyRWd5MTIyeGRQOElfSkw4WmhHT2tYeURFX0VsLVZGZWtOcXlUOGx3X1J5enJXdGFnQXlHbnVrYWZzMkg5anVNSVY3VGs0MXBYMXlZTmlPUUdyRkcxTFU0WjQtVHQwb0JYREZNZFV2MW9rXzhoVlNzYjdxZk5SaVk1NDI1TnRGSHROZHlmSGh6QU13WlFEdVpvdmQ2dDR3M2s3V3BSX1JSZmhpRGROQVhONTBn0gHnAUFVX3lxTE5ZNU1pbnBnbXRRMDNKOWFUQVNoWXBCU1lzTl9tMEVMMGt4REQyY0d4UklOQ2FXMHByWmdYSWNQTkZBTmNzN0l2ZEVxZzBydnp0OEJyYVpnazNNSWtlZGtKeEwzZWt3N2lpRlVMQThNMzE2dU1BX25tSGt6RDVEWms1Nlp6MXhQZEpLSTItZ1pDeWV2bWZIS1VpNkFSYjMwbHNTTjBrWEVkRFBjaHZpRTFPZFlvUUU1NzVRWWdMQ1YwbHNaYkl4d2lrbXJhbEYxOXpWOUNYV0VqNjVjaENoYkpmUWRuV2lTVQ?oc=5",
+          "source": "Google News \u00b7 ABC7 Chicago",
+          "published": "3h ago"
         }
       ]
     },
@@ -114,16 +210,68 @@
   "spread_arcs": [
     {
       "from": "Argentina",
-      "to": "USA",
+      "to": "Texas",
       "from_latlng": [
         -38.4,
         -63.6
       ],
       "to_latlng": [
-        37.1,
-        -95.7
+        31.5,
+        -99.3
       ],
-      "label": "Cruise passengers monitored on return"
+      "label": "TX residents on cruise, returned"
+    },
+    {
+      "from": "Argentina",
+      "to": "Nebraska",
+      "from_latlng": [
+        -38.4,
+        -63.6
+      ],
+      "to_latlng": [
+        41.5,
+        -99.8
+      ],
+      "label": "Federal quarantine \u2014 Nebraska Medicine"
+    },
+    {
+      "from": "Argentina",
+      "to": "New Jersey",
+      "from_latlng": [
+        -38.4,
+        -63.6
+      ],
+      "to_latlng": [
+        40.2,
+        -74.5
+      ],
+      "label": "NJDOH monitoring air-travel contacts"
+    },
+    {
+      "from": "Argentina",
+      "to": "California",
+      "from_latlng": [
+        -38.4,
+        -63.6
+      ],
+      "to_latlng": [
+        36.8,
+        -119.4
+      ],
+      "label": "Passengers monitored on return"
+    },
+    {
+      "from": "Argentina",
+      "to": "Arizona",
+      "from_latlng": [
+        -38.4,
+        -63.6
+      ],
+      "to_latlng": [
+        34.2,
+        -111.7
+      ],
+      "label": "Passengers monitored on return"
     },
     {
       "from": "Argentina",
@@ -167,7 +315,7 @@
       "lat": 23.33135,
       "lng": -18.92558,
       "heading_deg": 25.0,
-      "fetched_at": "2026-05-08T21:02:08Z"
+      "fetched_at": "2026-05-08T21:09:10Z"
     },
     "counts": {
       "cases_total": 7,
@@ -181,7 +329,7 @@
       "as_of": "2026-05-04",
       "source": "WHO DON599",
       "source_url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599",
-      "fetched_at": "2026-05-08T21:02:09Z"
+      "fetched_at": "2026-05-08T21:09:10Z"
     }
   },
   "cdc_snapshot": {
@@ -198,6 +346,12 @@
   },
   "items": [
     {
+      "title": "Why the hantavirus cruise outbreak is not the next pandemic, according to WHO",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9PYUdiQ21uc2ZDQTZDOUFaUk9OSWJ6aTFXUTNNU2hFN0ZDemVXd3h1YkcxSl9mS2NlRW5EQlptYXg5WUlfYktkQjNodV9ROWdzTWVzS01UVG5JOV93WC11S0c1MWJ2TzJVYWVxY0RTTFczVVUzQ0FuOTJBdHJvQQ?oc=5",
+      "source": "Google News \u00b7 The Washington Post",
+      "published": "2026-05-08"
+    },
+    {
       "title": "Health officials monitoring two NJ residents possibly exposed to hantavirus",
       "url": "https://news.google.com/rss/articles/CBMid0FVX3lxTE9TZE5UcVFZa3N4TUcza3R2ZnFoOFpJaHB5OTlYWkJjWFFOVTAzWnRxT0gyX2Q0MjJJWDJPLW1Zb3l0M0h5ZVBkN1J1bXp3S3ktMURsa2VXbjdSdFg4Wm03YXdOektGUFJTNkwtVk9PdDlOSG82c1ZV?oc=5",
       "source": "Google News \u00b7 New Jersey Monitor",
@@ -207,12 +361,6 @@
       "title": "Hantavirus cruise LIVE: Cruise passengers monitored in at least 5 US states as American passengers set to receive repatriation flight",
       "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE96M21HVHZERnd0dWdvdm5xWFpCQmpyeW85VjVudXRhUFkzWFAzdFVHT2xuWHY5LUNkVFE2Z2QwVWQ4dFV4VzVESmZtb0J3NEJ4RllGSjRQbmIwMk1GMVNaSGlkVlhMOFZRMExqOHBSaGlScHoxRl9fVHBn?oc=5",
       "source": "Google News \u00b7 Live Science",
-      "published": "2026-05-08"
-    },
-    {
-      "title": "Why the hantavirus cruise outbreak is not the next pandemic, according to WHO",
-      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE9PYUdiQ21uc2ZDQTZDOUFaUk9OSWJ6aTFXUTNNU2hFN0ZDemVXd3h1YkcxSl9mS2NlRW5EQlptYXg5WUlfYktkQjNodV9ROWdzTWVzS01UVG5JOV93WC11S0c1MWJ2TzJVYWVxY0RTTFczVVUzQ0FuOTJBdHJvQQ?oc=5",
-      "source": "Google News \u00b7 The Washington Post",
       "published": "2026-05-08"
     },
     {

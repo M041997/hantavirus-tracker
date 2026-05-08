@@ -376,8 +376,11 @@ def sort_by_date(items: list[Item]) -> list[Item]:
     return sorted(items, key=lambda i: i.published or epoch, reverse=True)
 
 
-# Approximate population-weighted centroids for countries we cluster on.
-# Used both for cluster detection and for placing map markers.
+# Approximate centroids for places we cluster on. Mix of countries and US
+# states — for the cruise-outbreak coverage, US-state granularity matters
+# because individual states (Texas, Nebraska, New Jersey, …) show up in
+# news as quarantine and monitoring sites.
+# "Georgia (US)" disambiguates from the country Georgia.
 COUNTRY_CENTROIDS: dict[str, tuple[float, float]] = {
     "Argentina":      (-38.4, -63.6),
     "Chile":          (-35.7, -71.5),
@@ -400,36 +403,61 @@ COUNTRY_CENTROIDS: dict[str, tuple[float, float]] = {
     "Sweden":         (60.1,   18.6),
     "Taiwan":         (23.7,  121.0),
     "Japan":          (36.2,  138.3),
+    # US states currently relevant to the Hondius / hantavirus coverage.
+    "Texas":          (31.5,  -99.3),
+    "Nebraska":       (41.5,  -99.8),
+    "New Jersey":     (40.2,  -74.5),
+    "Georgia (US)":   (32.6,  -83.4),
+    "California":     (36.8, -119.4),
+    "Arizona":        (34.2, -111.7),
+    "Virginia":       (37.9,  -78.0),
+    "Florida":        (27.7,  -81.5),
+    "Colorado":       (39.0, -105.5),
+    "New Mexico":     (34.5, -106.0),
+    "Nevada":         (38.8, -116.4),
+    "Utah":           (39.3, -111.6),
 }
 
 # Hardcoded "spread arcs" the news has reported clearly. Format:
-# (origin_country, dest_country, label). Origin must be in COUNTRY_CENTROIDS.
+# (origin, dest, label). Both endpoints must be in COUNTRY_CENTROIDS.
 SPREAD_ARCS: list[tuple[str, str, str]] = [
-    ("Argentina", "USA",   "Cruise passengers monitored on return"),
-    ("Argentina", "Chile", "Cruise stopover"),
-    ("Argentina", "Brazil","Cruise stopover"),
+    ("Argentina", "Texas",      "TX residents on cruise, returned"),
+    ("Argentina", "Nebraska",   "Federal quarantine — Nebraska Medicine"),
+    ("Argentina", "New Jersey", "NJDOH monitoring air-travel contacts"),
+    ("Argentina", "California", "Passengers monitored on return"),
+    ("Argentina", "Arizona",    "Passengers monitored on return"),
+    ("Argentina", "Chile",      "Cruise stopover"),
+    ("Argentina", "Brazil",     "Cruise stopover"),
 ]
 
 
-# Alias terms that imply a specific country in news titles. Order matters
-# only for matching efficiency; first match wins.
+# Alias terms that imply a specific place in news titles. Order matters:
+# state-specific aliases come BEFORE generic US terms so a headline like
+# "United States, Texas" tags Texas, not the generic USA bucket.
 COUNTRY_ALIASES: list[tuple[str, str]] = [
+    # US state aliases — match first.
+    ("California",    "California"),
+    ("Florida",       "Florida"),
+    ("Texas",         "Texas"),
+    ("Texan",         "Texas"),
+    ("Arizona",       "Arizona"),
+    ("New Mexico",    "New Mexico"),
+    ("Colorado",      "Colorado"),
+    ("Nevada",        "Nevada"),
+    ("Utah",          "Utah"),
+    ("Virginia",      "Virginia"),
+    ("Yosemite",      "California"),
+    ("Nebraska",      "Nebraska"),
+    ("Omaha",         "Nebraska"),
+    ("Georgia",       "Georgia (US)"),
+    ("Atlanta",       "Georgia (US)"),
+    ("New Jersey",    "New Jersey"),
+    ("NJDOH",         "New Jersey"),
+    # Generic US terms — fall through to country-level USA bucket only when
+    # no specific state matched first.
     ("United States", "USA"),
     ("U.S.",          "USA"),
-    ("California",    "USA"),
-    ("Florida",       "USA"),
-    ("Texas",         "USA"),
-    ("Arizona",       "USA"),
-    ("New Mexico",    "USA"),
-    ("Colorado",      "USA"),
-    ("Nevada",        "USA"),
-    ("Utah",          "USA"),
-    ("Yosemite",      "USA"),
-    ("Nebraska",      "USA"),
-    ("Omaha",         "USA"),
-    ("Georgia",       "USA"),
-    ("New Jersey",    "USA"),
-    ("NJDOH",         "USA"),
+    # Other-country aliases.
     ("South Korea",   "Korea"),
     ("Republic of Korea", "Korea"),
 ]
@@ -448,10 +476,17 @@ def cluster_by_country(items: list[Item]) -> dict[str, list[Item]]:
     for item in items:
         if not item.published or item.published < cutoff:
             continue
+        # An article can mention several places (e.g. roundup posts naming
+        # multiple US states). Count it once per distinct canonical place
+        # so each state pin reflects all relevant coverage, but don't double
+        # within one article.
+        seen: set[str] = set()
         for term, canon in term_to_country:
+            if canon in seen:
+                continue
             if re.search(rf"\b{re.escape(term)}\b", item.title, re.IGNORECASE):
                 clusters.setdefault(canon, []).append(item)
-                break
+                seen.add(canon)
     return clusters
 
 
