@@ -465,6 +465,11 @@ COUNTRY_CENTROIDS: dict[str, tuple[float, float]] = {
     "Sweden":         (60.1,   18.6),
     "Taiwan":         (23.7,  121.0),
     "Japan":          (36.2,  138.3),
+    "Spain":          (40.4,   -3.7),
+    # The Canaries are politically Spain but ~1,000 km away off NW Africa;
+    # disembarkation news points here, not Madrid, so keep a separate dot.
+    "Canary Islands": (28.3,  -15.5),
+    "South Africa":   (-30.6,  22.9),
     # US states currently relevant to the Hondius / hantavirus coverage.
     "Texas":          (31.5,  -99.3),
     "Nebraska":       (41.5,  -99.8),
@@ -488,8 +493,10 @@ SPREAD_ARCS: list[tuple[str, str, str]] = [
     ("Argentina", "New Jersey", "NJDOH monitoring air-travel contacts"),
     ("Argentina", "California", "Passengers monitored on return"),
     ("Argentina", "Arizona",    "Passengers monitored on return"),
-    ("Argentina", "Chile",      "Cruise stopover"),
-    ("Argentina", "Brazil",     "Cruise stopover"),
+    ("Argentina", "Chile",          "Cruise stopover"),
+    ("Argentina", "Brazil",         "Cruise stopover"),
+    ("Argentina", "Canary Islands", "Hondius port of disembarkation"),
+    ("Argentina", "South Africa",   "Contacts monitored on stopover"),
 ]
 
 
@@ -519,6 +526,11 @@ COUNTRY_ALIASES: list[tuple[str, str]] = [
     # no specific state matched first.
     ("United States", "USA"),
     ("U.S.",          "USA"),
+    # Canary Islands (Tenerife disembarkation).
+    ("Canary Islands", "Canary Islands"),
+    ("Tenerife",       "Canary Islands"),
+    ("Gran Canaria",   "Canary Islands"),
+    ("Las Palmas",     "Canary Islands"),
     # Other-country aliases.
     ("South Korea",   "Korea"),
     ("Republic of Korea", "Korea"),
