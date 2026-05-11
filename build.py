@@ -3,7 +3,8 @@
 
 Fetches:
   - Google News RSS (hantavirus query) — primary news firehose
-  - ProMED-mail search page (hantavirus) — official outbreak alerts
+  - ProMED-mail search page (hantavirus) — community outbreak alerts
+  - ECDC news RSS (filtered) — EU agency press releases & assessments
   - CDC HPS surveillance summary — slow-moving aggregate stats
 
 Renders templates/index.html.j2 -> docs/index.html for GitHub Pages.
@@ -361,6 +362,42 @@ def fetch_google_news(query: str = "hantavirus", limit: int = 25) -> list[Item]:
                 summary="",
             )
         )
+    return items
+
+
+# ----- Source: ECDC news RSS -----
+# ECDC has no dedicated hantavirus RSS, but the general news taxonomy feed
+# covers press releases + news items for current outbreaks. Filter by title
+# the same way we filter ProMED.
+ECDC_RSS_URL = "https://www.ecdc.europa.eu/en/taxonomy/term/1307/feed"
+
+
+def fetch_ecdc(query: str = "hantavirus", limit: int = 15) -> list[Item]:
+    parsed = feedparser.parse(ECDC_RSS_URL, request_headers=HEADERS)
+    items: list[Item] = []
+    for e in parsed.entries:
+        title = (e.title or "").strip()
+        if query.lower() not in title.lower():
+            continue
+        published = None
+        if getattr(e, "published", None):
+            try:
+                published = parsedate_to_datetime(e.published)
+                if published.tzinfo is None:
+                    published = published.replace(tzinfo=dt.timezone.utc)
+            except Exception:
+                published = None
+        items.append(
+            Item(
+                title=title,
+                url=e.link,
+                source="ECDC",
+                published=published,
+                summary="",
+            )
+        )
+        if len(items) >= limit:
+            break
     return items
 
 
@@ -824,6 +861,10 @@ def main() -> int:
     promed = fetch_promed()
     print(f"[build]   got {len(promed)} items", file=sys.stderr)
 
+    print("[build] fetching ECDC...", file=sys.stderr)
+    ecdc = fetch_ecdc()
+    print(f"[build]   got {len(ecdc)} items", file=sys.stderr)
+
     track_path = OUT / "hondius_track.json"
 
     print("[build] fetching MV Hondius position...", file=sys.stderr)
@@ -851,7 +892,8 @@ def main() -> int:
 
     promed = sort_by_date(promed)
     news = sort_by_date(news)
-    all_items = sort_by_date(dedupe_by_title(promed + news))
+    ecdc = sort_by_date(ecdc)
+    all_items = sort_by_date(dedupe_by_title(promed + ecdc + news))
     clusters = cluster_by_country(all_items)
     outbreaks = detect_active_outbreaks(clusters)
     country_index = build_country_index(clusters)
@@ -867,6 +909,7 @@ def main() -> int:
         "build_time_iso": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "build_time_human": now.strftime("%Y-%m-%d %H:%M UTC"),
         "promed_items": promed[:15],
+        "ecdc_items": ecdc[:10],
         "news_items": news[:25],
         "all_items": all_items[:30],
         "outbreaks": outbreaks,

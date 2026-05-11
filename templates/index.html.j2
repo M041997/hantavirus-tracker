@@ -37,6 +37,7 @@
     --muted: #8a99ab;
     --accent: #ff3b3b;
     --accent-2: #ffb84d;
+    --accent-3: #6db8ff;
     --good: #58c897;
     --line: #28323e;
   }
@@ -285,6 +286,7 @@
   }
   ul.items .src { color: var(--good); }
   ul.items .src.promed { color: var(--accent-2); }
+  ul.items .src.ecdc { color: var(--accent-3); }
 
   .stats-mini { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .stats-mini .stat { background: var(--panel-2); border-radius: 10px; padding: 12px 14px; }
@@ -477,6 +479,27 @@
     </div>
 
     <div class="card span-12">
+      <h2>ECDC · EU agency press releases &amp; assessments</h2>
+      {% if ecdc_items %}
+      <ul class="items">
+        {% for item in ecdc_items %}
+        <li>
+          <div class="title">
+            <a href="{{ item.url }}" target="_blank" rel="noopener">{{ item.title|unescape }}</a>
+          </div>
+          <div class="row">
+            <span class="src ecdc">{{ item.source }}</span>
+            {% if item.published_human %}<span>·</span><span>{{ item.published_human }}</span>{% endif %}
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <div style="color: var(--muted);">No ECDC hantavirus items in this build.</div>
+      {% endif %}
+    </div>
+
+    <div class="card span-12">
       <h2>News &amp; press · last {{ news_items|length }} items</h2>
       {% if news_items %}
       <ul class="items">
@@ -499,6 +522,7 @@
   <footer>
     <a href="about.html">About / disclaimer</a> ·
     Sources: <a href="https://promedmail.org/?s=hantavirus" target="_blank" rel="noopener">ProMED-mail</a>,
+    <a href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection" target="_blank" rel="noopener">ECDC</a>,
     <a href="https://news.google.com/search?q=hantavirus" target="_blank" rel="noopener">Google News</a>,
     <a href="{{ cdc.source_url }}" target="_blank" rel="noopener">CDC HPS surveillance</a>.
     Raw data: <a href="data.json">data.json</a>.
