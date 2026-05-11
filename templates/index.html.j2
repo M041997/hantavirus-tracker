@@ -371,7 +371,7 @@
         </div>
         <div class="stat-tile" style="background: rgba(255,184,77,0.05); border-color: #3a2e1a;">
           <div class="v warn">{{ vessel_counts.cases_suspected }}</div>
-          <div class="k">Suspected</div>
+          <div class="k">{% if vessel_counts.source == "ECDC" %}Probable{% else %}Suspected{% endif %}</div>
         </div>
         <div class="stat-tile" style="background: rgba(255,59,59,0.10); border-color: #4a1e22;">
           <div class="v alert">{{ vessel_counts.deaths }}</div>

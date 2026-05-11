@@ -79,6 +79,10 @@ HONDIUS_VESSEL = {
 }
 
 
+ECDC_OUTBREAK_URL = (
+    "https://www.ecdc.europa.eu/en/infectious-disease-topics/"
+    "hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak"
+)
 WHO_DON_URL = (
     "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599"
 )
@@ -111,6 +115,87 @@ def _to_int(s: str) -> int | None:
     if s.isdigit():
         return int(s)
     return WORD_NUMBERS.get(s)
+
+
+def fetch_ecdc_outbreak_counts() -> dict | None:
+    """Scrape ECDC's outbreak page. Returns None on failure.
+
+    ECDC updates the page daily (including weekends), so prefer it over WHO
+    DON599 which only republishes when figures change materially.
+
+    The page renders a stats block like
+        "Confirmed cases*** 7 Probable cases** 2 Suspected cases* 0
+         Number of deaths 3"
+    plus an "As of D Month" sentence with no year.
+    """
+    try:
+        r = requests.get(ECDC_OUTBREAK_URL, headers=HEADERS, timeout=TIMEOUT)
+        r.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"[ecdc] fetch failed: {exc}", file=sys.stderr)
+        return None
+    text = BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True)
+
+    confirmed = probable = suspected = deaths = None
+    m = re.search(r"Confirmed cases\*+\s+(\d+)", text)
+    if m: confirmed = int(m.group(1))
+    m = re.search(r"Probable cases\*+\s+(\d+)", text)
+    if m: probable = int(m.group(1))
+    m = re.search(r"Suspected cases\*+\s+(\d+)", text)
+    if m: suspected = int(m.group(1))
+    m = re.search(r"Number of deaths\s+(\d+)", text)
+    if m: deaths = int(m.group(1))
+
+    # Need at least confirmed + deaths to call this a successful parse.
+    if confirmed is None or deaths is None:
+        print("[ecdc] structured stats block not found", file=sys.stderr)
+        return None
+
+    # ECDC distinguishes Probable from Suspected; WHO lumps both as
+    # "suspected". To keep the existing template field meaningful, fold
+    # probable + suspected into cases_suspected.
+    p_total = (probable or 0) + (suspected or 0)
+    cases_total = confirmed + p_total
+
+    out = {
+        "cases_total":     cases_total,
+        "cases_confirmed": confirmed,
+        "cases_suspected": p_total,
+        "deaths":          deaths,
+        # ECDC summary doesn't surface these; carry forward from the WHO
+        # fallback so the UI doesn't show blanks.
+        "critical":   HONDIUS_OUTBREAK_FALLBACK["critical"],
+        "on_board":   HONDIUS_OUTBREAK_FALLBACK["on_board"],
+        "passengers": HONDIUS_OUTBREAK_FALLBACK["passengers"],
+        "crew":       HONDIUS_OUTBREAK_FALLBACK["crew"],
+        "as_of":      HONDIUS_OUTBREAK_FALLBACK["as_of"],
+        "source":     "ECDC",
+        "source_url": ECDC_OUTBREAK_URL,
+    }
+
+    # Parse "As of 11 May" — ECDC omits the year. Default to current UTC
+    # year; sanity-check that the resulting date isn't in the future.
+    m = re.search(
+        r"[Aa]s of\s+(\d{1,2})\s+"
+        r"(January|February|March|April|May|June|July|August|"
+        r"September|October|November|December)"
+        r"(?:\s+(\d{4}))?",
+        text,
+    )
+    if m:
+        day, month = m.group(1), m.group(2)
+        year = m.group(3) or str(dt.datetime.now(dt.timezone.utc).year)
+        try:
+            d = dt.datetime.strptime(f"{day} {month} {year}", "%d %B %Y")
+            if d.date() <= dt.datetime.now(dt.timezone.utc).date():
+                out["as_of"] = d.strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+
+    out["fetched_at"] = dt.datetime.now(dt.timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+    return out
 
 
 def fetch_hondius_outbreak_counts() -> dict:
@@ -881,11 +966,16 @@ def main() -> int:
     hondius_track = update_track(load_existing_track(track_path), hondius_pos)
     print(f"[build]   track length: {len(hondius_track)} points", file=sys.stderr)
 
-    print("[build] fetching WHO DON599 outbreak counts...", file=sys.stderr)
-    hondius_counts = fetch_hondius_outbreak_counts()
+    print("[build] fetching ECDC outbreak counts...", file=sys.stderr)
+    hondius_counts = fetch_ecdc_outbreak_counts()
+    if hondius_counts is None:
+        print("[build]   ECDC unavailable, falling back to WHO DON599",
+              file=sys.stderr)
+        hondius_counts = fetch_hondius_outbreak_counts()
     print(
         f"[build]   cases={hondius_counts['cases_total']} "
         f"deaths={hondius_counts['deaths']} "
+        f"source={hondius_counts['source']} "
         f"as_of={hondius_counts['as_of']}",
         file=sys.stderr,
     )
