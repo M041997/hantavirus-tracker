@@ -518,8 +518,17 @@ COUNTRY_ALIASES: list[tuple[str, str]] = [
     ("Yosemite",      "California"),
     ("Nebraska",      "Nebraska"),
     ("Omaha",         "Nebraska"),
+    # UNMC is the federal quarantine + biocontainment hub for returning
+    # Hondius passengers; headlines often name the institution, not the state.
+    ("UNMC",                                  "Nebraska"),
+    ("University of Nebraska Medical Center", "Nebraska"),
+    ("Nebraska Medicine",                     "Nebraska"),
+    ("Nebraska Medical Center",               "Nebraska"),
     ("Georgia",       "Georgia (US)"),
     ("Atlanta",       "Georgia (US)"),
+    # Emory University in Atlanta receives transfer cases (symptomatic).
+    ("Emory University", "Georgia (US)"),
+    ("Emory",            "Georgia (US)"),
     ("New Jersey",    "New Jersey"),
     ("NJDOH",         "New Jersey"),
     # Generic US terms — fall through to country-level USA bucket only when
