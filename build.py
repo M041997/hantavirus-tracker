@@ -588,6 +588,7 @@ COUNTRY_CENTROIDS: dict[str, tuple[float, float]] = {
     "Taiwan":         (23.7,  121.0),
     "Japan":          (36.2,  138.3),
     "Spain":          (40.4,   -3.7),
+    "France":         (46.6,    2.2),
     # The Canaries are politically Spain but ~1,000 km away off NW Africa;
     # disembarkation news points here, not Madrid, so keep a separate dot.
     "Canary Islands": (28.3,  -15.5),
@@ -605,6 +606,7 @@ COUNTRY_CENTROIDS: dict[str, tuple[float, float]] = {
     "New Mexico":     (34.5, -106.0),
     "Nevada":         (38.8, -116.4),
     "Utah":           (39.3, -111.6),
+    "Oregon":         (44.0, -120.5),
 }
 
 # Hardcoded "spread arcs" the news has reported clearly. Format:
@@ -619,6 +621,8 @@ SPREAD_ARCS: list[tuple[str, str, str]] = [
     ("Argentina", "Brazil",         "Cruise stopover"),
     ("Argentina", "Canary Islands", "Hondius port of disembarkation"),
     ("Argentina", "South Africa",   "Contacts monitored on stopover"),
+    ("Argentina", "France",         "Critical patient on ECMO"),
+    ("Argentina", "Oregon",         "Physician case in isolation"),
 ]
 
 
@@ -637,7 +641,12 @@ COUNTRY_ALIASES: list[tuple[str, str]] = [
     ("Nevada",        "Nevada"),
     ("Utah",          "Utah"),
     ("Virginia",      "Virginia"),
+    ("Oregon",        "Oregon"),
     ("Yosemite",      "California"),
+    ("San Francisco", "California"),
+    ("Bay Area",      "California"),
+    ("San Mateo",     "California"),
+    ("SFO",           "California"),
     ("Nebraska",      "Nebraska"),
     ("Omaha",         "Nebraska"),
     # UNMC is the federal quarantine + biocontainment hub for returning
@@ -662,6 +671,9 @@ COUNTRY_ALIASES: list[tuple[str, str]] = [
     ("Tenerife",       "Canary Islands"),
     ("Gran Canaria",   "Canary Islands"),
     ("Las Palmas",     "Canary Islands"),
+    ("France",         "France"),
+    ("French",         "France"),
+    ("Paris",          "France"),
     # Other-country aliases.
     ("South Korea",   "Korea"),
     ("Republic of Korea", "Korea"),
