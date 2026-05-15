@@ -416,11 +416,55 @@ class Item:
         return self.published.strftime("%b %d, %Y")
 
 
+# ----- Other active disease outbreaks (sidebar) -----
+# Lightweight side-panel that surfaces unrelated outbreaks the user might be
+# tracking in parallel. Each entry drives one Google News query; the UI lets
+# visitors hide the whole panel via a localStorage toggle, so this stays
+# opt-in for casual visitors but available for anyone who wants it.
+OTHER_DISEASES: list[dict] = [
+    {
+        "key": "ebola-drc-2026",
+        "name": "Ebola",
+        "region": "DR Congo · Ituri province",
+        "query": "ebola outbreak Congo",
+        # Africa CDC confirmation on 2026-05-15; figures will be scraped via
+        # Google News titles only — no structured counter source yet.
+        "started": "2026-05-15",
+        "blurb": "17th Congo outbreak. Africa CDC confirmed in Ituri province.",
+    },
+]
+
+
+def fetch_other_outbreaks(limit_each: int = 6) -> list[dict]:
+    """Fetch a few news items per configured other-disease outbreak."""
+    out: list[dict] = []
+    for cfg in OTHER_DISEASES:
+        news_items = fetch_google_news(query=cfg["query"], limit=limit_each)
+        out.append({
+            "key": cfg["key"],
+            "name": cfg["name"],
+            "region": cfg["region"],
+            "started": cfg["started"],
+            "blurb": cfg["blurb"],
+            "news": [
+                {
+                    "title": i.title,
+                    "url": i.url,
+                    "source": i.source,
+                    "published": i.published_human,
+                }
+                for i in news_items
+            ],
+        })
+    return out
+
+
 # ----- Source: Google News RSS -----
 def fetch_google_news(query: str = "hantavirus", limit: int = 25) -> list[Item]:
+    from urllib.parse import quote_plus
     url = (
         "https://news.google.com/rss/search?"
-        f"q={query}&hl=en-US&gl=US&ceid=US:en"
+        f"q={quote_plus(query)}&hl=en-US&gl=US&ceid=US:en"
     )
     parsed = feedparser.parse(url, request_headers=HEADERS)
     items: list[Item] = []
@@ -962,6 +1006,14 @@ def main() -> int:
     ecdc = fetch_ecdc()
     print(f"[build]   got {len(ecdc)} items", file=sys.stderr)
 
+    print("[build] fetching other-disease outbreaks...", file=sys.stderr)
+    other_outbreaks = fetch_other_outbreaks()
+    print(
+        f"[build]   got {sum(len(o['news']) for o in other_outbreaks)} "
+        f"items across {len(other_outbreaks)} outbreaks",
+        file=sys.stderr,
+    )
+
     track_path = OUT / "hondius_track.json"
 
     print("[build] fetching MV Hondius position...", file=sys.stderr)
@@ -1029,6 +1081,7 @@ def main() -> int:
         "vessel": HONDIUS_VESSEL,
         "vessel_position": hondius_pos,
         "vessel_counts": hondius_counts,
+        "other_outbreaks": other_outbreaks,
         "vessel_json": json.dumps(
             {**HONDIUS_VESSEL,
              "position": hondius_pos,

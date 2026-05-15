@@ -299,9 +299,126 @@
     border-top: 1px solid var(--line); padding-top: 16px;
   }
   footer a { color: var(--muted); text-decoration: underline; }
+
+  /* ---------- Other-outbreaks sidebar ---------- */
+  .sidebar {
+    position: fixed; top: 80px; right: 14px; z-index: 600;
+    width: 320px; max-height: calc(100vh - 100px);
+    background: rgba(20,28,38,.96);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform .25s ease, opacity .2s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  }
+  .sidebar.collapsed {
+    transform: translateX(calc(100% + 24px));
+    opacity: 0; pointer-events: none;
+  }
+  .sidebar .sb-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border-bottom: 1px solid var(--line);
+    background: linear-gradient(135deg, rgba(255,184,77,.10), rgba(255,59,59,.06));
+  }
+  .sidebar .sb-head h3 {
+    margin: 0; font-size: 12px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent-2);
+  }
+  .sidebar .sb-body { overflow-y: auto; padding: 10px 12px; }
+  .sidebar .ob {
+    padding: 10px 0; border-top: 1px solid var(--line);
+  }
+  .sidebar .ob:first-child { border-top: 0; padding-top: 4px; }
+  .sidebar .ob-name {
+    font-size: 15px; font-weight: 700; color: var(--ink);
+  }
+  .sidebar .ob-region {
+    color: var(--muted); font-size: 11px; margin-top: 2px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .sidebar .ob-blurb {
+    color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.5;
+  }
+  .sidebar .ob ul {
+    list-style: none; padding: 0; margin: 8px 0 0;
+  }
+  .sidebar .ob li { padding: 5px 0; font-size: 12px; line-height: 1.4; }
+  .sidebar .ob li .meta { color: var(--muted); font-size: 10px; }
+
+  .sidebar-toggle {
+    position: fixed; top: 80px; right: 14px; z-index: 601;
+    background: rgba(20,28,38,.92);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    color: var(--ink); font-size: 12px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; display: none;
+    transition: background .15s ease;
+  }
+  .sidebar-toggle:hover { background: rgba(30,40,52,.96); }
+  .sidebar-toggle .pill {
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent-2); margin-right: 6px;
+    box-shadow: 0 0 6px rgba(255,184,77,.7);
+  }
+  body.sidebar-off .sidebar { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
+  body.sidebar-off .sidebar-toggle { display: inline-block; }
+
+  .sb-close {
+    background: transparent; border: 0; color: var(--muted);
+    font-size: 18px; line-height: 1; cursor: pointer; padding: 4px 6px;
+    border-radius: 6px;
+  }
+  .sb-close:hover { color: var(--ink); background: rgba(255,255,255,.06); }
+
+  @media (max-width: 900px) {
+    .sidebar, .sidebar-toggle { display: none !important; }
+  }
 </style>
 </head>
 <body>
+<script>
+  // Apply sidebar visibility before rendering to avoid a flash.
+  try {
+    if (localStorage.getItem('hanta:sidebar') === 'off') {
+      document.body.classList.add('sidebar-off');
+    }
+  } catch (e) {}
+</script>
+
+{% if other_outbreaks %}
+<aside class="sidebar" id="otherOutbreaks">
+  <div class="sb-head">
+    <h3>Other active outbreaks</h3>
+    <button class="sb-close" id="sbClose" title="Hide sidebar" aria-label="Hide sidebar">×</button>
+  </div>
+  <div class="sb-body">
+    {% for ob in other_outbreaks %}
+    <div class="ob">
+      <div class="ob-name">{{ ob.name }}</div>
+      <div class="ob-region">{{ ob.region }} · since {{ ob.started }}</div>
+      <div class="ob-blurb">{{ ob.blurb }}</div>
+      {% if ob.news %}
+      <ul>
+        {% for i in ob.news[:4] %}
+        <li>
+          <a href="{{ i.url }}" target="_blank" rel="noopener">{{ i.title|unescape }}</a>
+          <div class="meta">{{ i.source }}{% if i.published %} · {{ i.published }}{% endif %}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</aside>
+<button class="sidebar-toggle" id="sbToggle" title="Show other outbreaks">
+  <span class="pill"></span>Other outbreaks
+</button>
+{% endif %}
 
 <div class="hero">
   <div id="map"></div>
@@ -704,6 +821,16 @@
       `, { maxWidth: 320 })
       .addTo(map);
   }
+
+  // ----- Other-outbreaks sidebar toggle (localStorage-persisted) -----
+  document.getElementById('sbClose')?.addEventListener('click', () => {
+    document.body.classList.add('sidebar-off');
+    try { localStorage.setItem('hanta:sidebar', 'off'); } catch (e) {}
+  });
+  document.getElementById('sbToggle')?.addEventListener('click', () => {
+    document.body.classList.remove('sidebar-off');
+    try { localStorage.setItem('hanta:sidebar', 'on'); } catch (e) {}
+  });
 
   // Fit to data bounds if any markers, else default world view.
   const allPoints = [
