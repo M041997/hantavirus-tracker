@@ -159,20 +159,22 @@
     background: var(--accent-2); box-shadow: none;
   }
 
-  /* Pulse marker (HTML divIcon) */
+  /* Pulse marker (HTML divIcon). Color overridable via --pc on the
+     element (used for non-hantavirus outbreak markers). */
   .pulse-marker {
     position: relative;
     width: 14px; height: 14px;
+    --pc: var(--accent);
   }
   .pulse-marker .core {
     position: absolute; inset: 0; margin: auto;
     width: 10px; height: 10px; border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px rgba(255,59,59,.9);
+    background: var(--pc);
+    box-shadow: 0 0 8px var(--pc);
   }
   .pulse-marker .ring {
     position: absolute; inset: -8px; border-radius: 50%;
-    border: 2px solid var(--accent);
+    border: 2px solid var(--pc);
     opacity: 0;
     animation: ring 2.2s ease-out infinite;
   }
@@ -402,13 +404,8 @@
       <ul>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMic0FVX3lxTE9jVkpWRjRtcmhqLU11MGM4dnNuVkFsb1NNcDBEdVVyWklCbDJ1WkhwSUtuTm1FM0xiWjlyNFdtdkxEVHIwdjBqX2dIV2U4WWVxczhSM3VOVmo2SnFoN1RiWHo0aUw4bVhfRWZVcmh4ekQ0QTQ?oc=5" target="_blank" rel="noopener">A new Ebola outbreak is confirmed in a remote Congo province, with 65 deaths recorded</a>
-          <div class="meta">Google News · CNN · 1h ago</div>
-        </li>
-        
-        <li>
-          <a href="https://news.google.com/rss/articles/CBMizwFBVV95cUxObzVndDlCNmxOWXRhME1fWFpwbkZEWTRsV0NFd1paN0pZSmJpSUdBcFBlUE1kMWRpdlI3QVkwQlVRcWRueXVveV9WSl9wSi1ncjJEUXMtZFdTMno1dkdWZVI5NVluVlBzNnI0MkdRemg1Y09NeTNWclk2LXFXM0lvRkFCZTFzSE5pSmVUWjhiY0tXTEEzeElYNHBjSmF1bzEyYjVVNUpHZnRhWG9HU0M1d1Rrb1VmWHZ1V2d3MHp6YXdvbURRc215TFFRUFhIeEU?oc=5" target="_blank" rel="noopener">African public health agency announces new Ebola outbreak in Congo, 65 suspected deaths</a>
-          <div class="meta">Google News · Reuters · 3h ago</div>
+          <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxPYmY2VURZNGQ0NkZsbElELXk5NTdCczJlZ05jOVpCRlMyT0J3S0xsNkJFdUdyUFZGaDdUNnEtTVI2eVJTTUhreTh2SDk3LUVQNnlIS25NRDZWOWhYNGxCNDJ6ZXk5a2FwdWVWQmVMVTZLUWVHLUdaT2VSeFQxcFQ4bEVDWl9GVlRfTTdsaURjczVlS2o2X1lwTkVOYld3cS0wWmRhTTBNZGVZaHJI?oc=5" target="_blank" rel="noopener">What to know about new Ebola outbreak that has killed 65 people in Congo</a>
+          <div class="meta">Google News · WRAL · 3h ago</div>
         </li>
         
         <li>
@@ -419,6 +416,11 @@
         <li>
           <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxOMXBBa1V2RjlfSnZjeXBqeS1Tb0I5ZjhJc2JoX0g5TS05TUVCb2tCMzdGVUNXR19hVldFQkhyXzFnSmY5QzJsMWl2YW9FWVVYRFp2TE5mR0RPT0h4dk1oN09OYlhZaURYTVhSVHZjVU1EanJWT0xWR25mRnJuRXZRejJjcEw2eEx0c3YyNTlQVk5qSVFEeHVtVXZIaGpHS3A0RzRZNW1BY0R0UQ?oc=5" target="_blank" rel="noopener">Ebola outbreak declared in eastern DR Congo as regional alert raised</a>
           <div class="meta">Google News · RFI · 3h ago</div>
+        </li>
+        
+        <li>
+          <a href="https://news.google.com/rss/articles/CBMizAFBVV95cUxNREY1X256QkVGdnhMbFZteV9TMTBjSUI1SktsUTBjYkxraTdSY0VIWXlheGh5aUE5cUk5ajVfR2s4dkZTbU1FdTJtbFNWOEVNM2xQZlZFUWxJZENFenZYbzdzSjlKcUtoenBGQ0VLUS0yRm5WeU1zSXBuUjktWWxQbWpKYlp4VFloVUZ1ZzlNT2cwVWIyaDQ4bUVQRHQwZnI5QlZmV3N2NjlDRV82RmNRZkJfcGpsV0EtNFR3M18xdUg3T1o0MDk4NmxnSW8?oc=5" target="_blank" rel="noopener">Africa calls multi-nation health meeting amid fatal Ebola outbreak</a>
+          <div class="meta">Google News · South China Morning Post · 3h ago</div>
         </li>
         
       </ul>
@@ -438,7 +440,7 @@
   <div class="hud hud-tl">
     <div class="title-card">
       <h1><span class="dot"></span>Hantavirus Tracker</h1>
-      <div class="sub">Updated 2026-05-15 13:56 UTC · rebuilds hourly</div>
+      <div class="sub">Updated 2026-05-15 14:08 UTC · rebuilds hourly</div>
     </div>
   </div>
 
@@ -533,22 +535,22 @@
           <div>
             <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Position</div>
             <div style="font-size: 18px; font-variant-numeric: tabular-nums;">
-              43.801°,
-              -10.272°
+              43.810°,
+              -10.265°
             </div>
           </div>
           
           <div>
             <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Heading</div>
             <div style="font-size: 18px; font-variant-numeric: tabular-nums;">
-              28°
+              31°
             </div>
           </div>
           
           <div>
             <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Last AIS fix</div>
             <div style="font-size: 13px; color: var(--good);">
-              2026-05-15 13:56 UTC
+              2026-05-15 14:08 UTC
             </div>
           </div>
         </div>
@@ -578,7 +580,7 @@
           </div>
           <div class="row">
             <span class="src promed">ProMED-mail</span>
-            <span>·</span><span>13h ago</span>
+            <span>·</span><span>14h ago</span>
           </div>
         </li>
         
@@ -751,20 +753,20 @@
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMi6wFBVV95cUxNZEFGZGV0YXctMUZnUGY0cmRlS2sxRm9kUjZoXzVWS2NBYjdhRklONEJMSDJHNlVrZGZCVjNnczdvUXdsR0RGdVNsY2k0MGs3LWVWU2RzcFV5QnZJRXBVZ2paNFlFai1xTmVXeUp3eWJTVVViTU8wQ1ZidGJvUS10WEZfcURYSGNRRFl4cjNjT2VueFBYNWEwcjRMYk9OeDFNNFpTSERpVW1Sd3FPSEZhQUlNdHFiMG5acF9Hak1jYjB5N0ZrbjdGaTM3aWh1eDJqYWdoR0FmdXBMakE1RV9aUUlxNE90cDNKVjhR?oc=5" target="_blank" rel="noopener">These are the 10 U.S. states monitoring for hantavirus cases linked to cruise ship at center of outbreak</a>
+            <a href="https://news.google.com/rss/articles/CBMijgFBVV95cUxOSV9BRHJ1eXJDSFFySXNOSXBQUDVOUkdxejNRdFd4SXNTWEl2cUhDZE9QZ3dhVWVEUkJFUDNpdHE1NXE2T0FIazhKWURqdThLVmRYUWRDQlBGNGY3QXNvS3llTlR0ZVc5NzFrVkxqNGRCMkxSajNZLUxydTk3c0NRTnhmX0VYNmQ0TlNna1dR?oc=5" target="_blank" rel="noopener">Will the Hantavirus Outbreak Cause a Lockdown? What Experts Want You to Know</a>
           </div>
           <div class="row">
-            <span class="src">Google News · Yahoo</span>
+            <span class="src">Google News · TODAY.com</span>
             <span>·</span><span>1h ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMijgFBVV95cUxOSV9BRHJ1eXJDSFFySXNOSXBQUDVOUkdxejNRdFd4SXNTWEl2cUhDZE9QZ3dhVWVEUkJFUDNpdHE1NXE2T0FIazhKWURqdThLVmRYUWRDQlBGNGY3QXNvS3llTlR0ZVc5NzFrVkxqNGRCMkxSajNZLUxydTk3c0NRTnhmX0VYNmQ0TlNna1dR?oc=5" target="_blank" rel="noopener">Will the Hantavirus Outbreak Cause a Lockdown? What Experts Want You to Know</a>
+            <a href="https://news.google.com/rss/articles/CBMimgFBVV95cUxOUWViYk8wbGhoampKRnlPbEIwX2t2c0puREU4ME4tRkVYcVZrV05TQ0VQX25SWFNYZV9BaWFJQzlpekx6bWVlWDJPQm96RVBEVlFEU3VGUWpxMjJ6MGpuU2xCa21tLVJObUVsT2RtclJ0eDgzNnk5RkF1bmotd2lGUXlHXy1nbEVTbUw5eFo1UVFrX0FRd1NuM3BR?oc=5" target="_blank" rel="noopener">M/V Hondius — Atlantic Odyssey: Tracking the First Andes Hantavirus Outbreak at Sea</a>
           </div>
           <div class="row">
-            <span class="src">Google News · TODAY.com</span>
+            <span class="src">Google News · World Health Network</span>
             <span>·</span><span>1h ago</span>
           </div>
         </li>
@@ -811,21 +813,11 @@
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMimgFBVV95cUxOUWViYk8wbGhoampKRnlPbEIwX2t2c0puREU4ME4tRkVYcVZrV05TQ0VQX25SWFNYZV9BaWFJQzlpekx6bWVlWDJPQm96RVBEVlFEU3VGUWpxMjJ6MGpuU2xCa21tLVJObUVsT2RtclJ0eDgzNnk5RkF1bmotd2lGUXlHXy1nbEVTbUw5eFo1UVFrX0FRd1NuM3BR?oc=5" target="_blank" rel="noopener">M/V Hondius — Atlantic Odyssey: Tracking the First Hantavirus Outbreak at Sea</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · World Health Network</span>
-            <span>·</span><span>3h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
             <a href="https://news.google.com/rss/articles/CBMiigFBVV95cUxOYVhLSjloUm0wQUdxUHdOMTdDS2xwMDFoVGNsa2pKU1V6NHd0WnJtNGpXa2NSN0hZWDN3S2pCLTNEcHhzdUpsS0RuU21vN1MydzZDaG41blFsNFdCeTZ6dUM3N2pORFRQMnhvV3lCMFJvYnJQSHM5RW9GMzdNVU9JTHo4RGtHU0xHalE?oc=5" target="_blank" rel="noopener">Penile implant specialist with history of far-right comments led hantavirus presser</a>
           </div>
           <div class="row">
             <span class="src">Google News · CNN</span>
-            <span>·</span><span>4h ago</span>
+            <span>·</span><span>5h ago</span>
           </div>
         </li>
         
@@ -835,7 +827,7 @@
           </div>
           <div class="row">
             <span class="src">Google News · C-SPAN</span>
-            <span>·</span><span>6h ago</span>
+            <span>·</span><span>7h ago</span>
           </div>
         </li>
         
@@ -855,7 +847,7 @@
           </div>
           <div class="row">
             <span class="src">Google News · 13wham.com</span>
-            <span>·</span><span>8h ago</span>
+            <span>·</span><span>9h ago</span>
           </div>
         </li>
         
@@ -876,6 +868,16 @@
           <div class="row">
             <span class="src">Google News · The Santa Barbara Independent</span>
             <span>·</span><span>11h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxOalFwa0NfQ0xuelJ4SWI2a0M5R0FVeWlsRktzSGtNV0d1TXVqOThqSjE1OWFtaU9tX2VYZ05wYUFNcmNMNFZfR0cwWkVjVFRqUjZxX2NzVlAwcWdTZ19DbEtSYUs3UllXcnhXdTBmUGNaajk3NTdLa3JydFVvQnpUUWNOMkQzSjlwc1hjb3Fxd9IBlAFBVV95cUxQc0xlY1REUUtHWEZoUThzRy1NX1BkZS1qR1pNMUZqeHlmLU5Gbmw4Q2FEc2RnaGR3Yk9KR29RUU9rNkVjelQ2bTVyaEFfWVpQanIyMF8xSzVCTjdmRDF6V2NodV9lOS0tMGZBWUxVdzAzam1NVjRQcDJPTXBaQ3NRNHFFWTNLZG5BMTZHOWRLVlBERDJG?oc=5" target="_blank" rel="noopener">American passenger from hantavirus-hit cruise ship speaks about life in quarantine</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · CBS News</span>
+            <span>·</span><span>14h ago</span>
           </div>
         </li>
         
@@ -961,11 +963,11 @@
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE1NUmxWeldpaUZKRmhzYWgzamVDVDJzNW52LTJMMGJZMzMxeTdNS1lJSDJIcFpCYmc3bnNMV21HRzlNc1pONG1NWjJETnN6cGJ4RHZKQkhlUWZCNUJTZTgwZzhnakdYQUhWOElaMkxOc3BwTF800gF6QVVfeXFMUE5rLTNtQnBMUXZCcnoxS2dJTVh1aGxtdG1IdjhUQ0dwR0dhYWZqYUlHWGFyUHE1REQ0b2dPdG1mRW5iQXoxUUlwWTE2eF9yRFJqcEw3NVkzYk5idy14OHRpQmJkR05HejVzcmtmOWhtRjZwRmtkc3BrN3c?oc=5" target="_blank" rel="noopener">CDC not requiring hantavirus cruise passengers to isolate at home</a>
+            <a href="https://news.google.com/rss/articles/CBMihwFBVV95cUxQZ2tnd2FFUHBBUDJTbUstT3U4VDYxa2JLNU9LVFhMWmFCZjIzeTQ1cGR5X2N1VjJDOFFwaUZOZmxwTnY5WWdlTkczdmlVQXFFWS1ZSVZrQnpsRVFWTTExMUMzOTk4SFRwVEttbUphV1NaWGNBenJhRXJfSWQ4TDNRc2RCUDF1Sk0?oc=5" target="_blank" rel="noopener">How hantavirus actually spreads is a key question</a>
           </div>
           <div class="row">
-            <span class="src">Google News · The Hill</span>
-            <span>·</span><span>1 day ago</span>
+            <span class="src">Google News · Harvard T.H. Chan School of Public Health</span>
+            <span>·</span><span>22h ago</span>
           </div>
         </li>
         
@@ -1019,9 +1021,10 @@
 <script>
   // Server-rendered data dump for the map.
   window.HANTA = {
-    countries: [{"country": "Argentina", "lat": -38.4, "lng": -63.6, "count": 8, "latest_title": "HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "13h ago", "items": [{"title": "HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "13h ago"}, {"title": "HANTAVIRUS - ARGENTINA (20): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED PASSENGERS", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "1 day ago"}, {"title": "HANTAVIRUS - ARGENTINA (19): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKATION", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "4 days ago"}, {"title": "HANTAVIRUS - ARGENTINA (18): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, POST-SHIP CASES AND SURVEILLANCE", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "4 days ago"}, {"title": "HANTAVIRUS (06) \u2013 ARGENTINA: BROTE EN ALTAMAR, INFORMACI\u00d3N SOBRE EL PACIENTE CERO", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "5 days ago"}, {"title": "HANTAVIRUS (05) \u2013 ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO, VIRUS ANDES, TRANSMISI\u00d3N MEDIANTE CONTACTO NO ESTRECHO", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "7 days ago"}]}, {"country": "Canary Islands", "lat": 28.3, "lng": -15.5, "count": 1, "latest_title": "Follow-up message by the WHO Director-General to the people of Tenerife regarding the hantavirus response", "latest_url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOWHUyMWpfWHNpMGdCOV9JemRJNlhmcU9ZY19LTEF5b0ROSzlnY3JpQzlKWjJfVEpPeS1IZ2RSY2xEYVA2OWcyVlJsdU9FeENMUDIyTG8yb2pHRVAwX3hxel9ES3dlaHEzSy03N2NzUUVjR0VHdlFFbmppbUVLYi02TEtRT3lrLWY2NVlJTW9fWER3RjRIcHhSZkhVZndYZC1XaWFhYWNOX25JNWdiMVUzN3lQQk4zak9qSWFza291dVkzbElkdkxWa2Zka0VqcDJGaFBNWF9CQjdVaTF0TDN3?oc=5", "latest_date": "20h ago", "items": [{"title": "Follow-up message by the WHO Director-General to the people of Tenerife regarding the hantavirus response", "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOWHUyMWpfWHNpMGdCOV9JemRJNlhmcU9ZY19LTEF5b0ROSzlnY3JpQzlKWjJfVEpPeS1IZ2RSY2xEYVA2OWcyVlJsdU9FeENMUDIyTG8yb2pHRVAwX3hxel9ES3dlaHEzSy03N2NzUUVjR0VHdlFFbmppbUVLYi02TEtRT3lrLWY2NVlJTW9fWER3RjRIcHhSZkhVZndYZC1XaWFhYWNOX25JNWdiMVUzN3lQQk4zak9qSWFza291dVkzbElkdkxWa2Zka0VqcDJGaFBNWF9CQjdVaTF0TDN3?oc=5", "source": "Google News \u00b7 World Health Organization (WHO)", "published": "20h ago"}]}, {"country": "France", "lat": 46.6, "lng": 2.2, "count": 1, "latest_title": "Critically ill French hantavirus patient is on an artificial lung as outbreak grows to 11", "latest_url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNNk0tQ2pGVF9vclU1YjlQR2pncmdQc3Y5c3BFNGF5c2pnUTdPRXp0emZoRWR1c3JCSWNMUUNaUEtJdmlxM1UtcVBDWWRNa01XOHFSaG0zUVZINXFuX284VUJNN04wb0ZJbF9IeHFtUWI1T0J2RzQyVk1tRDZ5aEh4OFRJUjRMUUlVdWg2QXZzbmhkclZ4QmlwSHpVTHVwcU9PLVNlSGlJWE4wRzM0NDFteDlseVJzNlV4My1rNlBtUktYemM?oc=5", "latest_date": "1 day ago", "items": [{"title": "Critically ill French hantavirus patient is on an artificial lung as outbreak grows to 11", "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNNk0tQ2pGVF9vclU1YjlQR2pncmdQc3Y5c3BFNGF5c2pnUTdPRXp0emZoRWR1c3JCSWNMUUNaUEtJdmlxM1UtcVBDWWRNa01XOHFSaG0zUVZINXFuX284VUJNN04wb0ZJbF9IeHFtUWI1T0J2RzQyVk1tRDZ5aEh4OFRJUjRMUUlVdWg2QXZzbmhkclZ4QmlwSHpVTHVwcU9PLVNlSGlJWE4wRzM0NDFteDlseVJzNlV4My1rNlBtUktYemM?oc=5", "source": "Google News \u00b7 PBS", "published": "1 day ago"}]}, {"country": "USA", "lat": 37.1, "lng": -95.7, "count": 1, "latest_title": "HANTAVIRUS - USA (04): (ILLINOIS) SUSPECTED, AUTOCHTHONOUS CASE", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "2 days ago", "items": [{"title": "HANTAVIRUS - USA (04): (ILLINOIS) SUSPECTED, AUTOCHTHONOUS CASE", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "2 days ago"}]}, {"country": "Taiwan", "lat": 23.7, "lng": 121.0, "count": 1, "latest_title": "HANTAVIRUS - TAIWAN (03): (TAIPEI) RAT INFESTATION, HUMAN, FATAL, NORMAL RANGE, RODENT CONTROL", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "5 days ago", "items": [{"title": "HANTAVIRUS - TAIWAN (03): (TAIPEI) RAT INFESTATION, HUMAN, FATAL, NORMAL RANGE, RODENT CONTROL", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "5 days ago"}]}, {"country": "South Africa", "lat": -30.6, "lng": 22.9, "count": 1, "latest_title": "HANTAVIRUS - SOUTH AFRICA: ex ARGENTINA, CRUISE SHIP, MONITORING CONTACTS OF HANTAVIRUS PATIENTS", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "7 days ago", "items": [{"title": "HANTAVIRUS - SOUTH AFRICA: ex ARGENTINA, CRUISE SHIP, MONITORING CONTACTS OF HANTAVIRUS PATIENTS", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "7 days ago"}]}],
+    countries: [{"country": "Argentina", "lat": -38.4, "lng": -63.6, "count": 8, "latest_title": "HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "14h ago", "items": [{"title": "HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "14h ago"}, {"title": "HANTAVIRUS - ARGENTINA (20): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED PASSENGERS", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "1 day ago"}, {"title": "HANTAVIRUS - ARGENTINA (19): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKATION", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "4 days ago"}, {"title": "HANTAVIRUS - ARGENTINA (18): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, FATAL, POST-SHIP CASES AND SURVEILLANCE", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "4 days ago"}, {"title": "HANTAVIRUS (06) \u2013 ARGENTINA: BROTE EN ALTAMAR, INFORMACI\u00d3N SOBRE EL PACIENTE CERO", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "5 days ago"}, {"title": "HANTAVIRUS (05) \u2013 ARGENTINA: BROTE EN ALTAMAR, MUERTES, BARCO CRUCERO, VIRUS ANDES, TRANSMISI\u00d3N MEDIANTE CONTACTO NO ESTRECHO", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "7 days ago"}]}, {"country": "Canary Islands", "lat": 28.3, "lng": -15.5, "count": 1, "latest_title": "Follow-up message by the WHO Director-General to the people of Tenerife regarding the hantavirus response", "latest_url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOWHUyMWpfWHNpMGdCOV9JemRJNlhmcU9ZY19LTEF5b0ROSzlnY3JpQzlKWjJfVEpPeS1IZ2RSY2xEYVA2OWcyVlJsdU9FeENMUDIyTG8yb2pHRVAwX3hxel9ES3dlaHEzSy03N2NzUUVjR0VHdlFFbmppbUVLYi02TEtRT3lrLWY2NVlJTW9fWER3RjRIcHhSZkhVZndYZC1XaWFhYWNOX25JNWdiMVUzN3lQQk4zak9qSWFza291dVkzbElkdkxWa2Zka0VqcDJGaFBNWF9CQjdVaTF0TDN3?oc=5", "latest_date": "20h ago", "items": [{"title": "Follow-up message by the WHO Director-General to the people of Tenerife regarding the hantavirus response", "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOWHUyMWpfWHNpMGdCOV9JemRJNlhmcU9ZY19LTEF5b0ROSzlnY3JpQzlKWjJfVEpPeS1IZ2RSY2xEYVA2OWcyVlJsdU9FeENMUDIyTG8yb2pHRVAwX3hxel9ES3dlaHEzSy03N2NzUUVjR0VHdlFFbmppbUVLYi02TEtRT3lrLWY2NVlJTW9fWER3RjRIcHhSZkhVZndYZC1XaWFhYWNOX25JNWdiMVUzN3lQQk4zak9qSWFza291dVkzbElkdkxWa2Zka0VqcDJGaFBNWF9CQjdVaTF0TDN3?oc=5", "source": "Google News \u00b7 World Health Organization (WHO)", "published": "20h ago"}]}, {"country": "France", "lat": 46.6, "lng": 2.2, "count": 1, "latest_title": "Critically ill French hantavirus patient is on an artificial lung as outbreak grows to 11", "latest_url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNNk0tQ2pGVF9vclU1YjlQR2pncmdQc3Y5c3BFNGF5c2pnUTdPRXp0emZoRWR1c3JCSWNMUUNaUEtJdmlxM1UtcVBDWWRNa01XOHFSaG0zUVZINXFuX284VUJNN04wb0ZJbF9IeHFtUWI1T0J2RzQyVk1tRDZ5aEh4OFRJUjRMUUlVdWg2QXZzbmhkclZ4QmlwSHpVTHVwcU9PLVNlSGlJWE4wRzM0NDFteDlseVJzNlV4My1rNlBtUktYemM?oc=5", "latest_date": "1 day ago", "items": [{"title": "Critically ill French hantavirus patient is on an artificial lung as outbreak grows to 11", "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxNNk0tQ2pGVF9vclU1YjlQR2pncmdQc3Y5c3BFNGF5c2pnUTdPRXp0emZoRWR1c3JCSWNMUUNaUEtJdmlxM1UtcVBDWWRNa01XOHFSaG0zUVZINXFuX284VUJNN04wb0ZJbF9IeHFtUWI1T0J2RzQyVk1tRDZ5aEh4OFRJUjRMUUlVdWg2QXZzbmhkclZ4QmlwSHpVTHVwcU9PLVNlSGlJWE4wRzM0NDFteDlseVJzNlV4My1rNlBtUktYemM?oc=5", "source": "Google News \u00b7 PBS", "published": "1 day ago"}]}, {"country": "USA", "lat": 37.1, "lng": -95.7, "count": 1, "latest_title": "HANTAVIRUS - USA (04): (ILLINOIS) SUSPECTED, AUTOCHTHONOUS CASE", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "2 days ago", "items": [{"title": "HANTAVIRUS - USA (04): (ILLINOIS) SUSPECTED, AUTOCHTHONOUS CASE", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "2 days ago"}]}, {"country": "Taiwan", "lat": 23.7, "lng": 121.0, "count": 1, "latest_title": "HANTAVIRUS - TAIWAN (03): (TAIPEI) RAT INFESTATION, HUMAN, FATAL, NORMAL RANGE, RODENT CONTROL", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "5 days ago", "items": [{"title": "HANTAVIRUS - TAIWAN (03): (TAIPEI) RAT INFESTATION, HUMAN, FATAL, NORMAL RANGE, RODENT CONTROL", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "5 days ago"}]}, {"country": "South Africa", "lat": -30.6, "lng": 22.9, "count": 1, "latest_title": "HANTAVIRUS - SOUTH AFRICA: ex ARGENTINA, CRUISE SHIP, MONITORING CONTACTS OF HANTAVIRUS PATIENTS", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "7 days ago", "items": [{"title": "HANTAVIRUS - SOUTH AFRICA: ex ARGENTINA, CRUISE SHIP, MONITORING CONTACTS OF HANTAVIRUS PATIENTS", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "7 days ago"}]}],
     arcs:      [{"from": "Argentina", "to": "Texas", "from_latlng": [-38.4, -63.6], "to_latlng": [31.5, -99.3], "label": "TX residents on cruise, returned"}, {"from": "Argentina", "to": "Nebraska", "from_latlng": [-38.4, -63.6], "to_latlng": [41.5, -99.8], "label": "Federal quarantine \u2014 Nebraska Medicine"}, {"from": "Argentina", "to": "New Jersey", "from_latlng": [-38.4, -63.6], "to_latlng": [40.2, -74.5], "label": "NJDOH monitoring air-travel contacts"}, {"from": "Argentina", "to": "California", "from_latlng": [-38.4, -63.6], "to_latlng": [36.8, -119.4], "label": "Passengers monitored on return"}, {"from": "Argentina", "to": "Arizona", "from_latlng": [-38.4, -63.6], "to_latlng": [34.2, -111.7], "label": "Passengers monitored on return"}, {"from": "Argentina", "to": "Chile", "from_latlng": [-38.4, -63.6], "to_latlng": [-35.7, -71.5], "label": "Cruise stopover"}, {"from": "Argentina", "to": "Brazil", "from_latlng": [-38.4, -63.6], "to_latlng": [-14.2, -51.9], "label": "Cruise stopover"}, {"from": "Argentina", "to": "Canary Islands", "from_latlng": [-38.4, -63.6], "to_latlng": [28.3, -15.5], "label": "Hondius port of disembarkation"}, {"from": "Argentina", "to": "South Africa", "from_latlng": [-38.4, -63.6], "to_latlng": [-30.6, 22.9], "label": "Contacts monitored on stopover"}, {"from": "Argentina", "to": "France", "from_latlng": [-38.4, -63.6], "to_latlng": [46.6, 2.2], "label": "Critical patient on ECMO"}, {"from": "Argentina", "to": "Oregon", "from_latlng": [-38.4, -63.6], "to_latlng": [44.0, -120.5], "label": "Physician case in isolation"}],
-    vessel:    {"name": "MV Hondius", "operator": "Oceanwide Expeditions", "imo": "9818709", "mmsi": "244327000", "flag": "Netherlands", "departed_from": "Ushuaia, Argentina", "departed_at": "2026-04-01", "tracker_url": "https://www.cruisemapper.com/ships/MV-Hondius-1624", "vesselfinder_url": "https://www.vesselfinder.com/vessels/details/9818709", "marinetraffic_url": "https://www.marinetraffic.com/en/ais/details/ships/shipid:5873599/mmsi:244327000/imo:9818709/vessel:HONDIUS", "position": {"lat": 43.801, "lng": -10.2722, "heading_deg": 28.0, "fetched_at": "2026-05-15T13:56:34Z"}, "counts": {"cases_total": 10, "cases_confirmed": 8, "cases_suspected": 2, "deaths": 3, "critical": 1, "on_board": 147, "passengers": 88, "crew": 59, "as_of": "2026-05-15", "source": "ECDC", "source_url": "https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak", "fetched_at": "2026-05-15T13:56:34Z"}, "track": [{"lat": 18.988, "lng": -21.12, "fetched_at": "2026-05-07T19:34:00Z"}, {"lat": 22.484, "lng": -19.355, "fetched_at": "2026-05-08T15:43:45Z"}, {"lat": 23.331, "lng": -18.926, "fetched_at": "2026-05-08T21:03:33Z"}, {"lat": 23.35961, "lng": -18.91158, "fetched_at": "2026-05-08T21:16:15Z"}, {"lat": 23.51273, "lng": -18.83061, "fetched_at": "2026-05-08T22:08:11Z"}, {"lat": 23.84758, "lng": -18.65935, "fetched_at": "2026-05-09T00:06:01Z"}, {"lat": 24.59444, "lng": -18.27289, "fetched_at": "2026-05-09T04:30:25Z"}, {"lat": 25.10726, "lng": -18.0078, "fetched_at": "2026-05-09T07:17:49Z"}, {"lat": 25.49981, "lng": -17.807568333333332, "fetched_at": "2026-05-09T09:40:51Z"}, {"lat": 25.72282, "lng": -17.69591, "fetched_at": "2026-05-09T11:06:30Z"}, {"lat": 26.19046, "lng": -17.4559, "fetched_at": "2026-05-09T13:46:05Z"}, {"lat": 26.41884, "lng": -17.34315, "fetched_at": "2026-05-09T15:03:57Z"}, {"lat": 26.59258, "lng": -17.25388, "fetched_at": "2026-05-09T16:04:51Z"}, {"lat": 26.76171, "lng": -17.16796, "fetched_at": "2026-05-09T17:08:51Z"}, {"lat": 27.13789, "lng": -16.97533, "fetched_at": "2026-05-09T19:17:02Z"}, {"lat": 27.31942, "lng": -16.88195, "fetched_at": "2026-05-09T20:57:04Z"}, {"lat": 27.4241, "lng": -16.82684, "fetched_at": "2026-05-09T21:56:29Z"}, {"lat": 27.52196, "lng": -16.77905, "fetched_at": "2026-05-09T22:58:14Z"}, {"lat": 27.61851, "lng": -16.72976, "fetched_at": "2026-05-09T23:58:15Z"}, {"lat": 27.99756, "lng": -16.53217, "fetched_at": "2026-05-10T04:07:08Z"}, {"lat": 28.07329, "lng": -16.49035, "fetched_at": "2026-05-10T07:31:04Z"}, {"lat": 28.07362, "lng": -16.49148, "fetched_at": "2026-05-10T09:45:49Z"}, {"lat": 28.07367, "lng": -16.49153, "fetched_at": "2026-05-10T11:07:48Z"}, {"lat": 28.07418, "lng": -16.49112, "fetched_at": "2026-05-10T13:02:36Z"}, {"lat": 28.0739, "lng": -16.49142, "fetched_at": "2026-05-10T13:49:27Z"}, {"lat": 28.0738, "lng": -16.49146, "fetched_at": "2026-05-10T15:04:37Z"}, {"lat": 28.0737, "lng": -16.49159, "fetched_at": "2026-05-10T16:06:01Z"}, {"lat": 28.07279, "lng": -16.49106, "fetched_at": "2026-05-10T17:58:55Z"}, {"lat": 28.0729, "lng": -16.49127, "fetched_at": "2026-05-10T19:18:28Z"}, {"lat": 28.07275, "lng": -16.49102, "fetched_at": "2026-05-10T20:59:55Z"}, {"lat": 28.07276, "lng": -16.49105, "fetched_at": "2026-05-10T21:57:59Z"}, {"lat": 28.07272, "lng": -16.4908, "fetched_at": "2026-05-10T23:00:21Z"}, {"lat": 28.07274, "lng": -16.49044, "fetched_at": "2026-05-11T00:02:14Z"}, {"lat": 28.07274, "lng": -16.49041, "fetched_at": "2026-05-11T04:19:30Z"}, {"lat": 28.07279, "lng": -16.49082, "fetched_at": "2026-05-11T08:31:16Z"}, {"lat": 28.07412, "lng": -16.49057, "fetched_at": "2026-05-11T12:19:53Z"}, {"lat": 28.07473, "lng": -16.48994, "fetched_at": "2026-05-11T16:09:44Z"}, {"lat": 28.07639, "lng": -16.48684, "fetched_at": "2026-05-11T18:06:55Z"}, {"lat": 28.01398, "lng": -16.31723, "fetched_at": "2026-05-11T19:05:15Z"}, {"lat": 28.21373, "lng": -16.04511, "fetched_at": "2026-05-11T20:52:38Z"}, {"lat": 28.43566, "lng": -15.82828, "fetched_at": "2026-05-11T22:16:06Z"}, {"lat": 28.75466, "lng": -15.62808, "fetched_at": "2026-05-12T00:06:54Z"}, {"lat": 29.61057, "lng": -15.34577, "fetched_at": "2026-05-12T04:43:52Z"}, {"lat": 30.20376, "lng": -15.15485, "fetched_at": "2026-05-12T07:50:55Z"}, {"lat": 30.72568, "lng": -14.97996, "fetched_at": "2026-05-12T10:39:52Z"}, {"lat": 31.13528, "lng": -14.8461, "fetched_at": "2026-05-12T13:10:17Z"}, {"lat": 31.73629, "lng": -14.64745, "fetched_at": "2026-05-12T16:28:08Z"}, {"lat": 32.15143, "lng": -14.49682, "fetched_at": "2026-05-12T19:03:55Z"}, {"lat": 32.4434, "lng": -14.37146, "fetched_at": "2026-05-12T20:48:15Z"}, {"lat": 32.74483, "lng": -14.28662, "fetched_at": "2026-05-12T22:20:14Z"}, {"lat": 32.88854, "lng": -14.24041, "fetched_at": "2026-05-12T22:45:20Z"}, {"lat": 33.07237, "lng": -14.1819, "fetched_at": "2026-05-13T00:10:48Z"}, {"lat": 34.00815, "lng": -13.873658333333333, "fetched_at": "2026-05-13T04:55:31Z"}, {"lat": 34.61093, "lng": -13.66529, "fetched_at": "2026-05-13T08:06:50Z"}, {"lat": 34.88568, "lng": -13.57108, "fetched_at": "2026-05-13T09:43:54Z"}, {"lat": 35.22919, "lng": -13.44724, "fetched_at": "2026-05-13T11:34:56Z"}, {"lat": 35.82698, "lng": -13.23812, "fetched_at": "2026-05-13T14:55:20Z"}, {"lat": 36.300578333333334, "lng": -13.07473, "fetched_at": "2026-05-13T17:21:59Z"}, {"lat": 36.80408, "lng": -12.89441, "fetched_at": "2026-05-13T20:06:28Z"}, {"lat": 37.22038, "lng": -12.74776, "fetched_at": "2026-05-13T22:21:12Z"}, {"lat": 37.54509, "lng": -12.63506, "fetched_at": "2026-05-14T00:11:37Z"}, {"lat": 38.38297, "lng": -12.32394, "fetched_at": "2026-05-14T04:54:20Z"}, {"lat": 38.90306, "lng": -12.13637, "fetched_at": "2026-05-14T07:50:56Z"}, {"lat": 39.33382, "lng": -11.98096, "fetched_at": "2026-05-14T10:29:23Z"}, {"lat": 39.76914, "lng": -11.81674, "fetched_at": "2026-05-14T13:00:44Z"}, {"lat": 40.21569, "lng": -11.6526, "fetched_at": "2026-05-14T15:27:35Z"}, {"lat": 40.64668, "lng": -11.47725, "fetched_at": "2026-05-14T18:04:02Z"}, {"lat": 40.97436, "lng": -11.36333, "fetched_at": "2026-05-14T19:59:56Z"}, {"lat": 41.17561, "lng": -11.28754, "fetched_at": "2026-05-14T21:18:46Z"}, {"lat": 41.47375, "lng": -11.175978333333333, "fetched_at": "2026-05-14T23:06:39Z"}, {"lat": 42.26923, "lng": -10.865918333333333, "fetched_at": "2026-05-15T04:12:47Z"}, {"lat": 42.90999, "lng": -10.62276, "fetched_at": "2026-05-15T08:11:59Z"}, {"lat": 43.40264, "lng": -10.43328, "fetched_at": "2026-05-15T11:27:36Z"}, {"lat": 43.801, "lng": -10.2722, "fetched_at": "2026-05-15T13:56:34Z"}]}
+    vessel:    {"name": "MV Hondius", "operator": "Oceanwide Expeditions", "imo": "9818709", "mmsi": "244327000", "flag": "Netherlands", "departed_from": "Ushuaia, Argentina", "departed_at": "2026-04-01", "tracker_url": "https://www.cruisemapper.com/ships/MV-Hondius-1624", "vesselfinder_url": "https://www.vesselfinder.com/vessels/details/9818709", "marinetraffic_url": "https://www.marinetraffic.com/en/ais/details/ships/shipid:5873599/mmsi:244327000/imo:9818709/vessel:HONDIUS", "position": {"lat": 43.809868333333334, "lng": -10.2649, "heading_deg": 31.0, "fetched_at": "2026-05-15T14:08:29Z"}, "counts": {"cases_total": 10, "cases_confirmed": 8, "cases_suspected": 2, "deaths": 3, "critical": 1, "on_board": 147, "passengers": 88, "crew": 59, "as_of": "2026-05-15", "source": "ECDC", "source_url": "https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak", "fetched_at": "2026-05-15T14:08:30Z"}, "track": [{"lat": 18.988, "lng": -21.12, "fetched_at": "2026-05-07T19:34:00Z"}, {"lat": 22.484, "lng": -19.355, "fetched_at": "2026-05-08T15:43:45Z"}, {"lat": 23.331, "lng": -18.926, "fetched_at": "2026-05-08T21:03:33Z"}, {"lat": 23.35961, "lng": -18.91158, "fetched_at": "2026-05-08T21:16:15Z"}, {"lat": 23.51273, "lng": -18.83061, "fetched_at": "2026-05-08T22:08:11Z"}, {"lat": 23.84758, "lng": -18.65935, "fetched_at": "2026-05-09T00:06:01Z"}, {"lat": 24.59444, "lng": -18.27289, "fetched_at": "2026-05-09T04:30:25Z"}, {"lat": 25.10726, "lng": -18.0078, "fetched_at": "2026-05-09T07:17:49Z"}, {"lat": 25.49981, "lng": -17.807568333333332, "fetched_at": "2026-05-09T09:40:51Z"}, {"lat": 25.72282, "lng": -17.69591, "fetched_at": "2026-05-09T11:06:30Z"}, {"lat": 26.19046, "lng": -17.4559, "fetched_at": "2026-05-09T13:46:05Z"}, {"lat": 26.41884, "lng": -17.34315, "fetched_at": "2026-05-09T15:03:57Z"}, {"lat": 26.59258, "lng": -17.25388, "fetched_at": "2026-05-09T16:04:51Z"}, {"lat": 26.76171, "lng": -17.16796, "fetched_at": "2026-05-09T17:08:51Z"}, {"lat": 27.13789, "lng": -16.97533, "fetched_at": "2026-05-09T19:17:02Z"}, {"lat": 27.31942, "lng": -16.88195, "fetched_at": "2026-05-09T20:57:04Z"}, {"lat": 27.4241, "lng": -16.82684, "fetched_at": "2026-05-09T21:56:29Z"}, {"lat": 27.52196, "lng": -16.77905, "fetched_at": "2026-05-09T22:58:14Z"}, {"lat": 27.61851, "lng": -16.72976, "fetched_at": "2026-05-09T23:58:15Z"}, {"lat": 27.99756, "lng": -16.53217, "fetched_at": "2026-05-10T04:07:08Z"}, {"lat": 28.07329, "lng": -16.49035, "fetched_at": "2026-05-10T07:31:04Z"}, {"lat": 28.07362, "lng": -16.49148, "fetched_at": "2026-05-10T09:45:49Z"}, {"lat": 28.07367, "lng": -16.49153, "fetched_at": "2026-05-10T11:07:48Z"}, {"lat": 28.07418, "lng": -16.49112, "fetched_at": "2026-05-10T13:02:36Z"}, {"lat": 28.0739, "lng": -16.49142, "fetched_at": "2026-05-10T13:49:27Z"}, {"lat": 28.0738, "lng": -16.49146, "fetched_at": "2026-05-10T15:04:37Z"}, {"lat": 28.0737, "lng": -16.49159, "fetched_at": "2026-05-10T16:06:01Z"}, {"lat": 28.07279, "lng": -16.49106, "fetched_at": "2026-05-10T17:58:55Z"}, {"lat": 28.0729, "lng": -16.49127, "fetched_at": "2026-05-10T19:18:28Z"}, {"lat": 28.07275, "lng": -16.49102, "fetched_at": "2026-05-10T20:59:55Z"}, {"lat": 28.07276, "lng": -16.49105, "fetched_at": "2026-05-10T21:57:59Z"}, {"lat": 28.07272, "lng": -16.4908, "fetched_at": "2026-05-10T23:00:21Z"}, {"lat": 28.07274, "lng": -16.49044, "fetched_at": "2026-05-11T00:02:14Z"}, {"lat": 28.07274, "lng": -16.49041, "fetched_at": "2026-05-11T04:19:30Z"}, {"lat": 28.07279, "lng": -16.49082, "fetched_at": "2026-05-11T08:31:16Z"}, {"lat": 28.07412, "lng": -16.49057, "fetched_at": "2026-05-11T12:19:53Z"}, {"lat": 28.07473, "lng": -16.48994, "fetched_at": "2026-05-11T16:09:44Z"}, {"lat": 28.07639, "lng": -16.48684, "fetched_at": "2026-05-11T18:06:55Z"}, {"lat": 28.01398, "lng": -16.31723, "fetched_at": "2026-05-11T19:05:15Z"}, {"lat": 28.21373, "lng": -16.04511, "fetched_at": "2026-05-11T20:52:38Z"}, {"lat": 28.43566, "lng": -15.82828, "fetched_at": "2026-05-11T22:16:06Z"}, {"lat": 28.75466, "lng": -15.62808, "fetched_at": "2026-05-12T00:06:54Z"}, {"lat": 29.61057, "lng": -15.34577, "fetched_at": "2026-05-12T04:43:52Z"}, {"lat": 30.20376, "lng": -15.15485, "fetched_at": "2026-05-12T07:50:55Z"}, {"lat": 30.72568, "lng": -14.97996, "fetched_at": "2026-05-12T10:39:52Z"}, {"lat": 31.13528, "lng": -14.8461, "fetched_at": "2026-05-12T13:10:17Z"}, {"lat": 31.73629, "lng": -14.64745, "fetched_at": "2026-05-12T16:28:08Z"}, {"lat": 32.15143, "lng": -14.49682, "fetched_at": "2026-05-12T19:03:55Z"}, {"lat": 32.4434, "lng": -14.37146, "fetched_at": "2026-05-12T20:48:15Z"}, {"lat": 32.74483, "lng": -14.28662, "fetched_at": "2026-05-12T22:20:14Z"}, {"lat": 32.88854, "lng": -14.24041, "fetched_at": "2026-05-12T22:45:20Z"}, {"lat": 33.07237, "lng": -14.1819, "fetched_at": "2026-05-13T00:10:48Z"}, {"lat": 34.00815, "lng": -13.873658333333333, "fetched_at": "2026-05-13T04:55:31Z"}, {"lat": 34.61093, "lng": -13.66529, "fetched_at": "2026-05-13T08:06:50Z"}, {"lat": 34.88568, "lng": -13.57108, "fetched_at": "2026-05-13T09:43:54Z"}, {"lat": 35.22919, "lng": -13.44724, "fetched_at": "2026-05-13T11:34:56Z"}, {"lat": 35.82698, "lng": -13.23812, "fetched_at": "2026-05-13T14:55:20Z"}, {"lat": 36.300578333333334, "lng": -13.07473, "fetched_at": "2026-05-13T17:21:59Z"}, {"lat": 36.80408, "lng": -12.89441, "fetched_at": "2026-05-13T20:06:28Z"}, {"lat": 37.22038, "lng": -12.74776, "fetched_at": "2026-05-13T22:21:12Z"}, {"lat": 37.54509, "lng": -12.63506, "fetched_at": "2026-05-14T00:11:37Z"}, {"lat": 38.38297, "lng": -12.32394, "fetched_at": "2026-05-14T04:54:20Z"}, {"lat": 38.90306, "lng": -12.13637, "fetched_at": "2026-05-14T07:50:56Z"}, {"lat": 39.33382, "lng": -11.98096, "fetched_at": "2026-05-14T10:29:23Z"}, {"lat": 39.76914, "lng": -11.81674, "fetched_at": "2026-05-14T13:00:44Z"}, {"lat": 40.21569, "lng": -11.6526, "fetched_at": "2026-05-14T15:27:35Z"}, {"lat": 40.64668, "lng": -11.47725, "fetched_at": "2026-05-14T18:04:02Z"}, {"lat": 40.97436, "lng": -11.36333, "fetched_at": "2026-05-14T19:59:56Z"}, {"lat": 41.17561, "lng": -11.28754, "fetched_at": "2026-05-14T21:18:46Z"}, {"lat": 41.47375, "lng": -11.175978333333333, "fetched_at": "2026-05-14T23:06:39Z"}, {"lat": 42.26923, "lng": -10.865918333333333, "fetched_at": "2026-05-15T04:12:47Z"}, {"lat": 42.90999, "lng": -10.62276, "fetched_at": "2026-05-15T08:11:59Z"}, {"lat": 43.40264, "lng": -10.43328, "fetched_at": "2026-05-15T11:27:36Z"}, {"lat": 43.801, "lng": -10.2722, "fetched_at": "2026-05-15T13:59:02Z"}]},
+    other:     [{"key": "ebola-drc-2026", "name": "Ebola", "region": "DR Congo \u00b7 Ituri province", "started": "2026-05-15", "blurb": "17th Congo outbreak. Africa CDC confirmed in Ituri province.", "color": "#c084fc", "locations": [{"name": "Mongwalu (Ituri)", "lat": 1.95, "lng": 30.06}, {"name": "Rwampara (Ituri)", "lat": 1.6, "lng": 30.2}], "news": [{"title": "What to know about new Ebola outbreak that has killed 65 people in Congo", "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxPYmY2VURZNGQ0NkZsbElELXk5NTdCczJlZ05jOVpCRlMyT0J3S0xsNkJFdUdyUFZGaDdUNnEtTVI2eVJTTUhreTh2SDk3LUVQNnlIS25NRDZWOWhYNGxCNDJ6ZXk5a2FwdWVWQmVMVTZLUWVHLUdaT2VSeFQxcFQ4bEVDWl9GVlRfTTdsaURjczVlS2o2X1lwTkVOYld3cS0wWmRhTTBNZGVZaHJI?oc=5", "source": "Google News \u00b7 WRAL", "published": "3h ago"}, {"title": "A new Ebola outbreak is confirmed in a remote Congo province, with 65 deaths recorded", "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxPRENXZi1QSFpVMVNWZVZPQi1UR1FRejYwNkJCUWtEWGZ2eGhtMXhJeVJtbEsycjIzWVZwQVJoQnNnZWFka3VLSW1XYmVQSVY0dTY3Z1d0dXJIbzRlQlRKVWF3eF93WGF1RU83ZWxBVTQ5RUkzc0RmcC1MUEtHZzM4b1hweXl2bG5STmJPQWFyQkxabGo5Qnk4UW5QQQ?oc=5", "source": "Google News \u00b7 AP News", "published": "1h ago"}, {"title": "Ebola outbreak declared in eastern DR Congo as regional alert raised", "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOMXBBa1V2RjlfSnZjeXBqeS1Tb0I5ZjhJc2JoX0g5TS05TUVCb2tCMzdGVUNXR19hVldFQkhyXzFnSmY5QzJsMWl2YW9FWVVYRFp2TE5mR0RPT0h4dk1oN09OYlhZaURYTVhSVHZjVU1EanJWT0xWR25mRnJuRXZRejJjcEw2eEx0c3YyNTlQVk5qSVFEeHVtVXZIaGpHS3A0RzRZNW1BY0R0UQ?oc=5", "source": "Google News \u00b7 RFI", "published": "3h ago"}, {"title": "Africa calls multi-nation health meeting amid fatal Ebola outbreak", "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxNREY1X256QkVGdnhMbFZteV9TMTBjSUI1SktsUTBjYkxraTdSY0VIWXlheGh5aUE5cUk5ajVfR2s4dkZTbU1FdTJtbFNWOEVNM2xQZlZFUWxJZENFenZYbzdzSjlKcUtoenBGQ0VLUS0yRm5WeU1zSXBuUjktWWxQbWpKYlp4VFloVUZ1ZzlNT2cwVWIyaDQ4bUVQRHQwZnI5QlZmV3N2NjlDRV82RmNRZkJfcGpsV0EtNFR3M18xdUg3T1o0MDk4NmxnSW8?oc=5", "source": "Google News \u00b7 South China Morning Post", "published": "3h ago"}, {"title": "Congo reports new Ebola virus disease outbreak", "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPMGVhMEVnT2cwdjF2SHp1TzRGMTBQWk1aa3RvNGlZQ2xqRHM2RWl0aEkxc2xVdlA3RmRfenlISzRWdElLSDlud2NWTXY1TUQtODNvX3EtaDRlMk9jV3ExUXRPNzVJQ0dhTHBXVUlxZDZXMnFpVU5nTUtVMnhvSDlUZDRnNUpKM0lESnc?oc=5", "source": "Google News \u00b7 Anadolu Ajans\u0131", "published": "3h ago"}, {"title": "New Ebola outbreak confirmed in the Congo with 65 deaths and hundreds of infections", "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxQaXVCd3VWTkVuRzRTdWx5T1ZyU0Q5Q0l2YnBYWXgtblh6R0Rnc25samVfMUYzOFFBQWR2ZXJMbFJDZ2NOeTFVLUJ1MXU2Z0xkejNpWUs0VU8xZ0k1MEJwNnNsXzNycDM3YXo5VVFoY3VSaGlVc0doVDM1OEwyaGlkdE1uYnRUazF0cjNaQzZSZ0tlalZ0TXlJd3p2d0Q0R1k?oc=5", "source": "Google News \u00b7 The Independent", "published": "3h ago"}]}]
   };
 </script>
 <script>
@@ -1190,14 +1193,60 @@
       .addTo(map);
   }
 
+  // ----- Other-outbreak map markers (colored pulses per disease) -----
+  // Grouped into a single LayerGroup we add/remove with the sidebar so the
+  // map stays focused on hantavirus by default.
+  const otherLayer = L.layerGroup();
+  (window.HANTA.other || []).forEach(ob => {
+    const color = ob.color || '#c084fc';
+    (ob.locations || []).forEach(loc => {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div class="pulse-marker large" style="--pc: ${color}">
+                 <div class="ring"></div><div class="core"></div>
+               </div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+      });
+      const newsHtml = (ob.news || []).slice(0, 3).map(i => `
+        <li>
+          <div class="src" style="color:${color}">${escape(i.source)}${i.published ? ' · ' + escape(i.published) : ''}</div>
+          <a href="${escape(i.url)}" target="_blank" rel="noopener">${escape(i.title)}</a>
+        </li>`).join('');
+      L.marker([loc.lat, loc.lng], {
+        icon,
+        title: `${ob.name} · ${loc.name}`,
+      })
+        .bindPopup(`
+          <div class="popup-title" style="color:${color}">${escape(ob.name)} — ${escape(loc.name)}</div>
+          <div class="popup-meta">${escape(ob.region)} · since ${escape(ob.started)}</div>
+          <div style="font-size:12px; color: var(--muted); margin-bottom: 6px;">
+            ${escape(ob.blurb)}
+          </div>
+          ${newsHtml ? `<ul class="popup-list">${newsHtml}</ul>` : ''}
+        `, { maxWidth: 320 })
+        .addTo(otherLayer);
+    });
+  });
+  const applyOtherLayer = () => {
+    if (document.body.classList.contains('sidebar-off')) {
+      map.removeLayer(otherLayer);
+    } else {
+      otherLayer.addTo(map);
+    }
+  };
+  applyOtherLayer();
+
   // ----- Other-outbreaks sidebar toggle (localStorage-persisted) -----
   document.getElementById('sbClose')?.addEventListener('click', () => {
     document.body.classList.add('sidebar-off');
     try { localStorage.setItem('hanta:sidebar', 'off'); } catch (e) {}
+    applyOtherLayer();
   });
   document.getElementById('sbToggle')?.addEventListener('click', () => {
     document.body.classList.remove('sidebar-off');
     try { localStorage.setItem('hanta:sidebar', 'on'); } catch (e) {}
+    applyOtherLayer();
   });
 
   // Fit to data bounds if any markers, else default world view.

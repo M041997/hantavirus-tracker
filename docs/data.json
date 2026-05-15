@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-05-15T13:56:34Z",
+  "generated_at": "2026-05-15T14:08:30Z",
   "outbreaks": [
     {
       "country": "Argentina",
       "count": 8,
       "latest_title": "HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY",
       "latest_url": "https://www.promedmail.org/?s=hantavirus",
-      "latest_date": "13h ago"
+      "latest_date": "14h ago"
     }
   ],
   "country_index": [
@@ -17,13 +17,13 @@
       "count": 8,
       "latest_title": "HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY",
       "latest_url": "https://www.promedmail.org/?s=hantavirus",
-      "latest_date": "13h ago",
+      "latest_date": "14h ago",
       "items": [
         {
           "title": "HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY",
           "url": "https://www.promedmail.org/?s=hantavirus",
           "source": "ProMED-mail",
-          "published": "13h ago"
+          "published": "14h ago"
         },
         {
           "title": "HANTAVIRUS - ARGENTINA (20): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED PASSENGERS",
@@ -300,10 +300,10 @@
     "vesselfinder_url": "https://www.vesselfinder.com/vessels/details/9818709",
     "marinetraffic_url": "https://www.marinetraffic.com/en/ais/details/ships/shipid:5873599/mmsi:244327000/imo:9818709/vessel:HONDIUS",
     "position": {
-      "lat": 43.801,
-      "lng": -10.2722,
-      "heading_deg": 28.0,
-      "fetched_at": "2026-05-15T13:56:34Z"
+      "lat": 43.809868333333334,
+      "lng": -10.2649,
+      "heading_deg": 31.0,
+      "fetched_at": "2026-05-15T14:08:29Z"
     },
     "counts": {
       "cases_total": 10,
@@ -317,7 +317,7 @@
       "as_of": "2026-05-15",
       "source": "ECDC",
       "source_url": "https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak",
-      "fetched_at": "2026-05-15T13:56:34Z"
+      "fetched_at": "2026-05-15T14:08:30Z"
     }
   },
   "cdc_snapshot": {
@@ -334,15 +334,15 @@
   },
   "items": [
     {
-      "title": "These are the 10 U.S. states monitoring for hantavirus cases linked to cruise ship at center of outbreak",
-      "url": "https://news.google.com/rss/articles/CBMi6wFBVV95cUxNZEFGZGV0YXctMUZnUGY0cmRlS2sxRm9kUjZoXzVWS2NBYjdhRklONEJMSDJHNlVrZGZCVjNnczdvUXdsR0RGdVNsY2k0MGs3LWVWU2RzcFV5QnZJRXBVZ2paNFlFai1xTmVXeUp3eWJTVVViTU8wQ1ZidGJvUS10WEZfcURYSGNRRFl4cjNjT2VueFBYNWEwcjRMYk9OeDFNNFpTSERpVW1Sd3FPSEZhQUlNdHFiMG5acF9Hak1jYjB5N0ZrbjdGaTM3aWh1eDJqYWdoR0FmdXBMakE1RV9aUUlxNE90cDNKVjhR?oc=5",
-      "source": "Google News \u00b7 Yahoo",
-      "published": "2026-05-15"
-    },
-    {
       "title": "Will the Hantavirus Outbreak Cause a Lockdown? What Experts Want You to Know",
       "url": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOSV9BRHJ1eXJDSFFySXNOSXBQUDVOUkdxejNRdFd4SXNTWEl2cUhDZE9QZ3dhVWVEUkJFUDNpdHE1NXE2T0FIazhKWURqdThLVmRYUWRDQlBGNGY3QXNvS3llTlR0ZVc5NzFrVkxqNGRCMkxSajNZLUxydTk3c0NRTnhmX0VYNmQ0TlNna1dR?oc=5",
       "source": "Google News \u00b7 TODAY.com",
+      "published": "2026-05-15"
+    },
+    {
+      "title": "M/V Hondius \u2014 Atlantic Odyssey: Tracking the First Andes Hantavirus Outbreak at Sea",
+      "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOUWViYk8wbGhoampKRnlPbEIwX2t2c0puREU4ME4tRkVYcVZrV05TQ0VQX25SWFNYZV9BaWFJQzlpekx6bWVlWDJPQm96RVBEVlFEU3VGUWpxMjJ6MGpuU2xCa21tLVJObUVsT2RtclJ0eDgzNnk5RkF1bmotd2lGUXlHXy1nbEVTbUw5eFo1UVFrX0FRd1NuM3BR?oc=5",
+      "source": "Google News \u00b7 World Health Network",
       "published": "2026-05-15"
     },
     {
@@ -367,12 +367,6 @@
       "title": "More than 36 Americans being monitored for potential exposure to hantavirus",
       "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPcmw3bWlHeVFxMkw1MVlTS2p5azBxaUlBN21qeHpBc2V5cktlWGk0Ni1YaVRHMFYtWm10bTU5ZERzaUlmaTE4U01ScE9MU3RRcVA1UDNiMnBkdTZFUHdveXgyd0JRckdRb0NFTTloUjZaMW8wTTlFREtHQTlvbWs5MDBoVUI5SlhpclRvOHJydG1tY3hWZDZudXFONlhFYVJaRFNacFQ0LW94a2U2alpMODNJb1Y?oc=5",
       "source": "Google News \u00b7 CBS News",
-      "published": "2026-05-15"
-    },
-    {
-      "title": "M/V Hondius \u2014 Atlantic Odyssey: Tracking the First Hantavirus Outbreak at Sea",
-      "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxOUWViYk8wbGhoampKRnlPbEIwX2t2c0puREU4ME4tRkVYcVZrV05TQ0VQX25SWFNYZV9BaWFJQzlpekx6bWVlWDJPQm96RVBEVlFEU3VGUWpxMjJ6MGpuU2xCa21tLVJObUVsT2RtclJ0eDgzNnk5RkF1bmotd2lGUXlHXy1nbEVTbUw5eFo1UVFrX0FRd1NuM3BR?oc=5",
-      "source": "Google News \u00b7 World Health Network",
       "published": "2026-05-15"
     },
     {
@@ -416,6 +410,12 @@
       "url": "https://www.promedmail.org/?s=hantavirus",
       "source": "ProMED-mail",
       "published": "2026-05-15"
+    },
+    {
+      "title": "American passenger from hantavirus-hit cruise ship speaks about life in quarantine",
+      "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxOalFwa0NfQ0xuelJ4SWI2a0M5R0FVeWlsRktzSGtNV0d1TXVqOThqSjE1OWFtaU9tX2VYZ05wYUFNcmNMNFZfR0cwWkVjVFRqUjZxX2NzVlAwcWdTZ19DbEtSYUs3UllXcnhXdTBmUGNaajk3NTdLa3JydFVvQnpUUWNOMkQzSjlwc1hjb3Fxd9IBlAFBVV95cUxQc0xlY1REUUtHWEZoUThzRy1NX1BkZS1qR1pNMUZqeHlmLU5Gbmw4Q2FEc2RnaGR3Yk9KR29RUU9rNkVjelQ2bTVyaEFfWVpQanIyMF8xSzVCTjdmRDF6V2NodV9lOS0tMGZBWUxVdzAzam1NVjRQcDJPTXBaQ3NRNHFFWTNLZG5BMTZHOWRLVlBERDJG?oc=5",
+      "source": "Google News \u00b7 CBS News",
+      "published": "2026-05-14"
     },
     {
       "title": "Suspected case of hantavirus in Ontario County on Thursday",
@@ -466,16 +466,16 @@
       "published": "2026-05-14"
     },
     {
+      "title": "How hantavirus actually spreads is a key question",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxQZ2tnd2FFUHBBUDJTbUstT3U4VDYxa2JLNU9LVFhMWmFCZjIzeTQ1cGR5X2N1VjJDOFFwaUZOZmxwTnY5WWdlTkczdmlVQXFFWS1ZSVZrQnpsRVFWTTExMUMzOTk4SFRwVEttbUphV1NaWGNBenJhRXJfSWQ4TDNRc2RCUDF1Sk0?oc=5",
+      "source": "Google News \u00b7 Harvard T.H. Chan School of Public Health",
+      "published": "2026-05-14"
+    },
+    {
       "title": "HANTAVIRUS - ARGENTINA (20): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED PASSENGERS",
       "url": "https://www.promedmail.org/?s=hantavirus",
       "source": "ProMED-mail",
       "published": "2026-05-14"
-    },
-    {
-      "title": "CDC not requiring hantavirus cruise passengers to isolate at home",
-      "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1NUmxWeldpaUZKRmhzYWgzamVDVDJzNW52LTJMMGJZMzMxeTdNS1lJSDJIcFpCYmc3bnNMV21HRzlNc1pONG1NWjJETnN6cGJ4RHZKQkhlUWZCNUJTZTgwZzhnakdYQUhWOElaMkxOc3BwTF800gF6QVVfeXFMUE5rLTNtQnBMUXZCcnoxS2dJTVh1aGxtdG1IdjhUQ0dwR0dhYWZqYUlHWGFyUHE1REQ0b2dPdG1mRW5iQXoxUUlwWTE2eF9yRFJqcEw3NVkzYk5idy14OHRpQmJkR05HejVzcmtmOWhtRjZwRmtkc3BrN3c?oc=5",
-      "source": "Google News \u00b7 The Hill",
-      "published": "2026-05-13"
     },
     {
       "title": "Critically ill French hantavirus patient is on an artificial lung as outbreak grows to 11",

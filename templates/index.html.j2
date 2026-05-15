@@ -162,20 +162,22 @@
     background: var(--accent-2); box-shadow: none;
   }
 
-  /* Pulse marker (HTML divIcon) */
+  /* Pulse marker (HTML divIcon). Color overridable via --pc on the
+     element (used for non-hantavirus outbreak markers). */
   .pulse-marker {
     position: relative;
     width: 14px; height: 14px;
+    --pc: var(--accent);
   }
   .pulse-marker .core {
     position: absolute; inset: 0; margin: auto;
     width: 10px; height: 10px; border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 8px rgba(255,59,59,.9);
+    background: var(--pc);
+    box-shadow: 0 0 8px var(--pc);
   }
   .pulse-marker .ring {
     position: absolute; inset: -8px; border-radius: 50%;
-    border: 2px solid var(--accent);
+    border: 2px solid var(--pc);
     opacity: 0;
     animation: ring 2.2s ease-out infinite;
   }
@@ -653,7 +655,8 @@
   window.HANTA = {
     countries: {{ country_index_json|safe }},
     arcs:      {{ spread_arcs_json|safe }},
-    vessel:    {{ vessel_json|safe }}
+    vessel:    {{ vessel_json|safe }},
+    other:     {{ other_outbreaks_json|safe }}
   };
 </script>
 <script>
@@ -822,14 +825,60 @@
       .addTo(map);
   }
 
+  // ----- Other-outbreak map markers (colored pulses per disease) -----
+  // Grouped into a single LayerGroup we add/remove with the sidebar so the
+  // map stays focused on hantavirus by default.
+  const otherLayer = L.layerGroup();
+  (window.HANTA.other || []).forEach(ob => {
+    const color = ob.color || '#c084fc';
+    (ob.locations || []).forEach(loc => {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div class="pulse-marker large" style="--pc: ${color}">
+                 <div class="ring"></div><div class="core"></div>
+               </div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+      });
+      const newsHtml = (ob.news || []).slice(0, 3).map(i => `
+        <li>
+          <div class="src" style="color:${color}">${escape(i.source)}${i.published ? ' · ' + escape(i.published) : ''}</div>
+          <a href="${escape(i.url)}" target="_blank" rel="noopener">${escape(i.title)}</a>
+        </li>`).join('');
+      L.marker([loc.lat, loc.lng], {
+        icon,
+        title: `${ob.name} · ${loc.name}`,
+      })
+        .bindPopup(`
+          <div class="popup-title" style="color:${color}">${escape(ob.name)} — ${escape(loc.name)}</div>
+          <div class="popup-meta">${escape(ob.region)} · since ${escape(ob.started)}</div>
+          <div style="font-size:12px; color: var(--muted); margin-bottom: 6px;">
+            ${escape(ob.blurb)}
+          </div>
+          ${newsHtml ? `<ul class="popup-list">${newsHtml}</ul>` : ''}
+        `, { maxWidth: 320 })
+        .addTo(otherLayer);
+    });
+  });
+  const applyOtherLayer = () => {
+    if (document.body.classList.contains('sidebar-off')) {
+      map.removeLayer(otherLayer);
+    } else {
+      otherLayer.addTo(map);
+    }
+  };
+  applyOtherLayer();
+
   // ----- Other-outbreaks sidebar toggle (localStorage-persisted) -----
   document.getElementById('sbClose')?.addEventListener('click', () => {
     document.body.classList.add('sidebar-off');
     try { localStorage.setItem('hanta:sidebar', 'off'); } catch (e) {}
+    applyOtherLayer();
   });
   document.getElementById('sbToggle')?.addEventListener('click', () => {
     document.body.classList.remove('sidebar-off');
     try { localStorage.setItem('hanta:sidebar', 'on'); } catch (e) {}
+    applyOtherLayer();
   });
 
   // Fit to data bounds if any markers, else default world view.

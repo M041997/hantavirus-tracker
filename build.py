@@ -431,6 +431,12 @@ OTHER_DISEASES: list[dict] = [
         # Google News titles only — no structured counter source yet.
         "started": "2026-05-15",
         "blurb": "17th Congo outbreak. Africa CDC confirmed in Ituri province.",
+        # Violet so it reads clearly against the red hantavirus pulses.
+        "color": "#c084fc",
+        "locations": [
+            {"name": "Mongwalu (Ituri)",  "lat":  1.95, "lng": 30.06},
+            {"name": "Rwampara (Ituri)",  "lat":  1.60, "lng": 30.20},
+        ],
     },
 ]
 
@@ -446,6 +452,8 @@ def fetch_other_outbreaks(limit_each: int = 6) -> list[dict]:
             "region": cfg["region"],
             "started": cfg["started"],
             "blurb": cfg["blurb"],
+            "color": cfg.get("color", "#c084fc"),
+            "locations": cfg.get("locations", []),
             "news": [
                 {
                     "title": i.title,
@@ -1082,6 +1090,7 @@ def main() -> int:
         "vessel_position": hondius_pos,
         "vessel_counts": hondius_counts,
         "other_outbreaks": other_outbreaks,
+        "other_outbreaks_json": json.dumps(other_outbreaks),
         "vessel_json": json.dumps(
             {**HONDIUS_VESSEL,
              "position": hondius_pos,
