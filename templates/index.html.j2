@@ -328,13 +328,53 @@
     margin: 0; font-size: 12px; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--accent-2);
   }
-  .sidebar .sb-body { overflow-y: auto; padding: 10px 12px; }
-  .sidebar .ob {
-    padding: 10px 0; border-top: 1px solid var(--line);
+  .sidebar .sb-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 10px; border-bottom: 1px solid var(--line);
+    background: rgba(255,255,255,.02);
   }
-  .sidebar .ob:first-child { border-top: 0; padding-top: 4px; }
+  .sidebar .sb-arrow {
+    background: transparent; border: 0; color: var(--muted);
+    font-size: 18px; line-height: 1; cursor: pointer;
+    padding: 4px 10px; border-radius: 6px;
+    transition: color .15s ease, background .15s ease;
+  }
+  .sidebar .sb-arrow:hover:not(:disabled) {
+    color: var(--ink); background: rgba(255,255,255,.06);
+  }
+  .sidebar .sb-arrow:disabled { opacity: 0.25; cursor: not-allowed; }
+  .sidebar .sb-dots {
+    display: flex; gap: 6px; align-items: center;
+    font-size: 10px; color: var(--muted); letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .sidebar .sb-dots .d {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--muted); opacity: 0.25;
+    transition: opacity .15s ease, background .15s ease;
+    cursor: pointer;
+  }
+  .sidebar .sb-dots .d.active { opacity: 1; }
+  .sidebar .sb-dots .d:hover { opacity: 0.6; }
+  .sidebar .sb-body { overflow-y: auto; padding: 12px 14px; }
+  .sidebar .ob { display: none; }
+  .sidebar .ob.active { display: block; }
   .sidebar .ob-name {
     font-size: 15px; font-weight: 700; color: var(--ink);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .sidebar .ob-dot {
+    display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .sidebar .ob-badge {
+    margin-left: auto; font-size: 9px; font-weight: 600;
+    padding: 2px 6px; border-radius: 10px; letter-spacing: 0.04em;
+    text-transform: uppercase; line-height: 1;
+  }
+  .sidebar .ob-badge.live {
+    color: var(--good); background: rgba(88,200,151,0.10);
+    border: 1px solid rgba(88,200,151,0.35);
   }
   .sidebar .ob-region {
     color: var(--muted); font-size: 11px; margin-top: 2px;
@@ -343,11 +383,31 @@
   .sidebar .ob-blurb {
     color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.5;
   }
+  .sidebar .ob-tickers {
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .sidebar .ob-tick { display: inline-flex; align-items: baseline; gap: 4px; }
+  .sidebar .ob-tick .v {
+    font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .sidebar .ob-tick .k {
+    color: var(--muted); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .sidebar .ob-asof {
+    color: var(--muted); font-size: 10px; flex-basis: 100%; opacity: 0.75;
+  }
+  .sidebar .ob-asof a { color: var(--muted); text-decoration: underline; }
   .sidebar .ob ul {
     list-style: none; padding: 0; margin: 8px 0 0;
   }
   .sidebar .ob li { padding: 5px 0; font-size: 12px; line-height: 1.4; }
   .sidebar .ob li .meta { color: var(--muted); font-size: 10px; }
+  .sidebar .ob-empty {
+    color: var(--muted); font-size: 11px; font-style: italic;
+    margin-top: 8px; opacity: 0.7;
+  }
 
   .sidebar-toggle {
     position: fixed; top: 80px; right: 14px; z-index: 601;
@@ -368,6 +428,36 @@
   }
   body.sidebar-off .sidebar { transform: translateX(calc(100% + 24px)); opacity: 0; pointer-events: none; }
   body.sidebar-off .sidebar-toggle { display: inline-block; }
+
+  /* ----- Per-outbreak filter bar (bottom-center, above the hint) ----- */
+  .ob-filterbar {
+    position: absolute; left: 50%; bottom: 56px; transform: translateX(-50%);
+    z-index: 602; display: flex; gap: 6px; flex-wrap: wrap;
+    background: rgba(20,28,38,.78); border: 1px solid var(--line);
+    border-radius: 999px; padding: 5px 7px;
+    backdrop-filter: blur(4px);
+    max-width: calc(100vw - 32px);
+  }
+  .ob-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 11px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    text-transform: uppercase; cursor: pointer;
+    background: transparent; color: var(--ink);
+    border: 1px solid transparent;
+    transition: background .15s ease, opacity .15s ease;
+    user-select: none;
+  }
+  .ob-chip .chip-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    box-shadow: 0 0 6px currentColor;
+  }
+  .ob-chip:hover { background: rgba(255,255,255,.05); }
+  .ob-chip.off { opacity: 0.4; }
+  .ob-chip.off .chip-dot { box-shadow: none; opacity: 0.5; }
+  .ob-chip.off .chip-name { text-decoration: line-through; }
+  body.sidebar-off .ob-filterbar { display: none; }
+  @media (max-width: 900px) { .ob-filterbar { display: none !important; } }
 
   .sb-close {
     background: transparent; border: 0; color: var(--muted);
@@ -397,11 +487,48 @@
     <h3>Other active outbreaks</h3>
     <button class="sb-close" id="sbClose" title="Hide sidebar" aria-label="Hide sidebar">×</button>
   </div>
+  <div class="sb-nav" id="sbNav">
+    <button class="sb-arrow" id="sbPrev" type="button" aria-label="Previous outbreak" title="Previous (←)">‹</button>
+    <div class="sb-dots" id="sbDots" aria-hidden="true">
+      {% for ob in other_outbreaks %}
+      <span class="d" data-ob-key="{{ ob.key }}" title="{{ ob.name }}"></span>
+      {% endfor %}
+    </div>
+    <button class="sb-arrow" id="sbNext" type="button" aria-label="Next outbreak" title="Next (→)">›</button>
+  </div>
   <div class="sb-body">
     {% for ob in other_outbreaks %}
-    <div class="ob">
-      <div class="ob-name">{{ ob.name }}</div>
-      <div class="ob-region">{{ ob.region }} · since {{ ob.started }}</div>
+    <div class="ob" data-ob-key="{{ ob.key }}">
+      <div class="ob-name">
+        <span class="ob-dot" style="background: {{ ob.color }}"></span>{{ ob.name }}
+        {% if ob.status == "live" %}
+        <span class="ob-badge live" title="Counters scraped from {{ ob.source }} this build">● Live</span>
+        {% endif %}
+      </div>
+      <div class="ob-region">{{ ob.region }} · {{ ob.started_human or ob.started }}</div>
+      {% if ob.status == "live" and (ob.cases is not none or ob.deaths is not none) %}
+      <div class="ob-tickers"
+           title="{% if ob.source %}{{ ob.source }}{% endif %}{% if ob.as_of %} · as of {{ ob.as_of }}{% endif %}">
+        {% if ob.cases is not none %}
+        <span class="ob-tick">
+          <span class="v" style="color: {{ ob.color }}">{{ '{:,}'.format(ob.cases) }}</span>
+          <span class="k">cases</span>
+        </span>
+        {% endif %}
+        {% if ob.deaths is not none %}
+        <span class="ob-tick">
+          <span class="v alert">{{ '{:,}'.format(ob.deaths) }}</span>
+          <span class="k">deaths</span>
+        </span>
+        {% endif %}
+        {% if ob.as_of %}
+        <span class="ob-asof">
+          {% if ob.source_url %}<a href="{{ ob.source_url }}" target="_blank" rel="noopener">{{ ob.source or 'source' }}</a>{% else %}{{ ob.source or '' }}{% endif %}
+          · as of {{ ob.as_of }}
+        </span>
+        {% endif %}
+      </div>
+      {% endif %}
       <div class="ob-blurb">{{ ob.blurb }}</div>
       {% if ob.news %}
       <ul>
@@ -412,6 +539,8 @@
         </li>
         {% endfor %}
       </ul>
+      {% else %}
+      <div class="ob-empty">No recent coverage</div>
       {% endif %}
     </div>
     {% endfor %}
@@ -425,6 +554,18 @@
 <div class="hero">
   <div id="map"></div>
 
+  {% if other_outbreaks %}
+  <div class="ob-filterbar" id="obFilterbar" role="toolbar" aria-label="Toggle outbreak layers">
+    {% for ob in other_outbreaks %}
+    <button type="button" class="ob-chip" data-ob-key="{{ ob.key }}"
+            title="Toggle {{ ob.name }} markers and sidebar entry">
+      <span class="chip-dot" style="background: {{ ob.color }}; color: {{ ob.color }}"></span>
+      <span class="chip-name">{{ ob.name }}</span>
+    </button>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <div class="hud hud-tl">
     <div class="title-card">
       <h1><span class="dot"></span>Hantavirus Tracker</h1>
@@ -435,12 +576,12 @@
   <div class="hud hud-tr">
     <div class="stat-strip">
       <div class="stat-tile"
-           title="Hondius cluster — confirmed + suspected — WHO DON599">
+           title="Hondius cluster — confirmed + probable/suspected — {{ vessel_counts.source }}">
         <div class="v warn">{{ vessel_counts.cases_total }}</div>
         <div class="k">Cases · Hondius</div>
       </div>
       <div class="stat-tile"
-           title="Hondius cluster fatalities — WHO DON599">
+           title="Hondius cluster fatalities — {{ vessel_counts.source }}">
         <div class="v alert">{{ vessel_counts.deaths }}</div>
         <div class="k">Deaths · Hondius</div>
       </div>
@@ -642,6 +783,7 @@
     <a href="about.html">About / disclaimer</a> ·
     Sources: <a href="https://promedmail.org/?s=hantavirus" target="_blank" rel="noopener">ProMED-mail</a>,
     <a href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection" target="_blank" rel="noopener">ECDC</a>,
+    <a href="https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599" target="_blank" rel="noopener">WHO DON599</a>,
     <a href="https://news.google.com/search?q=hantavirus" target="_blank" rel="noopener">Google News</a>,
     <a href="{{ cdc.source_url }}" target="_blank" rel="noopener">CDC HPS surveillance</a>.
     Raw data: <a href="data.json">data.json</a>.
@@ -826,11 +968,13 @@
   }
 
   // ----- Other-outbreak map markers (colored pulses per disease) -----
-  // Grouped into a single LayerGroup we add/remove with the sidebar so the
-  // map stays focused on hantavirus by default.
-  const otherLayer = L.layerGroup();
+  // One LayerGroup per outbreak so the top-of-map filter chips can toggle
+  // them independently. The sidebar close button still hides all of them.
+  const otherLayers = {};  // key -> L.LayerGroup
   (window.HANTA.other || []).forEach(ob => {
     const color = ob.color || '#c084fc';
+    const layer = L.layerGroup();
+    otherLayers[ob.key] = layer;
     (ob.locations || []).forEach(loc => {
       const icon = L.divIcon({
         className: '',
@@ -845,6 +989,16 @@
           <div class="src" style="color:${color}">${escape(i.source)}${i.published ? ' · ' + escape(i.published) : ''}</div>
           <a href="${escape(i.url)}" target="_blank" rel="noopener">${escape(i.title)}</a>
         </li>`).join('');
+      const tickerHtml = (ob.status === 'live' && (ob.cases != null || ob.deaths != null)) ? `
+        <div style="display:flex; gap:14px; align-items:baseline; margin: 4px 0 8px;">
+          ${ob.cases != null ? `
+            <div><span style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:${color}">${ob.cases.toLocaleString()}</span>
+            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em"> cases</span></div>` : ''}
+          ${ob.deaths != null ? `
+            <div><span style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--alert)">${ob.deaths.toLocaleString()}</span>
+            <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em"> deaths</span></div>` : ''}
+          ${ob.as_of ? `<div style="font-size:10px;color:var(--muted);align-self:flex-end">as of ${escape(ob.as_of)}</div>` : ''}
+        </div>` : '';
       L.marker([loc.lat, loc.lng], {
         icon,
         title: `${ob.name} · ${loc.name}`,
@@ -852,21 +1006,124 @@
         .bindPopup(`
           <div class="popup-title" style="color:${color}">${escape(ob.name)} — ${escape(loc.name)}</div>
           <div class="popup-meta">${escape(ob.region)} · since ${escape(ob.started)}</div>
+          ${tickerHtml}
           <div style="font-size:12px; color: var(--muted); margin-bottom: 6px;">
             ${escape(ob.blurb)}
           </div>
           ${newsHtml ? `<ul class="popup-list">${newsHtml}</ul>` : ''}
         `, { maxWidth: 320 })
-        .addTo(otherLayer);
+        .addTo(layer);
     });
   });
-  const applyOtherLayer = () => {
-    if (document.body.classList.contains('sidebar-off')) {
-      map.removeLayer(otherLayer);
-    } else {
-      otherLayer.addTo(map);
-    }
+
+  const isOutbreakOff = key => {
+    try { return localStorage.getItem(`hanta:ob:${key}`) === 'off'; }
+    catch (e) { return false; }
   };
+  const setOutbreakOff = (key, off) => {
+    try { localStorage.setItem(`hanta:ob:${key}`, off ? 'off' : 'on'); }
+    catch (e) {}
+  };
+
+  const applyOtherLayer = () => {
+    const sidebarOff = document.body.classList.contains('sidebar-off');
+    Object.entries(otherLayers).forEach(([key, layer]) => {
+      if (sidebarOff || isOutbreakOff(key)) {
+        map.removeLayer(layer);
+      } else {
+        layer.addTo(map);
+      }
+    });
+  };
+
+  // ----- Carousel state — sidebar shows one outbreak at a time -----
+  const obKeys = Array.from(document.querySelectorAll('.sidebar .ob'))
+    .map(el => el.dataset.obKey);
+  const enabledKeys = () => obKeys.filter(k => !isOutbreakOff(k));
+  let activeKey = enabledKeys()[0] || obKeys[0] || null;
+
+  const refreshChip = (key) => {
+    const off = isOutbreakOff(key);
+    const chip = document.querySelector(`.ob-chip[data-ob-key="${key}"]`);
+    if (chip) chip.classList.toggle('off', off);
+  };
+
+  const refreshCarousel = () => {
+    const enabled = enabledKeys();
+    // If active key is now disabled, pick the next enabled one.
+    if (activeKey && !enabled.includes(activeKey)) {
+      activeKey = enabled[0] || null;
+    }
+    // Sidebar entries: show only the active one.
+    document.querySelectorAll('.sidebar .ob').forEach(el => {
+      el.classList.toggle('active', el.dataset.obKey === activeKey);
+    });
+    // Dots: hide ones whose outbreak is filtered off; mark active.
+    document.querySelectorAll('.sb-dots .d').forEach(el => {
+      const key = el.dataset.obKey;
+      const off = isOutbreakOff(key);
+      el.style.display = off ? 'none' : '';
+      el.style.background = off
+        ? 'var(--muted)'
+        : (document.querySelector(`.ob-chip[data-ob-key="${key}"] .chip-dot`)
+            ?.style.background || 'var(--ink)');
+      el.classList.toggle('active', key === activeKey);
+    });
+    // Arrows: disable when 0 or 1 enabled outbreaks.
+    const navHidden = enabled.length < 2;
+    const prev = document.getElementById('sbPrev');
+    const next = document.getElementById('sbNext');
+    if (prev) prev.disabled = navHidden;
+    if (next) next.disabled = navHidden;
+    // Whole nav row: hide if no enabled outbreaks (sidebar would be empty too).
+    const nav = document.getElementById('sbNav');
+    if (nav) nav.style.display = enabled.length === 0 ? 'none' : '';
+  };
+
+  const advance = (delta) => {
+    const enabled = enabledKeys();
+    if (enabled.length === 0) return;
+    let idx = enabled.indexOf(activeKey);
+    if (idx === -1) idx = 0;
+    idx = (idx + delta + enabled.length) % enabled.length;
+    activeKey = enabled[idx];
+    refreshCarousel();
+  };
+
+  obKeys.forEach(refreshChip);
+  refreshCarousel();
+
+  document.querySelectorAll('.ob-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const key = chip.dataset.obKey;
+      const turningOn = isOutbreakOff(key);  // about to flip to on
+      setOutbreakOff(key, !isOutbreakOff(key));
+      refreshChip(key);
+      // If we just turned an outbreak on, jump the sidebar to it.
+      if (turningOn) activeKey = key;
+      refreshCarousel();
+      applyOtherLayer();
+    });
+  });
+
+  document.getElementById('sbPrev')?.addEventListener('click', () => advance(-1));
+  document.getElementById('sbNext')?.addEventListener('click', () => advance(+1));
+  document.querySelectorAll('.sb-dots .d').forEach(d => {
+    d.addEventListener('click', () => {
+      const key = d.dataset.obKey;
+      if (isOutbreakOff(key)) return;
+      activeKey = key;
+      refreshCarousel();
+    });
+  });
+  // Keyboard: left/right arrow keys cycle when the sidebar is focused/visible.
+  document.addEventListener('keydown', (e) => {
+    if (document.body.classList.contains('sidebar-off')) return;
+    if (e.target.matches('input, textarea')) return;
+    if (e.key === 'ArrowLeft')  advance(-1);
+    if (e.key === 'ArrowRight') advance(+1);
+  });
+
   applyOtherLayer();
 
   // ----- Other-outbreaks sidebar toggle (localStorage-persisted) -----

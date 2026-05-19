@@ -22,12 +22,15 @@ import re
 import sys
 import time
 from email.utils import parsedate_to_datetime
+from urllib.parse import quote_plus
 
 import feedparser
 import requests
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from PIL import Image, ImageDraw, ImageFont
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 ROOT = pathlib.Path(__file__).resolve().parent
 TEMPLATES = ROOT / "templates"
@@ -39,6 +42,43 @@ UA = (
 )
 HEADERS = {"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9"}
 TIMEOUT = 20
+
+SESSION = requests.Session()
+SESSION.headers.update(HEADERS)
+SESSION.mount(
+    "https://",
+    HTTPAdapter(
+        max_retries=Retry(
+            total=3,
+            backoff_factor=0.6,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=("GET",),
+        )
+    ),
+)
+
+
+def http_get(url: str) -> requests.Response:
+    """Fetch a URL with the tracker UA, timeout, and transient-error retries."""
+    return SESSION.get(url, timeout=TIMEOUT)
+
+
+def parse_feed_url(url: str):
+    """Fetch RSS/Atom over the retrying session, then parse with feedparser."""
+    try:
+        r = http_get(url)
+        r.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"[feed] fetch failed for {url}: {exc}", file=sys.stderr)
+        return feedparser.parse("")
+    return feedparser.parse(r.content)
+
+
+def clean_summary(value: str | None) -> str:
+    if not value:
+        return ""
+    text = BeautifulSoup(value, "html.parser").get_text(" ", strip=True)
+    return re.sub(r"\s+", " ", text).strip()
 
 # ----- Source: CDC US surveillance snapshot -----
 # CDC publishes annual aggregates only; values from
@@ -117,6 +157,124 @@ def _to_int(s: str) -> int | None:
     return WORD_NUMBERS.get(s)
 
 
+# ----- Live counter scrapers for OTHER_DISEASES entries -----
+# Each returns dict | None. Shape: {cases, deaths|None, as_of, source, source_url}.
+# Returning None tells the build to render the entry without a counter row —
+# we never display stale or hand-typed numbers.
+CDC_H5N1_URL = "https://www.cdc.gov/bird-flu/situation-summary/index.html"
+WHO_DON_EBOLA_URL = (
+    "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON602"
+)
+
+
+def fetch_ebola_don_counts() -> dict | None:
+    """Scrape WHO DON602 for the Ebola DRC 2026 (Bundibugyo virus) counters.
+
+    Canonical sentence in the "Description of the situation" section:
+        "As of 15 May, a total of 246 suspected cases and 80 deaths
+         (four deaths among confirmed cases) have been reported..."
+    """
+    try:
+        r = http_get(WHO_DON_EBOLA_URL)
+        r.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"[ebola] fetch failed: {exc}", file=sys.stderr)
+        return None
+
+    text = re.sub(
+        r"\s+", " ",
+        BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True),
+    )
+
+    m = re.search(
+        r"[Aa]s of (\d{1,2})\s+"
+        r"(January|February|March|April|May|June|July|August|"
+        r"September|October|November|December),?\s+"
+        r"a total of (\d+) suspected cases?\s+and (\d+) deaths",
+        text,
+    )
+    if not m:
+        print("[ebola] DON602 case sentence not found", file=sys.stderr)
+        return None
+
+    day, month, cases, deaths = m.groups()
+
+    # WHO often omits the year inline; pull it from the page title/header
+    # context, else fall back to the current UTC year.
+    year = dt.datetime.now(dt.timezone.utc).year
+    ym = re.search(
+        rf"\b{re.escape(day)}\s+{re.escape(month)}\s+(20\d\d)\b", text
+    )
+    if ym:
+        year = int(ym.group(1))
+
+    as_of = None
+    try:
+        as_of = dt.datetime.strptime(
+            f"{day} {month} {year}", "%d %B %Y"
+        ).strftime("%Y-%m-%d")
+    except ValueError:
+        pass
+
+    return {
+        "cases": int(cases),
+        "deaths": int(deaths),
+        "as_of": as_of,
+        "source": "WHO DON602",
+        "source_url": WHO_DON_EBOLA_URL,
+    }
+
+
+def fetch_h5n1_cdc_counts() -> dict | None:
+    """Scrape CDC's H5N1 situation summary for total US human cases.
+
+    CDC publishes "N total reported human cases" inline; the page metadata
+    tag `meta name="DC.date.reviewed"` carries the last-reviewed date.
+    Deaths aren't published on this page (CDC reports those separately
+    via HAN/MMWR), so we return deaths=None — UI handles missing values.
+    """
+    try:
+        r = http_get(CDC_H5N1_URL)
+        r.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"[h5n1] fetch failed: {exc}", file=sys.stderr)
+        return None
+
+    soup = BeautifulSoup(r.text, "html.parser")
+    text = re.sub(r"\s+", " ", soup.get_text(" ", strip=True))
+
+    m = re.search(r"(\d{1,5})\s+total\s+reported\s+human\s+cases", text, re.IGNORECASE)
+    if not m:
+        print("[h5n1] case-count pattern not found on CDC page", file=sys.stderr)
+        return None
+    cases = int(m.group(1))
+
+    as_of = None
+    meta = soup.find("meta", attrs={"property": "cdc:last_reviewed"})
+    if not meta:
+        meta = soup.find("meta", attrs={"property": "cdc:last_updated"})
+    if meta and meta.get("content"):
+        try:
+            d = dt.datetime.strptime(meta["content"], "%B %d, %Y")
+            as_of = d.strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+
+    return {
+        "cases": cases,
+        "deaths": None,  # not on this page
+        "as_of": as_of,
+        "source": "CDC",
+        "source_url": CDC_H5N1_URL,
+    }
+
+
+COUNTER_SOURCES = {
+    "cdc-h5n1":    fetch_h5n1_cdc_counts,
+    "who-don602":  fetch_ebola_don_counts,
+}
+
+
 def fetch_ecdc_outbreak_counts() -> dict | None:
     """Scrape ECDC's outbreak page. Returns None on failure.
 
@@ -129,7 +287,7 @@ def fetch_ecdc_outbreak_counts() -> dict | None:
     plus an "As of D Month" sentence with no year.
     """
     try:
-        r = requests.get(ECDC_OUTBREAK_URL, headers=HEADERS, timeout=TIMEOUT)
+        r = http_get(ECDC_OUTBREAK_URL)
         r.raise_for_status()
     except requests.RequestException as exc:
         print(f"[ecdc] fetch failed: {exc}", file=sys.stderr)
@@ -205,7 +363,7 @@ def fetch_hondius_outbreak_counts() -> dict:
     parsing fails (so the site never shows blank counters).
     """
     try:
-        r = requests.get(WHO_DON_URL, headers=HEADERS, timeout=TIMEOUT)
+        r = http_get(WHO_DON_URL)
         r.raise_for_status()
     except requests.RequestException as exc:
         print(f"[who] fetch failed, using fallback: {exc}", file=sys.stderr)
@@ -286,7 +444,7 @@ def fetch_hondius_position() -> dict | None:
     """
     url = HONDIUS_VESSEL["tracker_url"]
     try:
-        r = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+        r = http_get(url)
         r.raise_for_status()
     except requests.RequestException as exc:
         print(f"[hondius] fetch failed: {exc}", file=sys.stderr)
@@ -339,7 +497,7 @@ def load_existing_track(local_path: pathlib.Path) -> list[dict]:
     when the network is unavailable (e.g. local dev offline, first build).
     """
     try:
-        r = requests.get(TRACK_FETCH_URL, headers=HEADERS, timeout=TIMEOUT)
+        r = http_get(TRACK_FETCH_URL)
         if r.ok:
             data = r.json()
             if isinstance(data, list):
@@ -421,38 +579,121 @@ class Item:
 # tracking in parallel. Each entry drives one Google News query; the UI lets
 # visitors hide the whole panel via a localStorage toggle, so this stays
 # opt-in for casual visitors but available for anyone who wants it.
+DEFAULT_OUTBREAK_COLOR = "#c084fc"  # violet — reads cleanly against red hanta pulses
+
+# Counter fields are populated ONLY by live scrapers (`counter_source`).
+# Entries without a working scraper render with no ticker — we don't want
+# stale or manually-typed numbers masquerading as current.
 OTHER_DISEASES: list[dict] = [
     {
         "key": "ebola-drc-2026",
         "name": "Ebola",
         "region": "DR Congo · Ituri province",
         "query": "ebola outbreak Congo",
-        # Africa CDC confirmation on 2026-05-15; figures will be scraped via
-        # Google News titles only — no structured counter source yet.
         "started": "2026-05-15",
-        "blurb": "17th Congo outbreak. Africa CDC confirmed in Ituri province.",
-        # Violet so it reads clearly against the red hantavirus pulses.
-        "color": "#c084fc",
+        "blurb": "17th Congo outbreak (Bundibugyo virus). DRC + 1 imported case in Uganda.",
+        "color": "#c084fc",  # violet
+        "counter_source": "who-don602",
         "locations": [
             {"name": "Mongwalu (Ituri)",  "lat":  1.95, "lng": 30.06},
             {"name": "Rwampara (Ituri)",  "lat":  1.60, "lng": 30.20},
         ],
     },
+    {
+        "key": "mpox-clade-ib-2024",
+        "name": "Mpox · clade Ib",
+        "region": "Central & East Africa",
+        "query": "mpox clade Ib outbreak",
+        "started": "2024-08-14",  # WHO PHEIC declaration
+        "blurb": "WHO PHEIC since Aug 2024. Clade Ib continues across Central/East Africa.",
+        "color": "#f59e0b",  # amber
+        # News-only by design: no scrapeable global counter exists (WHO mpox
+        # dashboard is a Shiny app; CDC publishes US clade I cases only,
+        # which doesn't represent this outbreak's actual scope).
+        "locations": [
+            {"name": "Goma (DRC)",        "lat": -1.68,  "lng": 29.22},
+            {"name": "Bujumbura (Burundi)","lat": -3.38,  "lng": 29.36},
+            {"name": "Kampala (Uganda)",  "lat":  0.32,  "lng": 32.58},
+            {"name": "Kigali (Rwanda)",   "lat": -1.95,  "lng": 30.06},
+        ],
+    },
+    {
+        "key": "h5n1-global-2024",
+        "name": "H5N1 · avian flu",
+        "region": "US human cases (CDC)",
+        "query": "H5N1 bird flu outbreak",
+        "started": "2024-03-25",  # first US dairy cattle detection
+        "blurb": "Ongoing global poultry panzootic; US dairy + farmworker cases.",
+        "color": "#14b8a6",  # teal
+        "counter_source": "cdc-h5n1",
+        "locations": [
+            {"name": "California (US dairy)", "lat": 36.78, "lng": -119.42},
+            {"name": "Cambodia",              "lat": 12.57, "lng": 104.99},
+            {"name": "Vietnam",               "lat": 14.06, "lng": 108.28},
+            {"name": "UK (poultry)",          "lat": 52.35, "lng":   -1.17},
+        ],
+    },
 ]
 
 
+def _started_human(started: str) -> str:
+    """Render a started-date as 'May 15 · 4d ago'. Falls back to raw string."""
+    try:
+        d = dt.datetime.strptime(started, "%Y-%m-%d").replace(tzinfo=dt.timezone.utc)
+    except (ValueError, TypeError):
+        return started
+    days = (dt.datetime.now(dt.timezone.utc) - d).days
+    label = d.strftime("%b %-d")
+    if days <= 0:
+        return f"{label} · today"
+    if days == 1:
+        return f"{label} · 1d ago"
+    if days < 60:
+        return f"{label} · {days}d ago"
+    return d.strftime("%b %-d, %Y")
+
+
 def fetch_other_outbreaks(limit_each: int = 6) -> list[dict]:
-    """Fetch a few news items per configured other-disease outbreak."""
+    """Fetch a few news items + (optional) live counter scrape per outbreak.
+
+    Counters are populated only when the configured `counter_source` scraper
+    succeeds; there is no manual-fallback snapshot. Entries without live data
+    show news + metadata only, never stale numbers.
+    """
     out: list[dict] = []
     for cfg in OTHER_DISEASES:
+        cases = deaths = as_of = source = source_url = None
+        status = "no_counter"  # → "live" when scrape succeeds
+
+        src_key = cfg.get("counter_source")
+        if src_key and src_key in COUNTER_SOURCES:
+            scraped = COUNTER_SOURCES[src_key]()
+            if scraped and scraped.get("cases") is not None:
+                cases = scraped["cases"]
+                deaths = scraped.get("deaths")
+                as_of = scraped.get("as_of")
+                source = scraped.get("source")
+                source_url = scraped.get("source_url")
+                status = "live"
+            else:
+                print(f"[outbreaks] live scrape failed for {cfg['key']}; "
+                      "hiding counter row this build", file=sys.stderr)
+
         news_items = fetch_google_news(query=cfg["query"], limit=limit_each)
         out.append({
             "key": cfg["key"],
             "name": cfg["name"],
             "region": cfg["region"],
             "started": cfg["started"],
+            "started_human": _started_human(cfg["started"]),
             "blurb": cfg["blurb"],
-            "color": cfg.get("color", "#c084fc"),
+            "color": cfg.get("color", DEFAULT_OUTBREAK_COLOR),
+            "cases": cases,
+            "deaths": deaths,
+            "as_of": as_of,
+            "source": source,
+            "source_url": source_url,
+            "status": status,
             "locations": cfg.get("locations", []),
             "news": [
                 {
@@ -469,12 +710,11 @@ def fetch_other_outbreaks(limit_each: int = 6) -> list[dict]:
 
 # ----- Source: Google News RSS -----
 def fetch_google_news(query: str = "hantavirus", limit: int = 25) -> list[Item]:
-    from urllib.parse import quote_plus
     url = (
         "https://news.google.com/rss/search?"
         f"q={quote_plus(query)}&hl=en-US&gl=US&ceid=US:en"
     )
-    parsed = feedparser.parse(url, request_headers=HEADERS)
+    parsed = parse_feed_url(url)
     items: list[Item] = []
     for e in parsed.entries[:limit]:
         published = None
@@ -496,7 +736,7 @@ def fetch_google_news(query: str = "hantavirus", limit: int = 25) -> list[Item]:
                 url=e.link,
                 source=f"Google News · {outlet}" if outlet else "Google News",
                 published=published,
-                summary="",
+                summary=clean_summary(getattr(e, "summary", "")),
             )
         )
     return items
@@ -510,11 +750,13 @@ ECDC_RSS_URL = "https://www.ecdc.europa.eu/en/taxonomy/term/1307/feed"
 
 
 def fetch_ecdc(query: str = "hantavirus", limit: int = 15) -> list[Item]:
-    parsed = feedparser.parse(ECDC_RSS_URL, request_headers=HEADERS)
+    parsed = parse_feed_url(ECDC_RSS_URL)
     items: list[Item] = []
     for e in parsed.entries:
         title = (e.title or "").strip()
-        if query.lower() not in title.lower():
+        summary = clean_summary(getattr(e, "summary", ""))
+        haystack = f"{title} {summary}"
+        if query.lower() not in haystack.lower():
             continue
         published = None
         if getattr(e, "published", None):
@@ -530,7 +772,7 @@ def fetch_ecdc(query: str = "hantavirus", limit: int = 15) -> list[Item]:
                 url=e.link,
                 source="ECDC",
                 published=published,
-                summary="",
+                summary=summary,
             )
         )
         if len(items) >= limit:
@@ -753,7 +995,8 @@ def cluster_by_country(items: list[Item]) -> dict[str, list[Item]]:
         for term, canon in term_to_country:
             if canon in seen:
                 continue
-            if re.search(rf"\b{re.escape(term)}\b", item.title, re.IGNORECASE):
+            text = f"{item.title} {item.summary}"
+            if re.search(rf"\b{re.escape(term)}\b", text, re.IGNORECASE):
                 clusters.setdefault(canon, []).append(item)
                 seen.add(canon)
     return clusters
@@ -1120,12 +1363,14 @@ def main() -> int:
             "counts": hondius_counts,
         },
         "cdc_snapshot": CDC_SNAPSHOT,
+        "other_outbreaks": other_outbreaks,
         "items": [
             {
                 "title": i.title,
                 "url": i.url,
                 "source": i.source,
                 "published": i.published_iso,
+                "summary": i.summary,
             }
             for i in all_items[:50]
         ],

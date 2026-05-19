@@ -92,6 +92,20 @@
       — a firehose of press coverage from around the world.
     </li>
     <li>
+      <strong>ECDC</strong> — hantavirus-related agency updates, plus the
+      dedicated Andes hantavirus outbreak page for MV Hondius counters when
+      it can be parsed.
+      <a href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection"
+         target="_blank" rel="noopener">ecdc.europa.eu</a>
+    </li>
+    <li>
+      <strong>WHO Disease Outbreak News</strong> — DON599 is used as the
+      fallback source for the Hondius outbreak counters when ECDC's structured
+      page is unavailable.
+      <a href="https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599"
+         target="_blank" rel="noopener">who.int</a>
+    </li>
+    <li>
       <strong>CDC HPS surveillance</strong> — the static "US snapshot"
       box uses the most recent annual aggregate published by CDC
       (1993&nbsp;–&nbsp;2023, refreshed when CDC posts new totals).
@@ -104,7 +118,7 @@
   <p>
     A simple regex looks for country names (and a few aliases — e.g.
     <code>California</code> or <code>U.S.</code> roll up to USA) in each
-    article title. Items whose title doesn't name a country aren't placed
+    article title and summary. Items that don't name a country aren't placed
     on the map but still appear in the news list below it.
   </p>
 
@@ -121,10 +135,10 @@
   <h2>What's missing</h2>
   <ul>
     <li>
-      <strong>WHO Disease Outbreak News</strong> — their listing page is
-      JavaScript-rendered, so we'd need a headless browser to scrape it.
-      WHO statements still flow through Google News when major outlets
-      cover them.
+      <strong>Broad WHO DON indexing</strong> — the current WHO Disease
+      Outbreak News listing doesn't expose a verified RSS feed for this
+      static build. The tracker uses the relevant DON599 page directly for
+      Hondius fallback counters.
     </li>
     <li>
       <strong>State / sub-national resolution</strong> — the country

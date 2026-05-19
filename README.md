@@ -1,7 +1,8 @@
 # Hantavirus Tracker
 
 Hourly-updated static site aggregating hantavirus outbreak alerts and news from
-ProMED-mail, Google News, and CDC HPS surveillance.
+ProMED-mail, ECDC, Google News, WHO Disease Outbreak News, and CDC HPS
+surveillance.
 
 Live: https://m041997.github.io/hantavirus-tracker/
 
@@ -12,6 +13,10 @@ Live: https://m041997.github.io/hantavirus-tracker/
 - **Google News RSS** for the query `hantavirus` — primary news firehose.
 - **ProMED-mail** search page (`/?s=hantavirus`) — official outbreak alerts.
   Server-rendered HTML, scraped with BeautifulSoup.
+- **ECDC hantavirus RSS + outbreak page** — EU agency updates, including
+  structured MV Hondius counters when available.
+- **WHO Disease Outbreak News DON599** — fallback source for MV Hondius
+  counters when ECDC's structured page is unavailable.
 - **CDC HPS surveillance** — slow-moving aggregate stats, snapshotted in
   `CDC_SNAPSHOT` in `build.py`. Refresh by re-reading
   https://www.cdc.gov/hantavirus/data-research/cases/index.html when CDC
@@ -63,5 +68,8 @@ open docs/index.html
 
 - Not real-time. ProMED + news lag actual events by hours to days.
 - Not a medical resource. See CDC for clinical guidance.
-- Not WHO-sourced. WHO Disease Outbreak News page is JS-rendered and would
-  require headless browsing — skipped to keep the build hermetic.
+- Not a case registry. Counts and locations are only as current as the public
+  sources above.
+- Not broadly WHO-indexed. WHO's Disease Outbreak News listing does not expose
+  a verified RSS feed here; the tracker uses the relevant DON599 page directly
+  for Hondius fallback counts.
