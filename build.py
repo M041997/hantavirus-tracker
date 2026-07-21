@@ -653,6 +653,48 @@ def _started_human(started: str) -> str:
     return d.strftime("%b %-d, %Y")
 
 
+# How old an `as_of` figure is allowed to get before we stop presenting it as a
+# live number. Anything past DORMANT_DAYS is treated as a concluded/dormant
+# outbreak so the site never implies a month-old count is current.
+STALE_DAYS = 14
+DORMANT_DAYS = 45
+
+
+def data_age(as_of: str | None) -> dict:
+    """Classify how fresh an 'as_of' date is.
+
+    Returns {days, human, status} where status is one of:
+      fresh   (<= STALE_DAYS)      — present as a live counter
+      stale   (STALE_DAYS..DORMANT_DAYS) — show, but flag "no recent update"
+      dormant (> DORMANT_DAYS)     — treat the outbreak as concluded/quiet
+      unknown (no parseable date)
+    `human` renders as 'Jul 13, 2026 · 8 days ago' for badges.
+    """
+    if not as_of:
+        return {"days": None, "human": "date unknown", "status": "unknown"}
+    try:
+        d = dt.datetime.strptime(str(as_of)[:10], "%Y-%m-%d").replace(
+            tzinfo=dt.timezone.utc
+        )
+    except (ValueError, TypeError):
+        return {"days": None, "human": str(as_of), "status": "unknown"}
+    days = (dt.datetime.now(dt.timezone.utc) - d).days
+    label = d.strftime("%b %-d, %Y")
+    if days <= 0:
+        human = f"{label} · today"
+    elif days == 1:
+        human = f"{label} · 1 day ago"
+    else:
+        human = f"{label} · {days} days ago"
+    if days <= STALE_DAYS:
+        status = "fresh"
+    elif days <= DORMANT_DAYS:
+        status = "stale"
+    else:
+        status = "dormant"
+    return {"days": days, "human": human, "status": status}
+
+
 def fetch_other_outbreaks(limit_each: int = 6) -> list[dict]:
     """Fetch a few news items + (optional) live counter scrape per outbreak.
 
@@ -706,6 +748,147 @@ def fetch_other_outbreaks(limit_each: int = 6) -> list[dict]:
             ],
         })
     return out
+
+
+# ----- Hero outbreak: Cyclosporiasis (US, 2026) -----
+# The site's headline outbreak. Chosen because it is the largest currently
+# active, fast-moving outbreak we track. Unlike the sidebar diseases, the hero
+# carries a dated fallback so the masthead is never blank — but every surface
+# stamps the figure with `as_of`/`data_age`, so a frozen number can never
+# masquerade as live (see data_age / STALE_DAYS).
+CYCLOSPORA_INVESTIGATION_URL = (
+    "https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/investigation.html"
+)
+CYCLOSPORA_OUTBREAK_URL = (
+    "https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/index.html"
+)
+
+# Dated snapshot from the CDC investigation update (7/14/26 briefing). Used only
+# when the live scrape fails; always rendered with its as_of date.
+CYCLOSPORA_FALLBACK = {
+    "confirmed":    1645,
+    "pending":      5100,
+    "hospitalized": 141,
+    "deaths":       0,
+    "states":       31,
+    "as_of":        "2026-07-13",
+    "source":       "CDC",
+    "source_url":   CYCLOSPORA_INVESTIGATION_URL,
+    "vehicle":      "Iceberg lettuce · Taylor Farms de Mexico",
+}
+
+# US-state epicenters for map markers (Taylor Farms / Taco Bell advisory states
+# plus the reported hotspots). Coords are state centroids.
+CYCLOSPORA_LOCATIONS = [
+    {"name": "Michigan",       "lat": 43.33, "lng": -84.54},
+    {"name": "Ohio",           "lat": 40.42, "lng": -82.91},
+    {"name": "Kentucky",       "lat": 37.84, "lng": -84.27},
+    {"name": "West Virginia",  "lat": 38.60, "lng": -80.45},
+    {"name": "Indiana",        "lat": 39.85, "lng": -86.26},
+    {"name": "North Carolina", "lat": 35.63, "lng": -79.81},
+]
+
+
+def fetch_cyclospora_counts() -> dict:
+    """Scrape the CDC cyclosporiasis investigation page for current counts.
+
+    Returns a dict shaped like CYCLOSPORA_FALLBACK. Falls back to the dated
+    snapshot (never blank) when the fetch or parse fails; the caller stamps the
+    result with data_age() so a stale figure is always labelled as such.
+    """
+    out = dict(CYCLOSPORA_FALLBACK)
+    try:
+        r = http_get(CYCLOSPORA_INVESTIGATION_URL)
+        r.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"[cyclospora] fetch failed, using dated fallback: {exc}",
+              file=sys.stderr)
+        return out
+    text = BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True)
+
+    # "1,645 confirmed domestic cases of cyclosporiasis"
+    m = re.search(r"([\d,]+)\s+confirmed domestic cases", text)
+    if m:
+        out["confirmed"] = _to_int(m.group(1))
+    # "more than 5,100 cases that require further analysis"
+    m = re.search(r"more than\s+([\d,]+)\s+cases that require", text)
+    if m:
+        out["pending"] = _to_int(m.group(1))
+    # "141 (9%) were hospitalized"
+    m = re.search(r"([\d,]+)\s*\(\d+%\)\s+(?:were\s+)?hospitalized", text)
+    if m:
+        out["hospitalized"] = _to_int(m.group(1))
+    # deaths: "none have died" -> 0, else "N ... died"
+    if re.search(r"none have died", text, re.I):
+        out["deaths"] = 0
+    else:
+        m = re.search(r"(\d+)\s+(?:people\s+)?(?:have\s+)?died", text)
+        if m:
+            out["deaths"] = _to_int(m.group(1))
+
+    # "As of July 13, 2026" (year optional -> assume current year)
+    m = re.search(
+        r"[Aa]s of\s+(January|February|March|April|May|June|July|August|"
+        r"September|October|November|December)\s+(\d{1,2})(?:,?\s+(\d{4}))?",
+        text,
+    )
+    if m:
+        month, day = m.group(1), m.group(2)
+        year = m.group(3) or str(dt.datetime.now(dt.timezone.utc).year)
+        try:
+            d = dt.datetime.strptime(f"{month} {day} {year}", "%B %d %Y")
+            if d.date() <= dt.datetime.now(dt.timezone.utc).date():
+                out["as_of"] = d.strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+
+    out["fetched_at"] = dt.datetime.now(dt.timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
+    return out
+
+
+def build_hero() -> dict:
+    """Assemble the headline (hero) outbreak object for the masthead + hero card.
+
+    Bundles live/dated counts, freshness metadata, US-state map locations, and a
+    short news feed into a single normalised object the template renders big.
+    """
+    counts = fetch_cyclospora_counts()
+    news_items = fetch_google_news(query="cyclospora OR cyclosporiasis", limit=8)
+    return {
+        "key":          "cyclospora-us-2026",
+        "name":         "Cyclosporiasis",
+        "pathogen":     "Cyclospora cayetanensis (parasite)",
+        "region":       "United States · multistate",
+        "started":      "2026-05-01",
+        "started_human": _started_human("2026-05-01"),
+        "blurb":        "Explosive multistate cyclosporiasis surge. Epidemiologic "
+                        "and traceback data link a cluster to iceberg lettuce from "
+                        "Taylor Farms de Mexico served at Taco Bell locations.",
+        "color":        "#84cc16",  # lime — distinct from red hanta pulses
+        "confirmed":    counts.get("confirmed"),
+        "pending":      counts.get("pending"),
+        "hospitalized": counts.get("hospitalized"),
+        "deaths":       counts.get("deaths"),
+        "states":       counts.get("states"),
+        "vehicle":      counts.get("vehicle"),
+        "as_of":        counts.get("as_of"),
+        "data_age":     data_age(counts.get("as_of")),
+        "source":       counts.get("source"),
+        "source_url":   counts.get("source_url"),
+        "outbreak_url": CYCLOSPORA_OUTBREAK_URL,
+        "locations":    CYCLOSPORA_LOCATIONS,
+        "news": [
+            {
+                "title": i.title,
+                "url": i.url,
+                "source": i.source,
+                "published": i.published_human,
+            }
+            for i in news_items
+        ],
+    }
 
 
 # ----- Source: Google News RSS -----
@@ -1122,7 +1305,7 @@ def _load_font(size: int) -> ImageFont.ImageFont:
 
 
 def render_og_image(country_index: list[dict], outbreaks: list[dict],
-                     reports_today: int) -> Image.Image:
+                     reports_today: int, hero: dict | None = None) -> Image.Image:
     """Render a 1200x630 PNG share card matching the site's hero look."""
     W, H = 1200, 630
     img = Image.new("RGB", (W, H), (10, 14, 20))
@@ -1167,18 +1350,23 @@ def render_og_image(country_index: list[dict], outbreaks: list[dict],
     stat_v_font = _load_font(58)
     stat_k_font = _load_font(20)
 
-    draw.text((dot_x + 40, dot_y - 38), "HANTAVIRUS TRACKER",
+    draw.text((dot_x + 40, dot_y - 38), "OUTBREAK MONITOR",
               font=title_font, fill=(232, 238, 245))
     draw.text((dot_x + 42, dot_y + 36),
-              "Live global outbreak & news aggregator",
+              "Live tracker of active disease outbreaks",
               font=sub_font, fill=(138, 153, 171))
 
-    # Stat tiles (bottom)
+    # Stat tiles (bottom) — lead with the hero outbreak's headline figure.
+    hero = hero or {}
+    hero_confirmed = hero.get("confirmed")
+    hero_val = f"{hero_confirmed:,}" if hero_confirmed is not None else str(len(outbreaks))
+    hero_label = (hero.get("name", "OUTBREAK")[:14]).upper() + " (US)" \
+        if hero_confirmed is not None else "CLUSTERS"
     stats = [
-        (f"{len(country_index)}", "ACTIVE COUNTRIES"),
+        (hero_val, hero_label),
         (f"{reports_today}", "REPORTS TODAY"),
+        (f"{len(country_index)}", "HANTA COUNTRIES"),
         (f"{len(outbreaks)}", "CLUSTERS"),
-        ("35%", "US CFR · CDC"),
     ]
     tile_w, tile_h, gap = 240, 110, 24
     total_w = len(stats) * tile_w + (len(stats) - 1) * gap
@@ -1213,8 +1401,9 @@ def render_og_image(country_index: list[dict], outbreaks: list[dict],
 
 
 def write_og_image(path: pathlib.Path, country_index: list[dict],
-                   outbreaks: list[dict], reports_today: int) -> None:
-    img = render_og_image(country_index, outbreaks, reports_today)
+                   outbreaks: list[dict], reports_today: int,
+                   hero: dict | None = None) -> None:
+    img = render_og_image(country_index, outbreaks, reports_today, hero)
     img.save(path, "PNG", optimize=True)
 
 
@@ -1245,9 +1434,13 @@ def write_robots(path: pathlib.Path) -> None:
 
 
 def main() -> int:
-    print("[build] fetching Google News...", file=sys.stderr)
+    print("[build] fetching Google News (hantavirus)...", file=sys.stderr)
     news = fetch_google_news()
     print(f"[build]   got {len(news)} items", file=sys.stderr)
+
+    print("[build] fetching Google News (cyclospora)...", file=sys.stderr)
+    cyclo_news = fetch_google_news(query="cyclospora OR cyclosporiasis", limit=25)
+    print(f"[build]   got {len(cyclo_news)} items", file=sys.stderr)
 
     print("[build] fetching ProMED...", file=sys.stderr)
     promed = fetch_promed()
@@ -1262,6 +1455,14 @@ def main() -> int:
     print(
         f"[build]   got {sum(len(o['news']) for o in other_outbreaks)} "
         f"items across {len(other_outbreaks)} outbreaks",
+        file=sys.stderr,
+    )
+
+    print("[build] building hero outbreak (cyclosporiasis)...", file=sys.stderr)
+    hero = build_hero()
+    print(
+        f"[build]   cyclospora confirmed={hero['confirmed']} "
+        f"as_of={hero['as_of']} ({hero['data_age']['status']})",
         file=sys.stderr,
     )
 
@@ -1297,16 +1498,25 @@ def main() -> int:
 
     promed = sort_by_date(promed)
     news = sort_by_date(news)
+    cyclo_news = sort_by_date(cyclo_news)
     ecdc = sort_by_date(ecdc)
+    # Map clustering stays hantavirus-only (promed + ecdc + hantavirus news) so
+    # the country-pulse layer keeps its meaning; the headline "News & press"
+    # firehose is multi-disease (hantavirus + cyclospora).
     all_items = sort_by_date(dedupe_by_title(promed + ecdc + news))
+    news_feed = sort_by_date(dedupe_by_title(cyclo_news + news))
     clusters = cluster_by_country(all_items)
     outbreaks = detect_active_outbreaks(clusters)
     country_index = build_country_index(clusters)
     spread_arcs = build_spread_arcs(country_index)
 
+    # Freshness metadata so the UI never presents a frozen number as live.
+    vessel_age = data_age(hondius_counts.get("as_of"))
+    cdc_age = data_age(CDC_SNAPSHOT["as_of"])
+
     today = dt.datetime.now(dt.timezone.utc).date()
     reports_today = sum(
-        1 for i in all_items if i.published and i.published.date() == today
+        1 for i in news_feed if i.published and i.published.date() == today
     )
 
     now = dt.datetime.now(dt.timezone.utc)
@@ -1315,16 +1525,19 @@ def main() -> int:
         "build_time_human": now.strftime("%Y-%m-%d %H:%M UTC"),
         "promed_items": promed[:15],
         "ecdc_items": ecdc[:10],
-        "news_items": news[:25],
+        "news_items": news_feed[:25],
         "all_items": all_items[:30],
         "outbreaks": outbreaks,
+        "hero": hero,
+        "hero_json": json.dumps(hero),
         "country_index": country_index,
         "spread_arcs": spread_arcs,
         "country_index_json": json.dumps(country_index),
         "spread_arcs_json": json.dumps(spread_arcs),
         "cdc": CDC_SNAPSHOT,
+        "cdc_age": cdc_age,
         "promed_count": len(promed),
-        "news_count": len(news),
+        "news_count": len(news_feed),
         "reports_today": reports_today,
         "active_country_count": len(country_index),
         "site_url": SITE_URL,
@@ -1332,6 +1545,7 @@ def main() -> int:
         "vessel": HONDIUS_VESSEL,
         "vessel_position": hondius_pos,
         "vessel_counts": hondius_counts,
+        "vessel_age": vessel_age,
         "other_outbreaks": other_outbreaks,
         "other_outbreaks_json": json.dumps(other_outbreaks),
         "vessel_json": json.dumps(
@@ -1348,12 +1562,13 @@ def main() -> int:
     (OUT / "about.html").write_text(
         render("about.html.j2", context), encoding="utf-8"
     )
-    write_og_image(OUT / "og.png", country_index, outbreaks, reports_today)
+    write_og_image(OUT / "og.png", country_index, outbreaks, reports_today, hero)
     write_sitemap(OUT / "sitemap.xml", context["build_time_iso"])
     write_robots(OUT / "robots.txt")
     # Also write a JSON dump alongside for anyone who wants the raw data.
     payload = {
         "generated_at": context["build_time_iso"],
+        "hero": hero,
         "outbreaks": outbreaks,
         "country_index": country_index,
         "spread_arcs": spread_arcs,

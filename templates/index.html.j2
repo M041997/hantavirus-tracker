@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hantavirus Tracker — live global outbreak map</title>
-<meta name="description" content="Live, hourly-updated map of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC surveillance. Track active clusters, recent reports, and documented spread routes.">
+<title>Outbreak Monitor — live tracker of active disease outbreaks</title>
+<meta name="description" content="Live, hourly-updated tracker of active disease outbreaks — the US cyclosporiasis surge, hantavirus clusters, Ebola, mpox and H5N1 — with a global map and news from CDC, ECDC, WHO, ProMED-mail and Google News.">
 <link rel="canonical" href="{{ site_url }}/">
-<meta property="og:title" content="Hantavirus Tracker — live global outbreak map">
-<meta property="og:description" content="Live, hourly-updated map of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC.">
+<meta property="og:title" content="Outbreak Monitor — live tracker of active disease outbreaks">
+<meta property="og:description" content="Live, hourly-updated tracker of active disease outbreaks with a global map and news from CDC, ECDC, WHO and ProMED-mail.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="{{ site_url }}/">
 <meta property="og:image" content="{{ site_url }}/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Hantavirus Tracker">
-<meta name="twitter:description" content="Live global map of hantavirus outbreaks and news.">
+<meta name="twitter:title" content="Outbreak Monitor">
+<meta name="twitter:description" content="Live tracker of active disease outbreaks with a global map and news.">
 <meta name="twitter:image" content="{{ site_url }}/og.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2250%22 font-size=%2256%22>&#129440;</text></svg>">
 {% if analytics_code %}
@@ -139,6 +139,21 @@
   .stat-tile .k {
     color: var(--muted); font-size: 10px; text-transform: uppercase;
     letter-spacing: 0.08em; margin-top: 4px;
+  }
+
+  /* Data-freshness badges — every counter block is stamped with how old its
+     figure is, so a frozen number can never masquerade as live. */
+  .age-badge {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.02em; padding: 2px 8px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted);
+    background: rgba(20,28,38,.6); white-space: nowrap;
+  }
+  .age-badge.fresh {
+    color: #b6e56a; border-color: #3a4a1e; background: rgba(132,204,22,0.10);
+  }
+  .age-badge.stale {
+    color: var(--accent-2); border-color: #4a3a1e; background: rgba(255,184,77,0.10);
   }
 
   .legend {
@@ -571,42 +586,45 @@
 
   <div class="hud hud-tl">
     <div class="title-card">
-      <h1><span class="dot"></span>Hantavirus Tracker</h1>
-      <div class="sub">Updated {{ build_time_human }} · rebuilds hourly</div>
+      <h1><span class="dot"></span>Outbreak Monitor</h1>
+      <div class="sub">Active disease outbreaks · updated {{ build_time_human }} · rebuilds hourly</div>
     </div>
   </div>
 
   <div class="hud hud-tr">
     <div class="stat-strip">
       <div class="stat-tile"
-           title="Hondius cluster — confirmed + probable/suspected — {{ vessel_counts.source }}">
-        <div class="v warn">{{ vessel_counts.cases_total }}</div>
-        <div class="k">Cases · Hondius</div>
+           title="{{ hero.name }} — CDC-confirmed domestic cases · {{ hero.data_age.human }}">
+        <div class="v" style="color: {{ hero.color }}">{{ '{:,}'.format(hero.confirmed) }}</div>
+        <div class="k">Confirmed · {{ hero.name }}</div>
       </div>
       <div class="stat-tile"
-           title="Hondius cluster fatalities — {{ vessel_counts.source }}">
-        <div class="v alert">{{ vessel_counts.deaths }}</div>
-        <div class="k">Deaths · Hondius</div>
+           title="Cases awaiting confirmation as domestically acquired — CDC">
+        <div class="v warn">{{ '{:,}'.format(hero.pending) }}+</div>
+        <div class="k">Under review</div>
       </div>
       <div class="stat-tile"
-           title="Active countries with reports in last 60 days">
+           title="Hospitalized case-patients — CDC">
+        <div class="v warn">{{ '{:,}'.format(hero.hospitalized) }}</div>
+        <div class="k">Hospitalized</div>
+      </div>
+      <div class="stat-tile"
+           title="Active countries with hantavirus reports in last 60 days">
         <div class="v">{{ active_country_count }}</div>
         <div class="k">Active countries</div>
-      </div>
-      <div class="stat-tile"
-           title="US case fatality rate, all hantavirus 1993–2023">
-        <div class="v alert">{{ cdc.case_fatality_rate_pct }}%</div>
-        <div class="k">US CFR · CDC</div>
       </div>
     </div>
   </div>
 
   <div class="hud hud-bl">
     <div class="legend">
-      <div class="row"><span class="swatch"></span>Reported activity (last 60d)</div>
+      {% if hero.locations %}
+      <div class="row"><span class="swatch" style="background: {{ hero.color }}; box-shadow: 0 0 6px {{ hero.color }}"></span>{{ hero.name }} (US states)</div>
+      {% endif %}
+      <div class="row"><span class="swatch"></span>Hantavirus activity (last 60d)</div>
       <div class="row"><span class="swatch arc"></span>Documented spread route</div>
       {% if vessel_position %}
-      <div class="row"><span class="swatch ship"></span>MV Hondius (outbreak vessel)</div>
+      <div class="row"><span class="swatch ship"></span>MV Hondius (hantavirus vessel)</div>
       {% endif %}
     </div>
   </div>
@@ -618,10 +636,97 @@
 
 <div class="wrap">
   <div class="grid">
+    {% if hero %}
+    <div class="card span-12" style="border-color: #3a4a1e;
+         background: linear-gradient(135deg, #1c2411, #141a10);">
+      <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:4px;">
+        <span style="display:inline-block; font-size:11px; font-weight:700; letter-spacing:0.08em;
+              text-transform:uppercase; color:#0c1206; background:{{ hero.color }};
+              padding:2px 8px; border-radius:4px;">Active outbreak</span>
+        <h2 style="color: {{ hero.color }}; margin:0;">{{ hero.name }} · United States</h2>
+        {% if hero.data_age.status == 'fresh' %}
+        <span class="age-badge fresh">Updated {{ hero.data_age.human }}</span>
+        {% elif hero.data_age.status == 'unknown' %}
+        <span class="age-badge">Date unknown</span>
+        {% else %}
+        <span class="age-badge stale">No CDC update since {{ hero.data_age.human }}</span>
+        {% endif %}
+      </div>
+      <div style="color: var(--muted); font-size: 13px; margin-bottom: 14px;">
+        {{ hero.pathogen }} · outbreak began {{ hero.started_human }}
+      </div>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
+        <div class="stat-tile" style="background: rgba(132,204,22,0.10); border-color: #3a4a1e;">
+          <div class="v" style="color: {{ hero.color }};">{{ '{:,}'.format(hero.confirmed) }}</div>
+          <div class="k">Confirmed (CDC)</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,184,77,0.06); border-color: #3a2e1a;">
+          <div class="v warn">{{ '{:,}'.format(hero.pending) }}+</div>
+          <div class="k">Under review</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,184,77,0.06); border-color: #3a2e1a;">
+          <div class="v warn">{{ '{:,}'.format(hero.hospitalized) }}</div>
+          <div class="k">Hospitalized</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,59,59,0.05); border-color: #3a1c1f;">
+          <div class="v {% if hero.deaths %}alert{% endif %}">{{ hero.deaths }}</div>
+          <div class="k">Deaths</div>
+        </div>
+        <div class="stat-tile">
+          <div class="v">{{ hero.states }}</div>
+          <div class="k">States affected</div>
+        </div>
+      </div>
+
+      <div style="font-size: 13px; line-height: 1.55; margin-bottom: 10px;">
+        {{ hero.blurb }}
+        <div style="color: var(--muted); margin-top: 6px;">
+          <strong>Suspected vehicle:</strong> {{ hero.vehicle }}.
+        </div>
+      </div>
+
+      {% if hero.news %}
+      <ul class="items" style="margin-top: 6px;">
+        {% for i in hero.news[:4] %}
+        <li>
+          <a href="{{ i.url }}" target="_blank" rel="noopener">{{ i.title }}</a>
+          <div class="meta"><span class="src">{{ i.source }}</span>{% if i.published %}<span>·</span><span>{{ i.published }}</span>{% endif %}</div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <div style="font-size: 12px; color: var(--muted); margin-top: 8px;">
+        Counts {{ hero.data_age.human }}, from
+        <a href="{{ hero.source_url }}" target="_blank" rel="noopener">{{ hero.source }} investigation update</a>
+        (<a href="{{ hero.outbreak_url }}" target="_blank" rel="noopener">outbreak page</a>).
+        {% if hero.data_age.status != 'fresh' %}Awaiting a newer CDC figure.{% endif %}
+        Refreshes hourly.
+      </div>
+    </div>
+    {% endif %}
+
     {% if vessel_position %}
-    <div class="card span-12" style="border-color: #4a3a1e;
-         background: linear-gradient(135deg, #2a2113, #1a1812);">
-      <h2 style="color: var(--accent-2);">Outbreak vessel · live counters</h2>
+    <div class="card span-12" style="border-color: #3a3320;
+         background: linear-gradient(135deg, #211d13, #17140e); opacity: 0.94;">
+      <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:4px;">
+        <h2 style="color: var(--accent-2); margin:0;">Hantavirus · MV Hondius cluster</h2>
+        {% if vessel_age.status == 'fresh' %}
+        <span class="age-badge fresh">Updated {{ vessel_age.human }}</span>
+        {% elif vessel_age.status == 'unknown' %}
+        <span class="age-badge">Date unknown</span>
+        {% else %}
+        <span class="age-badge stale">{% if vessel_age.status == 'dormant' %}Dormant{% else %}No update{% endif %} — last {{ vessel_age.human }}</span>
+        {% endif %}
+      </div>
+      {% if vessel_age.status in ('stale', 'dormant') %}
+      <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+        This maritime cluster has had no new {{ vessel_counts.source }} figures since
+        {{ vessel_counts.as_of }} and appears to have resolved. Counts below are the
+        last reported values, kept for reference.
+      </div>
+      {% endif %}
 
       <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
         <div class="stat-tile" style="background: rgba(255,184,77,0.08); border-color: #4a3a1e;">
@@ -689,8 +794,8 @@
       </div>
 
       <div style="font-size: 12px; color: var(--muted);">
-        Counters as of {{ vessel_counts.as_of }}, scraped from
-        <a href="{{ vessel_counts.source_url }}" target="_blank" rel="noopener">{{ vessel_counts.source }}</a>.
+        Counters {{ vessel_age.human }}, from
+        <a href="{{ vessel_counts.source_url }}" target="_blank" rel="noopener">{{ vessel_counts.source }}</a>{% if vessel_age.status in ('stale', 'dormant') %} — no newer figure has been published{% endif %}.
         Position from
         <a href="{{ vessel.tracker_url }}" target="_blank" rel="noopener">CruiseMapper</a>;
         cross-check on
@@ -723,7 +828,10 @@
     </div>
 
     <div class="card span-4">
-      <h2>CDC US snapshot</h2>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:4px;">
+        <h2 style="margin:0;">CDC hantavirus snapshot</h2>
+        <span class="age-badge" title="CDC publishes hantavirus surveillance once a year; this is the latest annual dataset, not a live count.">Annual data · {{ cdc.as_of[:4] }}</span>
+      </div>
       <div class="stats-mini">
         <div class="stat"><div class="v">{{ cdc.total_cases }}</div>
           <div class="k">Total cases</div></div>
@@ -735,8 +843,10 @@
           <div class="k">West of Miss.</div></div>
       </div>
       <p style="color: var(--muted); margin-top:12px; font-size: 12px;">
-        Surveillance period {{ cdc.surveillance_start }} – {{ cdc.as_of[:4] }}.
-        Median age {{ cdc.median_age }}, {{ cdc.pct_male }}% male.
+        Cumulative US hantavirus surveillance, {{ cdc.surveillance_start }}–{{ cdc.as_of[:4] }}
+        (median age {{ cdc.median_age }}, {{ cdc.pct_male }}% male). This is an
+        <strong>annual</strong> dataset — CDC last published it {{ cdc_age.human }},
+        so these totals move once a year, not hourly.
         <a href="{{ cdc.source_url }}" target="_blank" rel="noopener">Source: CDC</a>.
       </p>
     </div>
@@ -763,7 +873,7 @@
     </div>
 
     <div class="card span-12">
-      <h2>News &amp; press · last {{ news_items|length }} items</h2>
+      <h2>Outbreak news · cyclospora + hantavirus · last {{ news_items|length }} items</h2>
       {% if news_items %}
       <ul class="items">
         {% for item in news_items %}
@@ -812,7 +922,8 @@
     countries: {{ country_index_json|safe }},
     arcs:      {{ spread_arcs_json|safe }},
     vessel:    {{ vessel_json|safe }},
-    other:     {{ other_outbreaks_json|safe }}
+    other:     {{ other_outbreaks_json|safe }},
+    hero:      {{ hero_json|safe }}
   };
 </script>
 <script>
@@ -979,6 +1090,42 @@
         </div>
       `, { maxWidth: 320 })
       .addTo(map);
+  }
+
+  // ----- Hero outbreak map markers (cyclosporiasis US states) -----
+  const hero = window.HANTA.hero;
+  if (hero && Array.isArray(hero.locations)) {
+    const hColor = hero.color || '#84cc16';
+    const heroNews = (hero.news || []).slice(0, 3).map(i => `
+      <li>
+        <div class="src" style="color:${hColor}">${escape(i.source)}${i.published ? ' · ' + escape(i.published) : ''}</div>
+        <a href="${escape(i.url)}" target="_blank" rel="noopener">${escape(i.title)}</a>
+      </li>`).join('');
+    const heroAge = hero.data_age && hero.data_age.human ? hero.data_age.human : '';
+    hero.locations.forEach(loc => {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div class="pulse-marker large" style="--pc: ${hColor}">
+                 <div class="ring"></div><div class="core"></div>
+               </div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+      });
+      L.marker([loc.lat, loc.lng], { icon, title: `${hero.name} · ${loc.name}` })
+        .bindPopup(`
+          <div class="popup-title" style="color:${hColor}">${escape(hero.name)} — ${escape(loc.name)}</div>
+          <div class="popup-meta">${escape(hero.region)}${heroAge ? ' · ' + escape(heroAge) : ''}</div>
+          <div style="display:flex; gap:14px; align-items:baseline; margin:4px 0 8px;">
+            <div><span style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:${hColor}">${(hero.confirmed || 0).toLocaleString()}</span>
+              <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em"> confirmed (US)</span></div>
+            <div><span style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent-2)">${(hero.hospitalized || 0).toLocaleString()}</span>
+              <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em"> hospitalized</span></div>
+          </div>
+          <div style="font-size:12px; color: var(--muted); margin-bottom: 6px;">${escape(hero.blurb || '')}</div>
+          ${heroNews ? `<ul class="popup-list">${heroNews}</ul>` : ''}
+        `, { maxWidth: 320 })
+        .addTo(map);
+    });
   }
 
   // ----- Other-outbreak map markers (colored pulses per disease) -----
