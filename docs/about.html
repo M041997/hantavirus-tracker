@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>About · Hantavirus Tracker</title>
+<title>About · Outbreak Monitor</title>
 <meta name="description" content="What this tracker is, where the data comes from, and what it isn't.">
-<link rel="canonical" href="https://m041997.github.io/hantavirus-tracker/about.html">
-<meta property="og:title" content="About · Hantavirus Tracker">
+<link rel="canonical" href="https://hantavirusonline.org/about.html">
+<meta property="og:title" content="About · Outbreak Monitor">
 <meta property="og:description" content="Sources, methodology, and a clear disclaimer.">
-<meta property="og:image" content="https://m041997.github.io/hantavirus-tracker/og.png">
+<meta property="og:image" content="https://hantavirusonline.org/og.png">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://m041997.github.io/hantavirus-tracker/about.html">
+<meta property="og:url" content="https://hantavirusonline.org/about.html">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2250%22 font-size=%2256%22>&#129440;</text></svg>">
 <style>
@@ -62,18 +62,35 @@
   </header>
 
   <p>
-    Hantavirus Tracker is a hobby aggregator. It pulls public outbreak
-    alerts and news, groups them by country, and renders a simple world
-    map you can scan in five seconds. It rebuilds itself once an hour.
+    Outbreak Monitor is a hobby aggregator. It tracks a rotating set of
+    active disease outbreaks — currently led by the 2026 US
+    cyclosporiasis surge, alongside hantavirus clusters, Ebola, mpox and
+    H5N1 — pulling public alerts and news, grouping them geographically,
+    and rendering a map you can scan in five seconds. Every counter is
+    stamped with how old its figure is, so a number that has stopped
+    updating is labelled rather than left to look current. It rebuilds
+    itself once an hour.
+  </p>
+
+  <p>
+    The map is the browsable view; the point of the project is the
+    <a href="https://hantavirusonline.org/feed.xml">alert feed</a>. Each build compares the current
+    picture against the previous one and emits an entry only when something
+    material changed — a new outbreak enters the tracker, reports start
+    clustering in a country that had none, or case and death counts move
+    past a threshold. Small revisions and downward corrections are ignored,
+    so subscribing does not mean an hourly notification. The same events go
+    out over RSS, and the full ledger is public at
+    <a href="https://hantavirusonline.org/alerts.json">alerts.json</a>.
   </p>
 
   <div class="panel danger">
     <strong>This is not a medical resource.</strong>
     Nothing here is clinical advice, diagnostic information, or an
     official outbreak declaration. If you think you've been exposed to
-    hantavirus, contact your healthcare provider or local health
-    authority. For US guidance, see the
-    <a href="https://www.cdc.gov/hantavirus/" target="_blank" rel="noopener">CDC</a>.
+    any illness tracked here, contact your healthcare provider or local
+    health authority. For US guidance, see the
+    <a href="https://www.cdc.gov/" target="_blank" rel="noopener">CDC</a>.
     For global outbreak surveillance, see
     <a href="https://www.who.int/emergencies/disease-outbreak-news"
        target="_blank" rel="noopener">WHO Disease Outbreak News</a>.
@@ -88,8 +105,18 @@
       <a href="https://promedmail.org/" target="_blank" rel="noopener">promedmail.org</a>
     </li>
     <li>
-      <strong>Google News RSS</strong> for the query <code>hantavirus</code>
-      — a firehose of press coverage from around the world.
+      <strong>Google News RSS</strong> for queries like
+      <code>cyclospora</code> and <code>hantavirus</code> — a firehose of
+      press coverage from around the world, merged into one news feed.
+    </li>
+    <li>
+      <strong>CDC cyclosporiasis outbreak pages</strong> — the headline
+      counts (confirmed, under-review, hospitalized, deaths) for the current
+      US cyclosporiasis surge. CDC bot-blocks automated fetches, so when the
+      live scrape is refused the tracker shows the most recent dated CDC
+      figure, always stamped with its <code>as of</code> date.
+      <a href="https://www.cdc.gov/cyclosporiasis/outbreaks/index.html"
+         target="_blank" rel="noopener">cdc.gov</a>
     </li>
     <li>
       <strong>ECDC</strong> — hantavirus-related agency updates, plus the
@@ -176,7 +203,7 @@
   <footer>
     Built with Python (feedparser + BeautifulSoup), Jinja2, Leaflet, and
     Esri World Imagery tiles. Hosted on GitHub Pages, rebuilt hourly by
-    GitHub Actions. No tracking cookies. No accounts. No ads.
+    GitHub Actions. No tracking cookies. No accounts.
   </footer>
 </div>
 </body>

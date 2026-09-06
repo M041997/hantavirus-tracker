@@ -72,6 +72,20 @@
     itself once an hour.
   </p>
 
+  <p>
+    The map is the browsable view; the point of the project is the
+    <a href="{{ feed_url }}">alert feed</a>. Each build compares the current
+    picture against the previous one and emits an entry only when something
+    material changed — a new outbreak enters the tracker, reports start
+    clustering in a country that had none, or case and death counts move
+    past a threshold. Small revisions and downward corrections are ignored,
+    so subscribing does not mean an hourly notification. The same events go
+    out over RSS{% if bluesky_handle %} and
+    <a href="https://bsky.app/profile/{{ bluesky_handle }}" target="_blank"
+       rel="noopener">Bluesky</a>{% endif %}, and the full ledger is public at
+    <a href="{{ site_url }}/alerts.json">alerts.json</a>.
+  </p>
+
   <div class="panel danger">
     <strong>This is not a medical resource.</strong>
     Nothing here is clinical advice, diagnostic information, or an

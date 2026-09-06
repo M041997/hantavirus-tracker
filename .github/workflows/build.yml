@@ -35,6 +35,11 @@ jobs:
         env:
           SITE_URL: ${{ vars.SITE_URL }}
           GOATCOUNTER_CODE: ${{ vars.GOATCOUNTER_CODE }}
+          NEWSLETTER_URL: ${{ vars.NEWSLETTER_URL }}
+          BLUESKY_HANDLE: ${{ vars.BLUESKY_HANDLE }}
+          # Optional. Absent secret => the Bluesky bot no-ops and the build
+          # still succeeds (forks and PRs don't get secrets).
+          BLUESKY_APP_PASSWORD: ${{ secrets.BLUESKY_APP_PASSWORD }}
         run: python build.py
 
       # We don't commit the regenerated docs/ back to the repo — the

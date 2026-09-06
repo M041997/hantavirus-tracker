@@ -6,6 +6,8 @@
 <title>Outbreak Monitor — live tracker of active disease outbreaks</title>
 <meta name="description" content="Live, hourly-updated tracker of active disease outbreaks — the US cyclosporiasis surge, hantavirus clusters, Ebola, mpox and H5N1 — with a global map and news from CDC, ECDC, WHO, ProMED-mail and Google News.">
 <link rel="canonical" href="{{ site_url }}/">
+<link rel="alternate" type="application/rss+xml"
+      title="Outbreak Monitor — alerts" href="{{ feed_url }}">
 <meta property="og:title" content="Outbreak Monitor — live tracker of active disease outbreaks">
 <meta property="og:description" content="Live, hourly-updated tracker of active disease outbreaks with a global map and news from CDC, ECDC, WHO and ProMED-mail.">
 <meta property="og:type" content="website">
@@ -311,6 +313,55 @@
   .stats-mini .k { color: var(--muted); font-size: 12px; text-transform: uppercase;
                    letter-spacing: 0.06em; margin-top: 2px; }
 
+  /* ---------- Subscribe (the site's primary call to action) ---------- */
+  .subscribe { border-color: #35506b; background:
+    linear-gradient(180deg, #16202c 0%, var(--panel) 100%); }
+  .subscribe h2 { color: var(--ink); text-transform: none; font-size: 20px;
+                  letter-spacing: 0; }
+  .subscribe p { margin: 0 0 16px; color: var(--muted); font-size: 14px;
+                 line-height: 1.5; max-width: 62ch; }
+  .sub-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    display: inline-block; padding: 9px 16px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--panel-2);
+    color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600;
+  }
+  .btn:hover { border-color: var(--accent-3); }
+  .btn.primary { background: var(--accent-3); border-color: var(--accent-3);
+                 color: #06121e; }
+  .sub-form { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sub-form input[type="email"] {
+    padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); font-size: 14px; min-width: 220px;
+  }
+  .sub-form input[type="email"]:focus { outline: 2px solid var(--accent-3);
+                                        outline-offset: 1px; }
+  .sub-form button {
+    padding: 9px 16px; border-radius: 8px; border: 1px solid var(--accent-3);
+    background: var(--accent-3); color: #06121e; font-size: 14px;
+    font-weight: 600; cursor: pointer;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
+
+  ul.alerts { list-style: none; padding: 0; margin: 0; }
+  ul.alerts li { padding: 10px 0; border-bottom: 1px solid var(--line);
+                 display: flex; gap: 10px; align-items: baseline; }
+  ul.alerts li:last-child { border-bottom: 0; }
+  ul.alerts .kind {
+    flex: 0 0 auto; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 2px 7px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted); white-space: nowrap;
+  }
+  ul.alerts .kind.new_outbreak { color: var(--accent-2); border-color: #5a4526; }
+  ul.alerts .kind.new_cluster  { color: var(--accent);   border-color: #5f2a2a; }
+  ul.alerts .kind.count_change { color: var(--accent-3); border-color: #2c4a68; }
+  ul.alerts .body { flex: 1 1 auto; min-width: 0; }
+  ul.alerts .when { color: var(--muted); font-size: 12px; margin-top: 3px; }
+
   footer {
     margin-top: 40px; color: var(--muted); font-size: 12px;
     border-top: 1px solid var(--line); padding-top: 16px;
@@ -485,9 +536,6 @@
     .sidebar, .sidebar-toggle { display: none !important; }
   }
 </style>
-<!-- Google AdSense — replace ca-pub-XXXXXXXXXXXXXXXX with your publisher ID -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2069400533787732"
-        crossorigin="anonymous"></script>
 </head>
 <body>
 <script>
@@ -636,6 +684,58 @@
 
 <div class="wrap">
   <div class="grid">
+
+    <div class="card span-12 subscribe">
+      <h2>Get alerts instead of checking a page</h2>
+      <p>
+        Outbreak Monitor rebuilds hourly but only emits an entry when something
+        actually changes — a new outbreak enters the tracker, reports start
+        clustering in a new country, or case and death counts move materially.
+        It is not a news firehose: quiet weeks produce nothing.
+      </p>
+      <div class="sub-actions">
+        <a class="btn primary" href="{{ feed_url }}">Subscribe by RSS</a>
+        {% if bluesky_handle %}
+        <a class="btn" href="https://bsky.app/profile/{{ bluesky_handle }}"
+           target="_blank" rel="noopener">Follow @{{ bluesky_handle }}</a>
+        {% endif %}
+        <a class="btn" href="{{ site_url }}/data.json">Raw JSON</a>
+        {% if newsletter_url %}
+        <form class="sub-form" action="{{ newsletter_url }}" method="post"
+              target="popupwindow">
+          <label for="sub-email" class="sr-only">Email address</label>
+          <input id="sub-email" type="email" name="email" required
+                 placeholder="you@example.com" autocomplete="email">
+          <button type="submit">Email me alerts</button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if alerts %}
+    <div class="card span-12">
+      <h2>Alert log · what changed</h2>
+      <ul class="alerts">
+        {% for a in alerts %}
+        <li>
+          <span class="kind {{ a.kind }}">{{ a.kind.replace('_', ' ') }}</span>
+          <div class="body">
+            <div class="title">
+              <a href="{{ a.url }}" target="_blank" rel="noopener">{{ a.title }}</a>
+            </div>
+            <div class="when">{{ a.when }}</div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      <p style="color: var(--muted); margin: 12px 0 0; font-size: 12px;">
+        Every entry here was pushed to
+        <a href="{{ feed_url }}">the feed</a>{% if bluesky_handle %} and
+        <a href="https://bsky.app/profile/{{ bluesky_handle }}" target="_blank"
+           rel="noopener">Bluesky</a>{% endif %} when it fired.
+      </p>
+    </div>
+    {% endif %}
     {% if hero %}
     <div class="card span-12" style="border-color: #3a4a1e;
          background: linear-gradient(135deg, #1c2411, #141a10);">
@@ -892,19 +992,10 @@
     </div>
   </div>
 
-  <!-- AdSense leaderboard — replace data-ad-slot value with your slot ID -->
-  <div style="text-align:center; margin: 24px 0 8px;">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-2069400533787732"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>
-
   <footer>
     <a href="about.html">About / disclaimer</a> ·
+    <a href="{{ feed_url }}">RSS</a> ·
+    <a href="{{ site_url }}/data.json">JSON</a> ·
     Sources: <a href="https://promedmail.org/?s=hantavirus" target="_blank" rel="noopener">ProMED-mail</a>,
     <a href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection" target="_blank" rel="noopener">ECDC</a>,
     <a href="https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599" target="_blank" rel="noopener">WHO DON599</a>,

@@ -3,20 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hantavirus Tracker — live global outbreak map</title>
-<meta name="description" content="Live, hourly-updated map of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC surveillance. Track active clusters, recent reports, and documented spread routes.">
-<link rel="canonical" href="https://m041997.github.io/hantavirus-tracker/">
-<meta property="og:title" content="Hantavirus Tracker — live global outbreak map">
-<meta property="og:description" content="Live, hourly-updated map of hantavirus outbreaks and news from ProMED-mail, Google News, and CDC.">
+<title>Outbreak Monitor — live tracker of active disease outbreaks</title>
+<meta name="description" content="Live, hourly-updated tracker of active disease outbreaks — the US cyclosporiasis surge, hantavirus clusters, Ebola, mpox and H5N1 — with a global map and news from CDC, ECDC, WHO, ProMED-mail and Google News.">
+<link rel="canonical" href="https://hantavirusonline.org/">
+<link rel="alternate" type="application/rss+xml"
+      title="Outbreak Monitor — alerts" href="https://hantavirusonline.org/feed.xml">
+<meta property="og:title" content="Outbreak Monitor — live tracker of active disease outbreaks">
+<meta property="og:description" content="Live, hourly-updated tracker of active disease outbreaks with a global map and news from CDC, ECDC, WHO and ProMED-mail.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://m041997.github.io/hantavirus-tracker/">
-<meta property="og:image" content="https://m041997.github.io/hantavirus-tracker/og.png">
+<meta property="og:url" content="https://hantavirusonline.org/">
+<meta property="og:image" content="https://hantavirusonline.org/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Hantavirus Tracker">
-<meta name="twitter:description" content="Live global map of hantavirus outbreaks and news.">
-<meta name="twitter:image" content="https://m041997.github.io/hantavirus-tracker/og.png">
+<meta name="twitter:title" content="Outbreak Monitor">
+<meta name="twitter:description" content="Live tracker of active disease outbreaks with a global map and news.">
+<meta name="twitter:image" content="https://hantavirusonline.org/og.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><text y=%2250%22 font-size=%2256%22>&#129440;</text></svg>">
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -136,6 +138,21 @@
   .stat-tile .k {
     color: var(--muted); font-size: 10px; text-transform: uppercase;
     letter-spacing: 0.08em; margin-top: 4px;
+  }
+
+  /* Data-freshness badges — every counter block is stamped with how old its
+     figure is, so a frozen number can never masquerade as live. */
+  .age-badge {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.02em; padding: 2px 8px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted);
+    background: rgba(20,28,38,.6); white-space: nowrap;
+  }
+  .age-badge.fresh {
+    color: #b6e56a; border-color: #3a4a1e; background: rgba(132,204,22,0.10);
+  }
+  .age-badge.stale {
+    color: var(--accent-2); border-color: #4a3a1e; background: rgba(255,184,77,0.10);
   }
 
   .legend {
@@ -292,6 +309,55 @@
   .stats-mini .v { font-size: 22px; font-weight: 700; }
   .stats-mini .k { color: var(--muted); font-size: 12px; text-transform: uppercase;
                    letter-spacing: 0.06em; margin-top: 2px; }
+
+  /* ---------- Subscribe (the site's primary call to action) ---------- */
+  .subscribe { border-color: #35506b; background:
+    linear-gradient(180deg, #16202c 0%, var(--panel) 100%); }
+  .subscribe h2 { color: var(--ink); text-transform: none; font-size: 20px;
+                  letter-spacing: 0; }
+  .subscribe p { margin: 0 0 16px; color: var(--muted); font-size: 14px;
+                 line-height: 1.5; max-width: 62ch; }
+  .sub-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    display: inline-block; padding: 9px 16px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--panel-2);
+    color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 600;
+  }
+  .btn:hover { border-color: var(--accent-3); }
+  .btn.primary { background: var(--accent-3); border-color: var(--accent-3);
+                 color: #06121e; }
+  .sub-form { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sub-form input[type="email"] {
+    padding: 9px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); font-size: 14px; min-width: 220px;
+  }
+  .sub-form input[type="email"]:focus { outline: 2px solid var(--accent-3);
+                                        outline-offset: 1px; }
+  .sub-form button {
+    padding: 9px 16px; border-radius: 8px; border: 1px solid var(--accent-3);
+    background: var(--accent-3); color: #06121e; font-size: 14px;
+    font-weight: 600; cursor: pointer;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+  }
+
+  ul.alerts { list-style: none; padding: 0; margin: 0; }
+  ul.alerts li { padding: 10px 0; border-bottom: 1px solid var(--line);
+                 display: flex; gap: 10px; align-items: baseline; }
+  ul.alerts li:last-child { border-bottom: 0; }
+  ul.alerts .kind {
+    flex: 0 0 auto; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 2px 7px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--muted); white-space: nowrap;
+  }
+  ul.alerts .kind.new_outbreak { color: var(--accent-2); border-color: #5a4526; }
+  ul.alerts .kind.new_cluster  { color: var(--accent);   border-color: #5f2a2a; }
+  ul.alerts .kind.count_change { color: var(--accent-3); border-color: #2c4a68; }
+  ul.alerts .body { flex: 1 1 auto; min-width: 0; }
+  ul.alerts .when { color: var(--muted); font-size: 12px; margin-top: 3px; }
 
   footer {
     margin-top: 40px; color: var(--muted); font-size: 12px;
@@ -467,9 +533,6 @@
     .sidebar, .sidebar-toggle { display: none !important; }
   }
 </style>
-<!-- Google AdSense — replace ca-pub-XXXXXXXXXXXXXXXX with your publisher ID -->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2069400533787732"
-        crossorigin="anonymous"></script>
 </head>
 <body>
 <script>
@@ -509,7 +572,7 @@
         <span class="ob-badge live" title="Counters scraped from WHO DON602 this build">● Live</span>
         
       </div>
-      <div class="ob-region">DR Congo · Ituri province · May 15 · 4d ago</div>
+      <div class="ob-region">DR Congo · Ituri province · May 15, 2026</div>
       
       <div class="ob-tickers"
            title="WHO DON602 · as of 2026-05-15">
@@ -538,23 +601,23 @@
       <ul>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxQS2I1NUZ3V3lJbkJfZWhlVE91M3VYSWpkRVlBZ1UxRWg3a1hWRUlldnU2YnBneDMycS1IN2ZidVRvYTAxU3VvUkd5NVpIa0NmUEVKV213M0E3TkFvU2hObEtwc2VZVGozbjM5dG5KOUEzc3BfU1lrVkUwcUJsOG1vbnZtb0VyaGpMdFlZVWk2aw?oc=5" target="_blank" rel="noopener">American infected with Ebola in DRC, as US moves to limit entry from virus-hit region</a>
-          <div class="meta">Google News · CNN · 1 day ago</div>
+          <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxPcXRpTkZCc2ZJQ2VpbUpQRXpnanYzeVZEQk51V0lCMUJRLXlSMHJabmRfWEZRa0g2MXlWMk03dFp6SlRySUxteDMxbW9mTXZSZVZ4TmdYWng3S1F4NWRsNHFVb2xCcjR2RGZidmlvYTJ3X1BhcWkyMkhuMFdGQnUzUFlSSXMzazV1Ykczd3NMb0xmYzJ5UF8wTm5pSU1PcFNUU2pHNmlaYVdiQnluYnBiWVhn?oc=5" target="_blank" rel="noopener">Fastest-growing Ebola outbreak on record threatens to become worst in history</a>
+          <div class="meta">Google News · The Washington Post · 1 day ago</div>
         </li>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMikgFBVV95cUxPM3lHLXlXX0ZuNXhTSTNMZ0JmNEtBMHJkNEFEY0duQW9wNzROUFNwUHhKTnUzOHI2RlNaMFFSaVBfM3lDYm5uYlRlcHhKajNFOUtsVE43cDd6QldWcHRhMENBZUpvTXRFMXB5NEhwakpHazA3NUs2cVdXcGxRVDd2SGxLZ2pYMFlYZjhFTkdmM3piZw?oc=5" target="_blank" rel="noopener">Aid cuts and war complicate Ebola response in Congo</a>
-          <div class="meta">Google News · politico.eu · 18h ago</div>
+          <a href="https://news.google.com/rss/articles/CBMizgFBVV95cUxObDI2WC1VMnZ0RWIxcEVPMFRkZ3RkR19UbVREQTN1MmZkaTBuSzdTbFlyOFFkOF9naWpmeHhFbDVxaTBnbEdTZUV6Q09zcUQ4eGF4VEV5R3JyRlB3a3o1ckpIX3QwSVRLWVhreDZhZ2l0UUJMbUUyOW9TYk9PZXpoeU9JWEZCRXRTYmg3ZVRlX2t3MjNDaTNrZ1I2bS1QWTNYRzVaQWhMRjgtT0trTUdIU1J4ZU9zb196OFJhTi1EZy0ySFpQbngtWGR0U0UxUQ?oc=5" target="_blank" rel="noopener">WHO says Ebola outbreak in Uganda is over, as cases rise in Congo</a>
+          <div class="meta">Google News · Reuters · 1 day ago</div>
         </li>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMiiwJBVV95cUxOLWc5YmNSd040d0pkM2czRzRXWmNBdk9NemR2MjE0RFF3eUg4TmpqQWNpYUpvbjdfbXRQVi1LUC1nbWdBQXRJaE9obE9oSGZ4M0lFY0VpOFVwb3ZLWjVnY3BjZkc1eERKOC1IbGt4cXZBX1lXVGxHZ3Q5c0RESnFTelNETGE4VW0tdnNNTjBRMEgzaFAzNVFPZ29INDN1MzN4MmM3SkhWSHJQUENwN21GbDhNLUdUOUhsbEpDS3VJMDhxWHBDZmt1THQwSzg0ZzZIdC0xRnFZT1VRRFNDaFZ1ZjhhR25wTW9jem5nWGJoX0Zzd29Yb3hGUTVaV1lyRVFPc2gwNUxzUVFrME0?oc=5" target="_blank" rel="noopener">Epidemic of Ebola Disease caused by Bundibugyo virus in the Democratic Republic of the Congo and Uganda determined a public health emergency of international concern</a>
-          <div class="meta">Google News · World Health Organization (WHO) · 2 days ago</div>
+          <a href="https://news.google.com/rss/articles/CBMipwFBVV95cUxPQVdRVVJsQU96Wk5lUGxWcjQ3eWQ4V05JdUFUNXRWT3NSRVl6Sm5zcVZpYnlvUUtubUVmZTZkNEp0R0t3dlpYRTNoWmw2QmdsSTMzMHI5SUZKdHo1N1piZDUyU3JuVDNaV19DdUcyMnNycUJUZmlmeTNaeFFLZ3ZyUVRjQklzeWZxQ3FEZDhMSElGSnpGU2xaOHNMMmo5Z2xfQ0MwRldVNNIBrAFBVV95cUxQeEl3bkx5ZEpsbWdjdUptS1hBWVdTT0JMLUwxSzVKc1U4YUFGZEVOSklsU2Y5NXZtMU0xMDh6QnUyRTFVNDRET0RoTm93MWJlem5wUzBYM19aakxVUS1sTVd0UmpaVzMzZWdHT2R1MUJyMEJJR3VRbVA1LW5EMW1XZkpjdzBGcWdFWlA2WVF2NGYtODBlU3lCWUwyaGQxSXBzZTMwbmk5RmQ4RjQ5?oc=5" target="_blank" rel="noopener">World Health Organization says Ebola outbreak in Uganda is over</a>
+          <div class="meta">Google News · Al Jazeera · 1 day ago</div>
         </li>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMiWkFVX3lxTE5LRjRFTldnQmZ6cHcyZjBLeThNMG9fRy1CQWZlaDNzX2pKbTN1dzF2VXA5VVhtb1paVExOVTNPWjlpR2h3ZV9CUmNHQ3p3dGJWc0czTU1OblpMUQ?oc=5" target="_blank" rel="noopener">At least 131 dead in Ebola outbreak in DR Congo, official says</a>
-          <div class="meta">Google News · BBC · 9h ago</div>
+          <a href="https://news.google.com/rss/articles/CBMi4gFBVV95cUxOMlRpWDBMdF9RZThsR2M2WV9XMU52QVJfbDBra0NCVmxtdW8taXY2OUpqc1JaXy1GSzdWTl9JejU3a0NTN2RjUFl0b1piYVk5eDExUFNWWWlhTG9Lb3RvZnhfQnV2VnNMV3ZmeXR0WEp0SVFSSzFTclNQSkJRQ2V4dDEzTE9abk51VFdiZE9hV0ZzSXd1UndlRjdfOWdxZXJHMkYzTWhWX3B2aDVFNkx0ZmZqTWdQeUhzR2JCRTVES1ZwdXRIcGZLWXFxS011VkJmTWk5UTJ4Q2VLcHUzUnhDWXZB?oc=5" target="_blank" rel="noopener">Parents and Teachers in Congo Urge Delay of School Resumption as Ebola Outbreak Rages On</a>
+          <div class="meta">Google News · U.S. News & World Report · 8h ago</div>
         </li>
         
       </ul>
@@ -573,8 +636,13 @@
       <ul>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMiZkFVX3lxTE9IZXZGczIyczRIMklCMW1aQm1obU53WjlJYUY4bEVBRXJjMHBCcVRtdy1fVk1ZNWg4R3B3ZDNwREQ4TXdvVEw3M1dDZnA4Q0ZPeUtDajBFUGcwTVRObklzbWhzbHM5UQ?oc=5" target="_blank" rel="noopener">Clade I Monkeypox Outbreaks</a>
-          <div class="meta">Google News · Centers for Disease Control and Prevention | CDC (.gov) · 4 days ago</div>
+          <a href="https://news.google.com/rss/articles/CBMib0FVX3lxTE1OT3MxdWVXTVlHdEU1MVZNT1NDSjNhWkRyeHEyTUgyazBIcnRzY0tkcDl0N3k3QVJhWTRoa1YxX3MzbVlvLXNIMUYySUxReUZNVW5faFhCRWtnWW5FaEt3SWJsbm1pa1hSN1Q5ZGFqOA?oc=5" target="_blank" rel="noopener">Clinical Overview of Clade I and Clade II Monkeypox</a>
+          <div class="meta">Google News · Centers for Disease Control and Prevention | CDC (.gov) · 8 days ago</div>
+        </li>
+        
+        <li>
+          <a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTFAtWl9TTThEZjQ2b0lRSWZXcWM2ck9PcGltcjJXOFBsR0swZ01sYnpWSjQyd2JZX2hCREp1UWNocGlFcDdwSldrSzF5M2dxUUx4dDItRW1fVnQ3OWZuVlFCdmJGdnlObDFs?oc=5" target="_blank" rel="noopener">Detection of Community Transmission of Clade Ib Mpox Virus in the United States</a>
+          <div class="meta">Google News · NEJM Evidence · Dec 17, 2025</div>
         </li>
         
         <li>
@@ -583,13 +651,8 @@
         </li>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMiX0FVX3lxTE5kQ085QVJQMlFxbXY3bTZGMEFRZU9scEdpVTBPZWVqcWkwYXFFUXE1dDQ5cTNmaUcxU1V0S3A3STVpTEVvWWFkQldSWXBDX3hpamtCMTk4QTBwT01JUHdB?oc=5" target="_blank" rel="noopener">Enhanced virulence of mpox virus clade Ib over clade IIb in the CAST/EiJ mouse model | Communications Biology</a>
-          <div class="meta">Google News · Nature · Feb 11, 2026</div>
-        </li>
-        
-        <li>
-          <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxNYU1uQVNPcHliaklkRVBlLTBHOU83MnhuS2RaY1FPSVBuMm9hQ1J0Nl8xbVFOTTgzRjEyMWRWQmxGMGh5ZkJUcTB0VDZHall4MWc1Q18ydjhyQkZmaHZYTEljRGh5cmQ3Wk5SQlIwbG9WbU1HY20yRm1nWDN0OGxFSnRFblg2bllMN3o3RQ?oc=5" target="_blank" rel="noopener">Ophthalmic Manifestations of Mpox: An Update for the General Practitioner</a>
-          <div class="meta">Google News · Ophthalmology Advisor · Mar 11, 2026</div>
+          <a href="https://news.google.com/rss/articles/CBMiX0FVX3lxTE1oYk5yQnJJeFNlcTU0TFN5Z2Zia25QRnVqNE0xZ0xhaU5wVnNBVHQ2emoyMkFxajRQb18wTTZfMW1tY1FPcWNhWGdIanB3dWxiOWoxcm91R18tOXNiaGow?oc=5" target="_blank" rel="noopener">Evidence of monkeypox virus clade IIb lineage A.2.2 in the Republic of the Congo and co-circulation of clade Ia, Ib and clade IIb</a>
+          <div class="meta">Google News · nature.com · Apr 03, 2026</div>
         </li>
         
       </ul>
@@ -600,50 +663,31 @@
       <div class="ob-name">
         <span class="ob-dot" style="background: #14b8a6"></span>H5N1 · avian flu
         
-        <span class="ob-badge live" title="Counters scraped from CDC this build">● Live</span>
-        
       </div>
       <div class="ob-region">US human cases (CDC) · Mar 25, 2024</div>
-      
-      <div class="ob-tickers"
-           title="CDC · as of 2026-03-06">
-        
-        <span class="ob-tick">
-          <span class="v" style="color: #14b8a6">71</span>
-          <span class="k">cases</span>
-        </span>
-        
-        
-        
-        <span class="ob-asof">
-          <a href="https://www.cdc.gov/bird-flu/situation-summary/index.html" target="_blank" rel="noopener">CDC</a>
-          · as of 2026-03-06
-        </span>
-        
-      </div>
       
       <div class="ob-blurb">Ongoing global poultry panzootic; US dairy + farmworker cases.</div>
       
       <ul>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMiaEFVX3lxTE5maC1Rb3ctQTcxOG5XenBoQzVEa2xNMGpXaEp1c1pVQXo0NnlUVXN3ak9jR05iSnhhVG9fSC1leHdDY1lFS0pPUUZQeXo0R0Rza0g1bkdEbTd0WjJkLW1VSFhtaVprZ1px?oc=5" target="_blank" rel="noopener">A(H5) Bird Flu: Current Situation</a>
-          <div class="meta">Google News · Centers for Disease Control and Prevention | CDC (.gov) · Mar 06, 2026</div>
+          <a href="https://news.google.com/rss/articles/CBMisAFBVV95cUxQcXYxY0FhOHMya2F5YVg2ZG5DaC1Oa1YyUGQyMGlLM05GVEhzeld3Y2h3V0VYZkRNbVhxUlY1QXpjRDNDblphSkc2elRxSE1KYzAyUzNGenZFckpXVHRUTFFHeGhpMDBOVVdJYzVnWjR0YUI5M0FSOTFqWi1NTFd4YjJLcWh3WHlwekZqQ3ZFMXBaMy1LSUVCV0hUcHdkd2J4eUozTkdQQVdOVmZuOHdhNg?oc=5" target="_blank" rel="noopener">USDA confirms new H5N1 avian flu cases in poultry, dairy cattle</a>
+          <div class="meta">Google News · CIDRAP · 6h ago</div>
         </li>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMivAFBVV95cUxQSC1taWtsajhJd1ZfbFBnMy1uQ0NGeDhvVk45cV84OUxMejJWT182QVNCcngwOXlpcUh4cEk2UmFaUjZIZUxvU09ZdXc2MFBPX05BamVVX0RjRUdWLVZLNEdoWDlSMVpITnJtODZEdTBRODh5MHlLVEJnZzBhdWh3Wm1IbmlpTVl2cjNGbkQ0cW94dk83YlY0QXNfSkdWVVc4aURCMVJpX3p4Y2VEeUd5QUI1UWxoZ285TkVVRQ?oc=5" target="_blank" rel="noopener">US officials note a handful of new avian flu outbreaks at poultry facilities</a>
-          <div class="meta">Google News · cidrap.umn.edu · 4 days ago</div>
+          <a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxOZWh5WlZuNmNtbG9VdDBoc3pIdVUwa3NaWmZCU2dSLXVRdUhHSUZpVWlYR3lhc09MV2ZlZ3NZdWZoajNPUWxRdXBCeDdTSHUxb3RxYzZoSlhKMmpTb2dFSE9Sc0lNXzQybDRrXzdTVHgxdF8ycVZLdjllem55QkJKQnRxRDlqRllFN096VWk2QXpTUlB5MzVST1BJT1ZDRjlBaERjeXZ4UGh3NVBxVUlINWF2WnhzN0JKSTNlSnJfSmJrcllCWWZV?oc=5" target="_blank" rel="noopener">Australia confirms first H5N1 bird flu case in local mammal</a>
+          <div class="meta">Google News · Reuters · 4 days ago</div>
         </li>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMiTEFVX3lxTE92cmpIUXNKa1VLZWNjNlE5SFNhNzNDS2tfTWduQmMya1FiWmZmY0hocHB3MENBMDN1TDQwTUpndTFBQUlSOElqSjQwbXk?oc=5" target="_blank" rel="noopener">H5N1 Influenza | Animal and Plant Health Inspection Service</a>
-          <div class="meta">Google News · aphis.usda.gov · Jan 20, 2026</div>
+          <a href="https://news.google.com/rss/articles/CBMib0FVX3lxTFBRWjFJTllnZzVCVWhpenJBNjBQN19EM2Y0X1RnbEtYOVhoMGxkcG0yTmlNMjBiaG85YXdYZmx0b0tkV3JGRUF1bi01MTgycEp0WEJhOEN3dnBGMUVEMzVYUnppQWJ2NEJHSkdvNUhDWQ?oc=5" target="_blank" rel="noopener">Bird flu is spreading. Your backyard feeder could make it worse</a>
+          <div class="meta">Google News · Science Daily · 3 days ago</div>
         </li>
         
         <li>
-          <a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxQZUFXSGd2LXpjSjJmUklPczRsRnl4YjBPdGVGOGM5dGZUbldMbmtVSmJuWkdtYTh2TWI3OU45dFI3RDcxdV83bXlLWXE4Y1lUdHNjRE1NeVltM3JRY1dqcmZmVFNsYnZhUWVBdnpGbGhRT3RwNkhsajkyWG54X3g5MHNKYWVLRTg5ZnQ2VGkyYw?oc=5" target="_blank" rel="noopener">E-News | H5N1 bird flu outbreak enters 4th year in US</a>
-          <div class="meta">Google News · West Virginia University · Feb 03, 2026</div>
+          <a href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxQVXN5ZWhtVDRiM2d0NjlOZkFHeEZKaThHRlFKa3l3R21pT19MQzJhc0J0MDBiZ2tqOWE2cnpIbm1NT0thTTdWNHdUYzd1VHFsOUNxNm9HemRVNWtsS0RwOFlWNERXVEUwak9OMlRxZjE1X0VWMm9nSl9jVld1U3pBZzVMV0NNbTlEa01DOEdlWXBHRHlWb3g0YlRhSXVfMmdvQ3JPdmVna0dlSTQ?oc=5" target="_blank" rel="noopener">What does bird flu do to humans and does it have pandemic potential?</a>
+          <div class="meta">Google News · ABC News & Headlines – Australian Broadcasting Corporation · 3 days ago</div>
         </li>
         
       </ul>
@@ -686,42 +730,45 @@
 
   <div class="hud hud-tl">
     <div class="title-card">
-      <h1><span class="dot"></span>Hantavirus Tracker</h1>
-      <div class="sub">Updated 2026-05-19 15:05 UTC · rebuilds hourly</div>
+      <h1><span class="dot"></span>Outbreak Monitor</h1>
+      <div class="sub">Active disease outbreaks · updated 2026-08-28 01:55 UTC · rebuilds hourly</div>
     </div>
   </div>
 
   <div class="hud hud-tr">
     <div class="stat-strip">
       <div class="stat-tile"
-           title="Hondius cluster — confirmed + probable/suspected — ECDC">
-        <div class="v warn">11</div>
-        <div class="k">Cases · Hondius</div>
+           title="Cyclosporiasis — CDC-confirmed domestic cases · Jul 13, 2026 · 46 days ago">
+        <div class="v" style="color: #84cc16">1,645</div>
+        <div class="k">Confirmed · Cyclosporiasis</div>
       </div>
       <div class="stat-tile"
-           title="Hondius cluster fatalities — ECDC">
-        <div class="v alert">3</div>
-        <div class="k">Deaths · Hondius</div>
+           title="Cases awaiting confirmation as domestically acquired — CDC">
+        <div class="v warn">5,100+</div>
+        <div class="k">Under review</div>
       </div>
       <div class="stat-tile"
-           title="Active countries with reports in last 60 days">
-        <div class="v">6</div>
+           title="Hospitalized case-patients — CDC">
+        <div class="v warn">141</div>
+        <div class="k">Hospitalized</div>
+      </div>
+      <div class="stat-tile"
+           title="Active countries with hantavirus reports in last 60 days">
+        <div class="v">2</div>
         <div class="k">Active countries</div>
-      </div>
-      <div class="stat-tile"
-           title="US case fatality rate, all hantavirus 1993–2023">
-        <div class="v alert">35%</div>
-        <div class="k">US CFR · CDC</div>
       </div>
     </div>
   </div>
 
   <div class="hud hud-bl">
     <div class="legend">
-      <div class="row"><span class="swatch"></span>Reported activity (last 60d)</div>
+      
+      <div class="row"><span class="swatch" style="background: #84cc16; box-shadow: 0 0 6px #84cc16"></span>Cyclosporiasis (US states)</div>
+      
+      <div class="row"><span class="swatch"></span>Hantavirus activity (last 60d)</div>
       <div class="row"><span class="swatch arc"></span>Documented spread route</div>
       
-      <div class="row"><span class="swatch ship"></span>MV Hondius (outbreak vessel)</div>
+      <div class="row"><span class="swatch ship"></span>MV Hondius (hantavirus vessel)</div>
       
     </div>
   </div>
@@ -733,22 +780,134 @@
 
 <div class="wrap">
   <div class="grid">
+
+    <div class="card span-12 subscribe">
+      <h2>Get alerts instead of checking a page</h2>
+      <p>
+        Outbreak Monitor rebuilds hourly but only emits an entry when something
+        actually changes — a new outbreak enters the tracker, reports start
+        clustering in a new country, or case and death counts move materially.
+        It is not a news firehose: quiet weeks produce nothing.
+      </p>
+      <div class="sub-actions">
+        <a class="btn primary" href="https://hantavirusonline.org/feed.xml">Subscribe by RSS</a>
+        
+        <a class="btn" href="https://hantavirusonline.org/data.json">Raw JSON</a>
+        
+      </div>
+    </div>
+
     
-    <div class="card span-12" style="border-color: #4a3a1e;
-         background: linear-gradient(135deg, #2a2113, #1a1812);">
-      <h2 style="color: var(--accent-2);">Outbreak vessel · live counters</h2>
+    
+    <div class="card span-12" style="border-color: #3a4a1e;
+         background: linear-gradient(135deg, #1c2411, #141a10);">
+      <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:4px;">
+        <span style="display:inline-block; font-size:11px; font-weight:700; letter-spacing:0.08em;
+              text-transform:uppercase; color:#0c1206; background:#84cc16;
+              padding:2px 8px; border-radius:4px;">Active outbreak</span>
+        <h2 style="color: #84cc16; margin:0;">Cyclosporiasis · United States</h2>
+        
+        <span class="age-badge stale">No CDC update since Jul 13, 2026 · 46 days ago</span>
+        
+      </div>
+      <div style="color: var(--muted); font-size: 13px; margin-bottom: 14px;">
+        Cyclospora cayetanensis (parasite) · outbreak began May 1, 2026
+      </div>
+
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
+        <div class="stat-tile" style="background: rgba(132,204,22,0.10); border-color: #3a4a1e;">
+          <div class="v" style="color: #84cc16;">1,645</div>
+          <div class="k">Confirmed (CDC)</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,184,77,0.06); border-color: #3a2e1a;">
+          <div class="v warn">5,100+</div>
+          <div class="k">Under review</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,184,77,0.06); border-color: #3a2e1a;">
+          <div class="v warn">141</div>
+          <div class="k">Hospitalized</div>
+        </div>
+        <div class="stat-tile" style="background: rgba(255,59,59,0.05); border-color: #3a1c1f;">
+          <div class="v ">0</div>
+          <div class="k">Deaths</div>
+        </div>
+        <div class="stat-tile">
+          <div class="v">31</div>
+          <div class="k">States affected</div>
+        </div>
+      </div>
+
+      <div style="font-size: 13px; line-height: 1.55; margin-bottom: 10px;">
+        Explosive multistate cyclosporiasis surge. Epidemiologic and traceback data link a cluster to iceberg lettuce from Taylor Farms de Mexico served at Taco Bell locations.
+        <div style="color: var(--muted); margin-top: 6px;">
+          <strong>Suspected vehicle:</strong> Iceberg lettuce · Taylor Farms de Mexico.
+        </div>
+      </div>
+
+      
+      <ul class="items" style="margin-top: 6px;">
+        
+        <li>
+          <a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxNNjdXdXVES0l1TnBNVlhySHVsaVhjdVkzRGJLZk42a2g4OFRNWmhBR0p3TlNIV2tIb0QwNHZObWptWUxRNFp0YmQ3cEY2R3NHR2tJY2hXM2p4T2dGeVlrN1FCUVRiWC1POGJBZU5SdEgzZWE4OTNpQWw2VWhmaGkzMjVOM0N5c3E2cy1UZDdTYw?oc=5" target="_blank" rel="noopener">Cyclospora outbreak linked to recalled iceberg lettuce tied to 3 more states, FDA says</a>
+          <div class="meta"><span class="src">Google News · CBS News</span><span>·</span><span>2h ago</span></div>
+        </li>
+        
+        <li>
+          <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxQazZ4bGcxdjRxdW9BRmlUU3dRd3BNV0xUVjZ2MVZvWHd1WUI5VzdSdndUaVgwdm1tOXpSY09pSWJOZlY1dFlTNHpzb09kODZta1N2aThYclZYb0M3Mlc1cWZYWDBYRzFzOGNXeE1fMHZvT1VUT2Z3OFA2Zlh2SlZ3NkJ3N2hoWHc2NUFnelpKX21sNnpZWHpabkZYYi01SU1SU0NvZ1BVdkEyTFFH0gHAAUFVX3lxTE53blBjRTBBSDhDSXR2cGhHVlVJMFZqNlFKNmRsUUdndnByejdFaTMwRUV6c3J0SzBCaG0yeHVUdF9LNklpamJqYU5TVkNkNFZTRm04ZXJ5ZjR2a0ZRQVBfNGRzYi1mTVVOZUFBLUt3Ml9oY0lGb2JidDNHT1RHSGFIeENkYy1JV1o4UjYwUGN6NlAxeTVEQjdZVXFMZi1meGI4ZUdzVTM5TDVtSmJnUGxTeTIwV25ESlU0Yk1iZUM4Mg?oc=5" target="_blank" rel="noopener">State investigates first potential local Cyclospora infection on Oahu</a>
+          <div class="meta"><span class="src">Google News · Hawaii News Now</span><span>·</span><span>1 day ago</span></div>
+        </li>
+        
+        <li>
+          <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxPN2w5VWNVMFNfV2Vxd3o2cmk5VllCWEh1c25NNkNITUhFLWZzV25lTDIzQ3ZaNXUtd3NRc1V6eEJFTFh1UzUtYjJ3SWtrb2pFVFdSdjVONU5HU0otUTFqXzRqMDFRZmsyQXBWNkpBZHdzTDhLbmpGaTBxR3dXX2ZQMjh6Y1htNG5ONFVZM1IzRUt4VWtW?oc=5" target="_blank" rel="noopener">Texas cyclospora cases jump past 500, with 71 total hospitalizations</a>
+          <div class="meta"><span class="src">Google News · Dallas News</span><span>·</span><span>1 day ago</span></div>
+        </li>
+        
+        <li>
+          <a href="https://news.google.com/rss/articles/CBMilwFBVV95cUxQa0VtRDZHOHNMM01IVW1pTlVweUhkYS02YWNtY0FnekNVMGxQelRqMWZmT09qLVFiR01zQUJRN1ZaMzF4cjZiaWNPMEdmTnhRS3ptZTRaaXBPc05JZGE1cDFVWnp6T0VoLVhHbFFiM2NnTm1KXzl1MVpfU1NwODNrUUtPRjV2RWM3b1FTWlBnajl4Q0JqSWJ3?oc=5" target="_blank" rel="noopener">940 cases of cyclosporiasis now confirmed in North Carolina: What to know</a>
+          <div class="meta"><span class="src">Google News · WBTV</span><span>·</span><span>1 day ago</span></div>
+        </li>
+        
+      </ul>
+      
+
+      <div style="font-size: 12px; color: var(--muted); margin-top: 8px;">
+        Counts Jul 13, 2026 · 46 days ago, from
+        <a href="https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/investigation.html" target="_blank" rel="noopener">CDC investigation update</a>
+        (<a href="https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/index.html" target="_blank" rel="noopener">outbreak page</a>).
+        Awaiting a newer CDC figure.
+        Refreshes hourly.
+      </div>
+    </div>
+    
+
+    
+    <div class="card span-12" style="border-color: #3a3320;
+         background: linear-gradient(135deg, #211d13, #17140e); opacity: 0.94;">
+      <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:4px;">
+        <h2 style="color: var(--accent-2); margin:0;">Hantavirus · MV Hondius cluster</h2>
+        
+        <span class="age-badge stale">Dormant — last Jun 17, 2026 · 72 days ago</span>
+        
+      </div>
+      
+      <div style="font-size: 12px; color: var(--muted); margin-bottom: 12px;">
+        This maritime cluster has had no new ECDC figures since
+        2026-06-17 and appears to have resolved. Counts below are the
+        last reported values, kept for reference.
+      </div>
+      
 
       <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
         <div class="stat-tile" style="background: rgba(255,184,77,0.08); border-color: #4a3a1e;">
-          <div class="v warn">11</div>
+          <div class="v warn">13</div>
           <div class="k">Total cases</div>
         </div>
         <div class="stat-tile" style="background: rgba(88,200,151,0.08); border-color: #1e4a35;">
-          <div class="v" style="color: var(--good);">9</div>
+          <div class="v" style="color: var(--good);">12</div>
           <div class="k">Lab confirmed</div>
         </div>
         <div class="stat-tile" style="background: rgba(255,184,77,0.05); border-color: #3a2e1a;">
-          <div class="v warn">2</div>
+          <div class="v warn">1</div>
           <div class="k">Probable</div>
         </div>
         <div class="stat-tile" style="background: rgba(255,59,59,0.10); border-color: #4a1e22;">
@@ -782,30 +941,30 @@
           <div>
             <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Position</div>
             <div style="font-size: 18px; font-variant-numeric: tabular-nums;">
-              51.954°,
-              4.154°
+              78.215°,
+              14.485°
             </div>
           </div>
           
           <div>
             <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Heading</div>
             <div style="font-size: 18px; font-variant-numeric: tabular-nums;">
-              0°
+              72°
             </div>
           </div>
           
           <div>
             <div style="color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;">Last AIS fix</div>
             <div style="font-size: 13px; color: var(--good);">
-              2026-05-19 15:05 UTC
+              2026-08-28 01:55 UTC
             </div>
           </div>
         </div>
       </div>
 
       <div style="font-size: 12px; color: var(--muted);">
-        Counters as of 2026-05-19, scraped from
-        <a href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak" target="_blank" rel="noopener">ECDC</a>.
+        Counters Jun 17, 2026 · 72 days ago, from
+        <a href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak" target="_blank" rel="noopener">ECDC</a> — no newer figure has been published.
         Position from
         <a href="https://www.cruisemapper.com/ships/MV-Hondius-1624" target="_blank" rel="noopener">CruiseMapper</a>;
         cross-check on
@@ -819,74 +978,15 @@
     <div class="card span-8">
       <h2>ProMED-mail · official outbreak alerts</h2>
       
-      <ul class="items">
-        
-        <li>
-          <div class="title">
-            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - ARGENTINA (22): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED CANADIANS</a>
-          </div>
-          <div class="row">
-            <span class="src promed">ProMED-mail</span>
-            <span>·</span><span>1 day ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - USA (06): (WASHINGTON) SIN NOMBRE VIRUS (SNV)</a>
-          </div>
-          <div class="row">
-            <span class="src promed">ProMED-mail</span>
-            <span>·</span><span>2 days ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - USA (05): (NEW YORK) SUSPECTED</a>
-          </div>
-          <div class="row">
-            <span class="src promed">ProMED-mail</span>
-            <span>·</span><span>3 days ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY</a>
-          </div>
-          <div class="row">
-            <span class="src promed">ProMED-mail</span>
-            <span>·</span><span>4 days ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - ARGENTINA (20): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED PASSENGERS</a>
-          </div>
-          <div class="row">
-            <span class="src promed">ProMED-mail</span>
-            <span>·</span><span>5 days ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://www.promedmail.org/?s=hantavirus" target="_blank" rel="noopener">HANTAVIRUS - USA (04): (ILLINOIS) SUSPECTED, AUTOCHTHONOUS CASE</a>
-          </div>
-          <div class="row">
-            <span class="src promed">ProMED-mail</span>
-            <span>·</span><span>6 days ago</span>
-          </div>
-        </li>
-        
-      </ul>
+      <div style="color: var(--muted);">No ProMED items fetched in this build.</div>
       
     </div>
 
     <div class="card span-4">
-      <h2>CDC US snapshot</h2>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:4px;">
+        <h2 style="margin:0;">CDC hantavirus snapshot</h2>
+        <span class="age-badge" title="CDC publishes hantavirus surveillance once a year; this is the latest annual dataset, not a live count.">Annual data · 2023</span>
+      </div>
       <div class="stats-mini">
         <div class="stat"><div class="v">890</div>
           <div class="k">Total cases</div></div>
@@ -898,8 +998,10 @@
           <div class="k">West of Miss.</div></div>
       </div>
       <p style="color: var(--muted); margin-top:12px; font-size: 12px;">
-        Surveillance period 1993 – 2023.
-        Median age 38, 62% male.
+        Cumulative US hantavirus surveillance, 1993–2023
+        (median age 38, 62% male). This is an
+        <strong>annual</strong> dataset — CDC last published it Dec 31, 2023 · 971 days ago,
+        so these totals move once a year, not hourly.
         <a href="https://www.cdc.gov/hantavirus/data-research/cases/index.html" target="_blank" rel="noopener">Source: CDC</a>.
       </p>
     </div>
@@ -911,21 +1013,11 @@
         
         <li>
           <div class="title">
-            <a href="https://www.ecdc.europa.eu/en/news-events/andes-hantavirus-outbreak-ecdc-continues-working-frontline-support-eu-member-states" target="_blank" rel="noopener">Andes hantavirus outbreak: ECDC continues working on the frontline to support EU Member States</a>
+            <a href="https://www.ecdc.europa.eu/en/news-events/epidemiological-update-11-august-2026-imported-case-andes-hantavirus-eueea" target="_blank" rel="noopener">Epidemiological update – 11 August 2026: Imported case of Andes hantavirus in the EU/EEA</a>
           </div>
           <div class="row">
             <span class="src ecdc">ECDC</span>
-            <span>·</span><span>8 days ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://www.ecdc.europa.eu/en/news-events/ecdc-publishes-guidance-management-passengers-linked-andes-hantavirus-outbreak-cruise" target="_blank" rel="noopener">ECDC publishes guidance for the management of passengers linked to the Andes hantavirus outbreak on cruise ship</a>
-          </div>
-          <div class="row">
-            <span class="src ecdc">ECDC</span>
-            <span>·</span><span>10 days ago</span>
+            <span>·</span><span>7 days ago</span>
           </div>
         </li>
         
@@ -934,257 +1026,257 @@
     </div>
 
     <div class="card span-12">
-      <h2>News &amp; press · last 25 items</h2>
+      <h2>Outbreak news · cyclospora + hantavirus · last 25 items</h2>
       
       <ul class="items">
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiqAFBVV95cUxQWkdQZHpMVzdJYm5WX1A5S0x1bVhYd2Y0b1RNRjRNaGNPV0dxbUdGODFCT2VyX2ZtS2FDZmVvU3VJQWY4Y0hGakFTWmVLdzhQRmk5Ui1MdmpZcXRQckVIUW9sNG1FaUVqS0VPNkhoM1ZKYUVSQV9sWHdpd3Y5WFN3TFRyMldZTEJ1VzlTMmhMM01TRW1TNWxYcEZGR29pLUhIbkVVUXk4d1M?oc=5" target="_blank" rel="noopener">'We're working on it': Secretary Robert F. Kennedy Jr. on Ebola, hantavirus response</a>
+            <a href="https://news.google.com/rss/articles/CBMijgFBVV95cUxQY0hoV19VbXF3cEdPZUN0OEhGX3RsZTdES3NGNEtmVlpBUVQ2N3p3T3VIZVNQZUItVWVCMDNYYUlDeWtjU3BKVVJ6Q1dmcjU5bXh6ekNTRDlkSDdlUEI0WWd5LVMyemdDeEl3Wjk4dU5jYWdoaFdFQVMwcWVMbkdYZkVFWExNb2NfeUplSEpn?oc=5" target="_blank" rel="noopener">Taylor Farms Cyclospora outbreak continues to grow</a>
           </div>
           <div class="row">
-            <span class="src">Google News · ABC7 Chicago</span>
+            <span class="src">Google News · eFoodAlert</span>
             <span>·</span><span>1h ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiwgFBVV95cUxPYlFKTmFYZ01HWlZ0bjNERmFrcG5mMU1oclNSQnk2SU1aM2xlTkY5NDVmcmh4WWpTWTUyVHltSFJGa1gtMUctSjYtY3NqcUYxcEZBcDhZWkRBemYxSHhFcVRjNm9uZEV6eEFnMUdDZHdWTEY1MlhpWGVpRHI5WDlRQTJKTmM3aE91S0lYR1ZQQlU3T0ZMSWRxZ3JTSGU4Yk5ITFY2ZDlPdVoyd3NtVUlLY2Vab2VQbVVQNklMcjd4Q21RZw?oc=5" target="_blank" rel="noopener">Hantavirus in Focus I: what we know and what it means</a>
+            <a href="https://news.google.com/rss/articles/CBMijwFBVV95cUxNNjdXdXVES0l1TnBNVlhySHVsaVhjdVkzRGJLZk42a2g4OFRNWmhBR0p3TlNIV2tIb0QwNHZObWptWUxRNFp0YmQ3cEY2R3NHR2tJY2hXM2p4T2dGeVlrN1FCUVRiWC1POGJBZU5SdEgzZWE4OTNpQWw2VWhmaGkzMjVOM0N5c3E2cy1UZDdTYw?oc=5" target="_blank" rel="noopener">Cyclospora outbreak linked to recalled iceberg lettuce tied to 3 more states, FDA says</a>
           </div>
           <div class="row">
-            <span class="src">Google News · World Health Organization (WHO)</span>
-            <span>·</span><span>1h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMidEFVX3lxTE95bWdPV0RJblN6Qkd1ZGJ6a0RhM1RzLXdRY0poNGFaZmZCLUpyLU4zLVphN3pPQThGd1ZvZFU2UFc1NGV0TTB6MlFvRHNuX1dJVnlETGtCd0JyNkowZjUxcWJFZHVWbkxVTWpJQ2UtbW8tSWpS?oc=5" target="_blank" rel="noopener">Hantavirus Death Confirmed in Colorado as Health Officials Launch Investigation</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · People.com</span>
-            <span>·</span><span>1h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMisgFBVV95cUxPUWpXa21hMVQxZUh5eUJNN1FkbUZhOFdNd2lYUU5MMXBzRDJTc2txNllQTUk0b0VXOUdwbXEtbEQtdjVGa2wzN1A5M1puT3NRMndwSXdNRkZJMFNMUkNnTTRxZWh1LUY5ZGw1NVZLM3Y0ek54cTlOVFl5NzQzY2stT2lsanQwRG50eWZpWHlmYkpRT1Z0UjRHUzdtMHJVcWFTQ3VPbnF1Ykg0SUlXZkpPMEdn?oc=5" target="_blank" rel="noopener">Ebola, hantavirus and what these frightening outbreaks really mean</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · USA Today</span>
-            <span>·</span><span>1h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMikwFBVV95cUxQWjBFc2ZhUHAzdFZJdl9tZkQ2S0tZWmZtWWhBVUJoODZtUzdVbkN6ZTNwRld0djFvQjQ0SGR3NEZfOFROcktoa0h5WnVBVi1zNlNDR082R0taS0xFR1JYWURfd296OE1ZUTU0dDVKdHJ5dkM1VGxxTTBxVzhpcl9xQXl2QnltbWlrYlRZUEt0TmlmVUE?oc=5" target="_blank" rel="noopener">‘Healthy Rounds’: How Worried Should We Be About Hantavirus?</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · UConn Today</span>
-            <span>·</span><span>1h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiuwFBVV95cUxNcEY5Ri1fbmFtTHFFQy1uMVpiUXpocEUwRmktcVdCbTltSy1jcVNUNklack5NTjd0OWJRSDZ2Nk9DRzdva2NSRmF4eHJsSzZ4LVZYb1lLQWlvWlBUWi1NVndjcEZseFphc0RoZGc1T1pJNlRUbFNRSzBwWXdDQmxvQ1o0ZHhhZDI4VnczdWg4WXJIMXBlS3RJRk5taE04dDVXdTJfMHI0R0hwTmd4aUVJbGNvTVdkU2ItNEVv?oc=5" target="_blank" rel="noopener">Hantavirus-Hit Cruise Ship Will Sail Again In June (Latest Updates)</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · Forbes</span>
+            <span class="src">Google News · CBS News</span>
             <span>·</span><span>2h ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMilwFBVV95cUxQV3VFdWVMS1RrQ1l3RDJQUTUxQnA1LUZzREQ3TkNKcjU1S0lSWV9md1Qyc3h4enJ0ZktQOWdJWDhZVkQxQTFibWdBd0F2Z29HR1R0YVhYeUw0eTZqUUJOb0VmTWl4OExUaFQ0Um5NVGpQT19UV1VZYm5jaUM0bGFsV3VSSGlaRzNZWDVHZ0dsVlMwSG1pWkN3?oc=5" target="_blank" rel="noopener">A critical window to stop hantavirus is opening. Not all countries are managing exposed travelers the same way</a>
+            <a href="https://news.google.com/rss/articles/CBMijgJBVV95cUxNa2ZLSFJ6NFAzaEpXemlDbjJ6NUVmalhGdEpReF9sbjlNMEdlWjZfQ2F1Qnh4TEczN0J1TV9YdFNqaVF2bUM2cW12V0dtcUloLWxoMXBHUmI4ckFIZ0ZFYzRDWmVMelFnbHp0SmJqWElUT0lYNkNjdkVGeTJNZUp3SzJCTnlGWHR4UHI4Ml9wVDI5YU9JUGcxWTBtN09uOXJRdTFlQno5RlpfQ1dwejNHR3lEcTlNVEdvQ2VKODhtNGJzWmJRSHNMeVlWVzIyS3pOelp1SkhaVTBmbzdPcUt3dzJ0YmIxbXZndEJGRnRMamI3cGpnT1hGZGNTYzZTSkJyT1NOYWhkVV91Ym1HMlE?oc=5" target="_blank" rel="noopener">US officials tie cyclospora outbreak involving iceberg lettuce to 3 more states</a>
           </div>
           <div class="row">
-            <span class="src">Google News · CNN</span>
+            <span class="src">Google News · Bozeman Daily Chronicle</span>
             <span>·</span><span>4h ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiiAFBVV95cUxQWmJKQmFMcm1KYVpHZlh6aEd5MnVzLXFvQzJSc1R5UzFTRllDdUZibU8wOW1yYll1b0xncERIX2FHQUk0WWFxaEZrbGZscHVTRHZuWmZtc3ByR2hKRTlNbmZoeEhqVDRkV1JnM0FXVFVNZUxWWE95RDJHai1Qb2RaYlFTY0FhYTdI?oc=5" target="_blank" rel="noopener">Hantavirus: What you need to know</a>
+            <a href="https://news.google.com/rss/articles/CBMixwFBVV95cUxOTjBmRExXZERBYktYNTk0MmhUTHV5N2pwSXVWRkktTE1kdmo1VjV5bFRfdUxPY1h3eVJScjd0amZYUmZYSVVUZjNsMklvRTZpREVzNDd1aVczOUJpSVFSVF9Ub2JpTUt5RkNQeXBDdE5qMkZlRWNTM2pTdGplUC1TZHVYaUlaQUFiYTZSNTZhMHNLaHI5NTkxZWoyZTRGVzlBM1N6bEY0WW51WXVhT2pmSkUtYXVmWF9vYnFjcXkwTkIyMnN5dVln?oc=5" target="_blank" rel="noopener">US widens lettuce-related cyclosporiasis probe to 20 states</a>
           </div>
           <div class="row">
-            <span class="src">Google News · Virginia Department of Health (.gov)</span>
+            <span class="src">Google News · Reuters</span>
             <span>·</span><span>4h ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMikAFBVV95cUxQSnFGOGREZzktNnNrc2pYaVc5OG1GVmRzMnB1ZnA5VXdDM29yclFKU0JRWk9YX18za19NRUVLSGhpTlhXcnJ4bUI1OHBwYjFldWttSm1JYmM0TzhHSkgzaUJjS3hwRW1YNlVMcUg4X29TcHBTU3NaNkJjeTViMlhwQ05uXy1kRllVMV9VRGg0WHc?oc=5" target="_blank" rel="noopener">Ebola international emergency, hantavirus update, ticks, heat, opioid deaths decline, and more.</a>
+            <a href="https://news.google.com/rss/articles/CBMiZkFVX3lxTE9NN0w4YUx6V3Y1ekJSV3dGRXd5aW1qQ0VQeHFYSXVfOFRzU3NDSlFPb2VKSkI5VEV1Yk55RGN5cTRXTXRybGNObFVMWmsxemNJUGNyaUVWVUt3bkQwTkZQYWY3TkpOQdIBa0FVX3lxTE5oTWd1SDhTYWRaRGJNOE50a3dlVVJOelhYSVFRbmo2dWZBeDFxUTlHbEphU2ZlYmI1UHdGemowOGl6SmhXbjl6OEZzLU1idWRqekk1MmxuM1ZwNzZ6M3pPVDI5dDU5TnBGM2NV?oc=5" target="_blank" rel="noopener">Chicago librarian files Illinois’ first Taylor Farms lawsuit over cyclospora illness</a>
           </div>
           <div class="row">
-            <span class="src">Google News · Your Local Epidemiologist</span>
+            <span class="src">Google News · FOX 32 Chicago</span>
             <span>·</span><span>4h ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMipAFBVV95cUxOVjBacFhQdU9NVWdmUGFQeWQ0OGU2UjJnR0ZkUWNuY3Q1el82VU5TMDBKay15elRqMWtnNklub19tSHhWeHQ5ZDV4Qzc5S3B4cXpXY2dUT0xTd1QxSzFwZC1pN1JtbmRXdnQ2eDI5NjJaNVplcHltckVFZWN2OUxqM01fbG12dGl0eG5MaDlhclVybTcyNTcydmU0eTlqbXVZU1RKcA?oc=5" target="_blank" rel="noopener">Opinion | Why Congo’s Ebola outbreak is far more alarming than hantavirus</a>
+            <a href="https://news.google.com/rss/articles/CBMifEFVX3lxTFAwbGk2UGZGZklfOTBWeUh5blpSSUZkV2pQQnJGcGU2cUVrd1Z5eGR6OWtCdFctTmJ5b244MXBoRS1TN0tCOThNX2R1VGtaOHp6WWRLbnpkNkltUUxMUUZsOUNIUm5qQ3U0dy1Kek9hRjZtbUl2Uk9uaGc3YS3SAYIBQVVfeXFMTUg3UTFrNzh1QlgwVng0NERHQ3ZiRFhhWENCMjZSMDNFNkNfaktfRTM3dFNzdWVZVVdwODNJQVY4WnFyaTRpTEdndWJnQUJJWmNldno5RVgwT3oxR0YydjF3aDc5dDFObk41cVBRc3JTUmFCYmxZNnRDMWV2MGRhdTAzUQ?oc=5" target="_blank" rel="noopener">Michigan adds more than 200 Cyclosporiasis cases in last week</a>
           </div>
           <div class="row">
-            <span class="src">Google News · The Washington Post</span>
+            <span class="src">Google News · WLNS 6 News</span>
+            <span>·</span><span>5h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiqwFBVV95cUxNYWpHeEFzOWVVRDU5ZTBrSFRrYWNMMUh2cUY5cm1vNUxCaFhGWFhJVzRLN01WM2YyTlZoLXBjMzhPUEkwTjhLZ0cxUEhuQmdiRG14d3FYd2NraUtiVmJ2aVRaRHItTUR0a0FuY1Vkb0RYcTJtZmpKR3dCTVlvbmdFQVlXaUNvN2NweVNNcG1QR1g4N1B4ZzNOMm5CR0Etb1ZGeTFJc09FNUdfN0U?oc=5" target="_blank" rel="noopener">Are we safe from cyclospora? State health officials give timeline update</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · 828 News Now</span>
+            <span>·</span><span>5h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMi4wFBVV95cUxNd2VDczlvd1pJV3lHWG9UVEx2RndqaWZNVi1rb3pLQlMtb3FkQXU4cml6ZlhZRE11UFFvaC05LXRhOVBCb0tvVEF5UUVyQlFoTHJBMVktN2tvMlZ1Q29YTUowUklEQkdPQkNSZ0lKY0F5WlliOG9KZkFaRE1maFI1ZjRUMzV1YnE4SVRGX012WUFvX1FUMUc0MThXa0hua25PWXF3SWJhdktGUUx5RkpHMkdqdzkyX2szbWZPczVoeXVHdEJ4dWw0WEUzc1lobGdfQ1RqbkpYN2lRdFF6ZlY2RTVxdw?oc=5" target="_blank" rel="noopener">Ohio sees largest decrease in new cases of illness caused by cyclospora</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · The Columbus Dispatch</span>
+            <span>·</span><span>7h ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxOV0xUOVlfYUZxcnREMWpNY3RUSkxDeWJRT2pmMnVnenRwdkxOakV3Uk5MVGJ5LTBITFVROGl0ZG9yR3VmQ3hvNG5hZjZmMGdPRkU1UldTZ0RhNmdyblpGNm9rdHoxNzVSUy1maV8tZjRxUEdIQzNlSng3ZFFzU0V0WW5WbUNKWG1wTzdKZ1JTYk0wcF9RZTVHc3FfTnZlMzBRdFdYWlFGTTl3VnFhTFFjWTlJZVZaZ2piOHNKbnM5U0JtQzhI?oc=5" target="_blank" rel="noopener">First Illinois lawsuit linked to cyclospora outbreak filed by Chicago librarian</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · Chicago Sun-Times</span>
             <span>·</span><span>10h ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMitAFBVV95cUxOaFo5QzRfQUhHS3M3M1hNZzVacFctMU9odVZPVzQ1RjBFdTJFdGR5emJKWUlfVnVENThfZUhUQ3NpY1JSNTRndS1yb0Zkakg1cVAwTzJSNXJxcTI5VWRDS3FPdlRfeU9BRVNfRTJyRkRlRWtFZThGcExPUzJuYU1WVDlGeVdOVlBmOTBkVzBobXpja1BaS3EwSW83eFF5U3YwWGlYaUowUEt5OTlBYzV5dkgwR18?oc=5" target="_blank" rel="noopener">Booming Expedition-Cruise Business Grapples With Fallout From Hantavirus Outbreak</a>
+            <a href="https://news.google.com/rss/articles/CBMiuAFBVV95cUxOUG1Vcjd6WHZDN3hyOFdlWnNYVlozWldfT2U1bEhCMXFtTVNCQUxZa1BQa1EzcWVnanFYZ0JHNDdseXEyQzgyWnBSLUJqUGJ3aVFOUFM4UUs0dnJlWDBkanNONVI4WkRnQnFROWk0d01tcWh3OGZibE55RnZJUFFWZHY1U3lIRHc5ZlZTWHlUVTNRdDBqdk1IMElrTzZRNFB2RGtJMmVwYkFfdFNtOWkzMWVHclludVFU?oc=5" target="_blank" rel="noopener">Hantavirus exposure among wildlife farmers in Vietnam: A warning for Southeast Asia</a>
           </div>
           <div class="row">
-            <span class="src">Google News · WSJ</span>
-            <span>·</span><span>12h ago</span>
+            <span class="src">Google News · The Conversation</span>
+            <span>·</span><span>23h ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMicEFVX3lxTE9oN2Y1SlBMb21GRzI3WEFIMFRuUS1NQzVqY1ZtMEswZUluTEExdlZiTkcyYkY3ZGJKaTQzTFZCaTdYVzVpRGNWTGhFUDRxMXY3U1JiUkFiN1lIZWNoaHIxY0FPUFlJa0JJaFBzdENQc0o?oc=5" target="_blank" rel="noopener">Douglas County adult dies from hantavirus, health officials say there’s no link to cruise ship outbreak</a>
+            <a href="https://news.google.com/rss/articles/CBMijAFBVV95cUxNNld4QzZGc0dLQ2hiRGw1YndlYWlyZkJxVzJDQ2xjbTFmSkhPbkVxY1czcnVtYWsxcGl2dDJEdWh5aUJlUlJUWkV0ZkZ6bHJxcmdQS001SklOVDZVRHFYOWlxODRFNnlSTFlaVHdTSkFTX3h5QzdyaWNyekFoRHBDQnhoT0VVMUNMOVZoM9IBkgFBVV95cUxOS0pWeWdaU2N2M1pRajlpc2xwTHBLNUU4MXlHNGlkQk5CcGpzUUJNU3RJdzd6cldMSVFkUEZrblJDbXNnWklSSktoU2h0SXVla2NBR2Juc1Bha0F4TlZhZUZWYUgxc1pNQ1hhTHZwX1Q1M2dEMjNaMlBoQk5KcjB2Vk5FWFNWblR5Vk1Gb0hFWHozdw?oc=5" target="_blank" rel="noopener">New Hawaiʻi case points to local cyclosporiasis infection</a>
           </div>
           <div class="row">
-            <span class="src">Google News · Colorado Public Radio</span>
-            <span>·</span><span>12h ago</span>
+            <span class="src">Google News · KHON2</span>
+            <span>·</span><span>1 day ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMi3AFBVV95cUxONTdnVFBvZXlpNUhkZV9TRjhqRGppQlYwRU9QWWQtUDBQNjNkcE9CaWRscmM3bW9HYnJQNjVzZTRFYi1VM2ZhNnloTF9MeFlCQ1RsbkJGazBhalFqYXhFZVNhc0NHTGRSTHpCQUJBZ0h2ZllOWHJvZUE3b2diVktqRlJvVXRvSTdKeDZwRUdMVV9taGxTVnhObzkwNy14TEpIMmYtVUtCLW4wVVM1djY4OU9lRTQyLTB2X1RFU0UxT3VTSTBUZDZRc0RQeUhtRlUxVG9kckZpRm5GS1hL?oc=5" target="_blank" rel="noopener">Hantavirus isn’t the next Covid. But here's why we should worry - Stateside with Kai and Carter</a>
+            <a href="https://news.google.com/rss/articles/CBMirAFBVV95cUxQazZ4bGcxdjRxdW9BRmlUU3dRd3BNV0xUVjZ2MVZvWHd1WUI5VzdSdndUaVgwdm1tOXpSY09pSWJOZlY1dFlTNHpzb09kODZta1N2aThYclZYb0M3Mlc1cWZYWDBYRzFzOGNXeE1fMHZvT1VUT2Z3OFA2Zlh2SlZ3NkJ3N2hoWHc2NUFnelpKX21sNnpZWHpabkZYYi01SU1SU0NvZ1BVdkEyTFFH0gHAAUFVX3lxTE53blBjRTBBSDhDSXR2cGhHVlVJMFZqNlFKNmRsUUdndnByejdFaTMwRUV6c3J0SzBCaG0yeHVUdF9LNklpamJqYU5TVkNkNFZTRm04ZXJ5ZjR2a0ZRQVBfNGRzYi1mTVVOZUFBLUt3Ml9oY0lGb2JidDNHT1RHSGFIeENkYy1JV1o4UjYwUGN6NlAxeTVEQjdZVXFMZi1meGI4ZUdzVTM5TDVtSmJnUGxTeTIwV25ESlU0Yk1iZUM4Mg?oc=5" target="_blank" rel="noopener">State investigates first potential local Cyclospora infection on Oahu</a>
           </div>
           <div class="row">
-            <span class="src">Google News · The Guardian</span>
-            <span>·</span><span>18h ago</span>
+            <span class="src">Google News · Hawaii News Now</span>
+            <span>·</span><span>1 day ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMikwFBVV95cUxObWpOWGd0ekhGbDhyOE1uNTZQM1FuOHNoeTlKWnQ2ZFJHaGRhczNfUzlhMDVBX2QtRGhtbHM5dEFUb2JCYkhmY1RTRTFmRDIwMWk0MUR3WmhPcF91ZTZ1NUVSWFV2VHJvblg1VkVFSGJvaEhfLVhEZmp2RUQtbE9WOW81NWNoMDlnU2VEY01Vb1RPTUXSAZgBQVVfeXFMT3hrTU8xMlByVHM5d3RNdk9uZUUzX3RVU3g4QWV1eWNpWkRMZGN6SGQySzVVbVFPYzhVYUNCUU9kQXdSRE10S2wwQlFEd25WUEVDb3VZR0t0X2ktU3dGRE9ZM3VtMURfczYxYmZmS3IwaFBDeXM1NjJUeTBZY1BqWlRiUnRmd3dlbmJEcWlNdTB6TnhPUFh5T2k?oc=5" target="_blank" rel="noopener">Fatal Colorado hantavirus case not linked to cruise ship, officials say</a>
+            <a href="https://news.google.com/rss/articles/CBMilAFBVV95cUxPN2w5VWNVMFNfV2Vxd3o2cmk5VllCWEh1c25NNkNITUhFLWZzV25lTDIzQ3ZaNXUtd3NRc1V6eEJFTFh1UzUtYjJ3SWtrb2pFVFdSdjVONU5HU0otUTFqXzRqMDFRZmsyQXBWNkpBZHdzTDhLbmpGaTBxR3dXX2ZQMjh6Y1htNG5ONFVZM1IzRUt4VWtW?oc=5" target="_blank" rel="noopener">Texas cyclospora cases jump past 500, with 71 total hospitalizations</a>
           </div>
           <div class="row">
-            <span class="src">Google News · The Hill</span>
-            <span>·</span><span>18h ago</span>
+            <span class="src">Google News · Dallas News</span>
+            <span>·</span><span>1 day ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMixAFBVV95cUxOWWl5U2J1SGpPNUhLVGJjRWhodVNoUzhMT3VzME9UMzEwTS1EMm5jczRKcTdGWDRYeEVEYmJmTkRPUkdoUXVNblRnRXJBZjJ6THR0M09uWVBjbmRVZjc0TDFWb1JhVkN3dmxqMEtwMFV5Vjc5cXd4VjA3MFYzXzNSazFPeWZDa2dhVkkya25kUjZ0dVJRWjJRcFBLaUpiMWx2RktDWldTWXVFN2hIU2F0aXF6M3FLV1ZNVGd4UzhfcE14Wl9J?oc=5" target="_blank" rel="noopener">Ebola and hantavirus have African leaders talking 'health sovereignty' as donor support fades</a>
+            <a href="https://news.google.com/rss/articles/CBMitgFBVV95cUxOVFJNOG5LRmlNMGw0ZUljcmZqOFJlbkJXWnlQaWcwMU11Q2xPbzJiY3dPS0lRMkl2VThnbW5OZTBNOVJYRDgwNEQyNjZuVC1CQndtYjRQN3FpVXhlVGhJWTBfaV94MEJXRUZVU2dQZzNYSHdkZ2dGeVFZMkRBQXFRY0JoTW9DbUdTSjB4ODVNTTg0MDF2SEFmRzN4LVZiVW5lTG56aXhPNjAxZHpySlAyZWVIUWZLUQ?oc=5" target="_blank" rel="noopener">E. coli, Salmonella, Cyclospora: Is the U.S. Seeing a Surge in Foodborne Illnesses?</a>
           </div>
           <div class="row">
-            <span class="src">Google News · PBS</span>
-            <span>·</span><span>18h ago</span>
+            <span class="src">Google News · Time Magazine</span>
+            <span>·</span><span>1 day ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMifkFVX3lxTE5YNXEyd0NaWGFHOTJiTFhYS2R6Y2w4NFViQmNXR2V5czdMR2VfeVFraHdTQi0xUWdMVVBuVXRxZV9ENWxaemdhME84OFlEcF96UVZUTW9LTHRDTHlGdnhVejZ3bnhyZmlObERJaTEyVTl1dHpNeGxHMkw5cWx0UQ?oc=5" target="_blank" rel="noopener">Colorado records first hantavirus death since 2024. It’s not from the cruise ship.</a>
+            <a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxPbFV0cFZ0bFlseGFZWkVOS2FLR3d3YzM4Mnd3X0V4bzU2cGV5V2JMUURZcUMxWVpjR1QwT0xDRHNGa25jaUs0VmJucnlON0V0X3g4a19MZGw1MVRZdzNCX05nVFdCcFhjR3RrZG9ZM0kySFVYcG1YY3ZUUHpZcTRQZnNLWTk?oc=5" target="_blank" rel="noopener">Cyclospora in Iowa: State now has over 320 confirmed cases of cyclosporiasis</a>
           </div>
           <div class="row">
-            <span class="src">Google News · The Colorado Sun</span>
-            <span>·</span><span>19h ago</span>
+            <span class="src">Google News · KCCI</span>
+            <span>·</span><span>1 day ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiV0FVX3lxTE55MFhKTjNDdnZtRHVhMC16Rk1ieVgwR2FHTTJkOU82Qk8wenJoR2NjbFpheFFpSE1EOFhEZ056aGpLY0VfZXl1NXJ5RldzRjR5RDNDVFRiUQ?oc=5" target="_blank" rel="noopener">WHO assembly opens under shadow of Ebola, hantavirus and funding cuts</a>
+            <a href="https://news.google.com/rss/articles/CBMilwFBVV95cUxQa0VtRDZHOHNMM01IVW1pTlVweUhkYS02YWNtY0FnekNVMGxQelRqMWZmT09qLVFiR01zQUJRN1ZaMzF4cjZiaWNPMEdmTnhRS3ptZTRaaXBPc05JZGE1cDFVWnp6T0VoLVhHbFFiM2NnTm1KXzl1MVpfU1NwODNrUUtPRjV2RWM3b1FTWlBnajl4Q0JqSWJ3?oc=5" target="_blank" rel="noopener">940 cases of cyclosporiasis now confirmed in North Carolina: What to know</a>
           </div>
           <div class="row">
-            <span class="src">Google News · UN News</span>
-            <span>·</span><span>19h ago</span>
+            <span class="src">Google News · WBTV</span>
+            <span>·</span><span>1 day ago</span>
           </div>
         </li>
         
         <li>
           <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMioAFBVV95cUxQU0E5TDdrY1ZVWkNLdldSejN2MkcxX2pfUVVzZFBSeGxGeldDQmx2aWZKdmJVVWpKcVJrRzFCbUFodXowOTQ3dXB5c2hwcXlRTFhjTWJsTWp4R19ZTTJMTG92cWNZem9LTWx1c1hEcmUwNGtpdEtPdUY3YjZkTE9GcWpPalpnRWZBbTVzaUJiSnBoNHUzNkx0U1I2S09kMTB5?oc=5" target="_blank" rel="noopener">Canadian passenger now presumed positive for hantavirus</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · cidrap.umn.edu</span>
-            <span>·</span><span>19h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMijgFBVV95cUxNMTNUNklldDk5MTlYTkRDWFVFZG5ZZExQNURHV0Nrd0s3T0c5dmlpU0h4ZzVBWWxQOE5ja3FSUS1hVjJlQ1prTnNheEFZX3R6Vm9waU5YaURNQlZEdWhpLVlhdnpvbUpxS2Q4LWNTVm9PLUJWUHF5djI2dDUta3Y1X2dBS21oZS1oc3RHTnh3?oc=5" target="_blank" rel="noopener">American Hantavirus Patient Ordered to Stay in Quarantine Despite Plans to Leave</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · The New York Times</span>
-            <span>·</span><span>20h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMi5wFBVV95cUxPWmlvRUhYMVBwY0tNbVp4RnVXdTBjLTNWa1d5WENxYXQ1ZjFBSng5TDctVlNyalZsN3BhSFhyRGd2ems1N1NKdUxscng1LUlYS3RjZWRqU2NfbUIyWnRYLXpReGJEMk1oc3RaLTdFTVZsNDJvS2ZlUW1VNlRPdmZHWGUtckFNNE5iajU0d0piODROS2VmSDQxVDlWWTc5R0ttY0lncXNjbzlFVU9tQ3pwNkk4ejVIVjFhQS0zeVRnMHFMbzJaRXVYU2JNZmVhQTFITmZsel9sYVlIcW5wQWh2S2w4Zzg5eWs?oc=5" target="_blank" rel="noopener">How scientists developed a hantavirus PCR test in a weekend</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · Scientific American</span>
-            <span>·</span><span>21h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMi0gFBVV95cUxQS2dnTnV0bXBIXzlYZ0JpRTVrWDBrUG9hVnk3RDJHYUJfdC1wMXcwUkxHc3ZQaVBkNm9LZ2VCbHhHQXVSeF9LNDFBNm5lVEZKQUtsd2R3UFZCOFd3UWIzRW9yc2x1Q2JEYmNNWW9OV0FrS2xyM1JhSmFxbVRsODVDdTlGUEJrck1OamtOVjVpWnVoekp5bExOY2RNeW4xMU1vWEIxMHZlQm5JZ2F0MWswZGNDZWJzNFp6R212MFE4a2xwTDVhbm5tQ2I5cXhTV1NlR0E?oc=5" target="_blank" rel="noopener">Britain gets experimental drug from Japan to bolster hantavirus response</a>
+            <a href="https://news.google.com/rss/articles/CBMitwFBVV95cUxOU21vMENjY1NJdlRJbUFTZVYwUG91Z2xJTWVlTGZKdFcwX1MtWGJuUjA1ZXAxc3VmeUQxYmoyNXZjSDVTcVlIb0RDMERNcFp6QjNxUnVXNm01cXNJTzlvUEZnSUNXTUdoUHpKYjNhSHlKZkNaM0ZXZjBPSFJTYlpmcUVWTzZid3FCMkJPa3JmNE1SQzcxLW5SNkZIN09ibVBwZnhSN01feTNFX05xWHpqSk82VURmc3c?oc=5" target="_blank" rel="noopener">Cyclosporiasis cases in US climb to 17,180, CDC says</a>
           </div>
           <div class="row">
             <span class="src">Google News · Reuters</span>
-            <span>·</span><span>21h ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiwAFBVV95cUxOWFZfZ0JCV25YNG9wVlhsODkzWVc5NGFMTDljUlkwUm1mc2x1UUFVMEVEVktEaDk4ZFFBdlJCZUltWlVPanJ4TmN2bFpKVzdtSTZ1dXBPT1JpU0NtODRNR3MxU2tWZWpFY2YxM0dDMWtpX2FsRElaN1JGLTA1d3huQlJDN3FnQWtGdHBwRk5sR2dOS053X3FPeHBmT0FJcUJuSUE2ejVqMUQ3OW13QWJENllIVmV1WnZXdkw4MVNmVUI?oc=5" target="_blank" rel="noopener">Amid growing hantavirus worries, how prepared is Europe for new health threats?</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · Euronews.com</span>
-            <span>·</span><span>1 day ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMipwJBVV95cUxPakR3YnNId0p2MllZbU5xUEV5LXE3b09fTW5yb0c4OGhGV09JeU1GVl9hZmxoT092OTlrNER6NTU3eEltT1hLSFFaRThlX2YtVXlEa0kxQ19VaWtMNE55UDNVMWx3N2NKTGgyUDlpbWZfZHAxT2Y3S3FEZE5IMFltQk9HZ2xQMUkzWFBma2ROdXE4WjJsQWJHUFBtMU92T0xpanQ0VWs5bm80QmZ3bEJJTnNQZDRTaEc0cl81c0lLNDFaZ2EtU0xSaTRzbGppeGJYeWptbG1tWmszRTc1R3dzeklmTEc4S0FKdjJ6TVQ3MHplMHUwWWZPYmFDb2lIU201STZPdTBKWkFad3BPZFRPU3BVaDdES19TTklBczNJUDJqa21qYWg0?oc=5" target="_blank" rel="noopener">Sheriff: Man threatens mass shooting at Walmart if hantavirus leads to lockdown</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · KATU</span>
-            <span>·</span><span>1 day ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMiwgFBVV95cUxPN3hHenZJeEFzdXVMU2JpcVJ4YzFoLUVDT0hzUEVxVURRRWFKWU16ZXdGbWtTektoMWtkby1nTC1tZjNtYjh2al8wNjUzb0EwbEYwS1pQRUZveEJJUm9aY2dBVTVXZ0xRTHJoaHJOUTQ1V3VIeXV2TGdhbUU1RnNrRzNDWlNUTks5VzZzMFF4OW05YzlpTHVhb2pMU3VXN0pzM1BNZFNDanVDa3ExWlpCQ2JnZjRYYUJXYUoxMWxMcXFVd9IBxwFBVV95cUxQLXJBTGZ4LW9nZWkwcUpqc1RiOXZ0eWQ0QkRUZmU2a0EyV1Q4bHkySG91R3doaHVEWHU0X3pRMjRreExKYVphRHZzbnY3aklFS3lJR1oxMlhpcl9HaFI4M3hTMXhjQTVMZ1lZUFpWMmJXbWhFbGJXSFd2LVZLUnplYUFCODZLcWpxbHZHakpTWW0zNnBBclZCQTV2d1lYdUpseFEyMVEzMWxUdGZybWJDSm5pUDdvc3dmRVhpZ1B0ejM1SFh4anNJ?oc=5" target="_blank" rel="noopener">Arkansas man allegedly threatened Walmart mass shooting over hantavirus lockdown fears, authorities say</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · Fox News</span>
-            <span>·</span><span>1 day ago</span>
-          </div>
-        </li>
-        
-        <li>
-          <div class="title">
-            <a href="https://news.google.com/rss/articles/CBMizgFBVV95cUxNRjdxZ2JjQmtXNmtIX3FZenBYMnJtQjZpN3BYNl9jaXJLTHI4b0tlcXlXSUF4d1BqaUF3X3hsMVhPY3Zua1hrSEJ2Y0EzWVhBTjAtZi1tdVYyY1F3LVc4RU1QTGFRT2luWEZTQkVHcWpNVHFUdDF6bGlSbFlER1loZ21NUHMzODdIRUdHemQzRXl6YWt3dkFqUnZPcEFIMmU5NFdtMm9KaFdDZDltNVNCR2ZSeUdoYnd1VWZFQ2o4THN6Q1o1MlRielcwM2Yzd9IB4gFBVV95cUxQSkd5RzV4SFpCWmxxZUJVWFAtSXd6WUc2SnpUV2RhVm5NY211V29Tb0dJZlNldXFSVWh1ajlHb2JIdG5vbmk5Y3lCZDNub0ZZZHZtSFp5ZVprVUJGRlBrb3hZWHdVV0E2V2hDSDV4RjZHU3dJSUVhbjdvSmo3UzZ4MWplWjEwTUprYlAzemt4bjQ2ZFFzZFZLQkpZVDFkUkpyUm81SXd0Nm5mWDNROEU4TlZqNDdoMTJ1UWlObVJ1TER3UjZLSjRMZlZKVlNVbThnRWc3cGgtaDljNmswMnBqZE13?oc=5" target="_blank" rel="noopener">Arkansas man accused of threatening a mass shooting if the country were locked down due to hantavirus</a>
-          </div>
-          <div class="row">
-            <span class="src">Google News · KY3</span>
             <span>·</span><span>2 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMieEFVX3lxTFB2aEh3YkpFSG1qTXg2UmpTRnZORU0xRHB6SF9MQU1OQVRJY0lMdlcxU0Q0d1cxZkxodEtSTDd2MWJzOWM5V3B4TnhlTEc3VGZsRFJzZ1pwekk4eWFkYTZUSTc2cDJfUmZQM1QwX25NUUVHVW1MYWxIUg?oc=5" target="_blank" rel="noopener">How Data Are Collected for Cyclosporiasis</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · Centers for Disease Control and Prevention | CDC (.gov)</span>
+            <span>·</span><span>2 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiYEFVX3lxTE50eUpPeURQbVFaUVdiWk42RHhxLTRNZ1RwYkFZaUgwU0pGN3Vsek5IelJJd0tlbnIzYlZINDFjV0JZTzZ2R1FXN2RQaURwRE5aeFI3MmF6M3g4M1lrTFlTbg?oc=5" target="_blank" rel="noopener">Cyclospora Case Data | Cyclosporiasis</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · Centers for Disease Control and Prevention | CDC (.gov)</span>
+            <span>·</span><span>2 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxQVmFScDhoY1p0TFMtZms4Tm1feDZhVEoxNUlmQmY1YU40bHZ3Q1Q2SGFyems3VTlEa2UtNndjcnliN1I4OTh5T3lsbGVGN2NxdnZJVmdJX29QZFhXSzR3VTUxbS1TWUFCMEM3cTU3d1lnVDhaZlRqeVdhWlIwQTdlUk5YUUljM0NlTmtodGJDN2dnMmxmRmNoZTFxUHNWNzlZSVR3VnU5ZDd5RFJvM3YwbzRfamk3b3podVdRLTNTTlJVYWRDNUZyUVRqbl9BZ3Z4b0k5Mjd3XzNyRHRUVGYwZQ?oc=5" target="_blank" rel="noopener">Cyclosporiasis in Children: Symptoms, Treatment & Prevention</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · HealthyChildren.org</span>
+            <span>·</span><span>2 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMihAFBVV95cUxONlh5MmRkSzdSeV9BT0NFR1A5MnJkejV2cmJVeW1ySGZPNFFFc2ZBaUpJNkJ3amJMR2M4OGVaZ0ZiYjlkT2ZzTm8wZGpBLTB6SFNlaDdhQzdzQmFfaTFNa24xM2lzSjZyQnJ0QUQwYlZhOWxZRk9TRzkwT3IxQjNBUHFFSno?oc=5" target="_blank" rel="noopener">National Quarantine Unit (NQU) & Hantavirus Response</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · National Emerging Special Pathogens Training & Education Center</span>
+            <span>·</span><span>3 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMi4AFBVV95cUxOMDVlR1RzZDY1S3d4M3BJa1cxeW00V1VxVm1sRVFVaXpBZm14OUxCQlg2bzd4c1ppaUdxSWh2QXNxU3lzVEs0c24yOUVIT2VuYUhMcVpjMzEzbFNUOUdIeU9pSTV1WVJaajI4dGdra2xhTXl1MHU1SUJTWnJMQmNsVEkyYTFQVDBsS2tOQUNXNDB4ZTVwcTFieVJjOHgwVHd5NkhYUlZMdFFUb2lVTjlISmpGUVVkM2xaTmQzY2Q3SHhqU05JREFwbzEzYVlJX3VvaEZ6Vlo0akxvQm1HX2hjU9IB5gFBVV95cUxOcWtIS1ZoWjdvZFlXMHgtMjlxOUZZNkY4VVJfZC14dWVtZ3ROaENoa28ybEZndHRSdFBaRkIzWXMzcEQxekFRSExKWnpQVldDUHFPRDVnNWluUXBSelNfVWl3Sm5hWlRWQ0VqQ21UTnNzWlNyX1NLMWJLSnRtZktNUHRBRnhqSWhtUk9ERU05Y3dQckZzT2FzMUsydjJpdkJwclBpVEpjVmVCaDRtTVl3WTVHTVM5QW9TNFFaN0c1ZHd3cTBlZVVxSE9kT2d6LUhKb3lxNHBWSVZyVU1MMWI2c2VJMGZWdw?oc=5" target="_blank" rel="noopener">San Francisco Department of Public Health officials report 10 cyclosporiasis cases so far in 2026; no known outbreak in the city</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · ABC7 Bay Area</span>
+            <span>·</span><span>5 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMidkFVX3lxTE9iSFZlSC03U3hoTWRPVTNXWGhxVVc0Q2dBYnBUdHJ0Y0J0el9NMlNRXy0xaE1DUk5JSnVibE1FS1pCd3p4a1MxN0wxcXlXM1NaaENYMDZfeFBpdkVzN3lRWEtoUkNKcURhbThiY2w4UkFJU1E4T0E?oc=5" target="_blank" rel="noopener">Cyclospora Outbreak 2026: FAQs for Consumers - IFPA</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · International Fresh Produce Association</span>
+            <span>·</span><span>6 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMiqgFBVV95cUxPVDlYSjVYUWZ6N015T0RjTWRYYkhHOGxTM3N4Y2hheVM4bjV3V3lFY01ZODBrSGxrUVNUNjVhNHBYZmFMSTJpS1QwU3hDdFEybHZUekt5b2JHQmtwUnB3VlNQbXBabHlFS2dKOG5qaE9DZmJuQmU4aWlxbjFDNGYyTmozbnNKYTUtYUl2eWNZS3dKUVVUdTlHM3E3cGlkT19hYTljWlVMTFZUZw?oc=5" target="_blank" rel="noopener">Cyclospora Cases Are Starting to Trend Down: See States Still Impacted, Foods to Avoid and More</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · TODAY.com</span>
+            <span>·</span><span>8 days ago</span>
+          </div>
+        </li>
+        
+        <li>
+          <div class="title">
+            <a href="https://news.google.com/rss/articles/CBMib0FVX3lxTE51X1BhQ0lBVWtVOTNraUlGZk53Y29odEVFUE9IN3ZzZ3VfTEFNdXlraHpHWHVfS1JfdG9XdkpiQ3hjc1hGRUlqbmJHVmQ1b1RTdFhFbVhLT2p6TnpteXhsVGM3cExYMEczek1zZXh6Yw?oc=5" target="_blank" rel="noopener">Surveillance of Cyclosporiasis</a>
+          </div>
+          <div class="row">
+            <span class="src">Google News · Centers for Disease Control and Prevention | CDC (.gov)</span>
+            <span>·</span><span>9 days ago</span>
           </div>
         </li>
         
@@ -1193,19 +1285,10 @@
     </div>
   </div>
 
-  <!-- AdSense leaderboard — replace data-ad-slot value with your slot ID -->
-  <div style="text-align:center; margin: 24px 0 8px;">
-    <ins class="adsbygoogle"
-         style="display:block"
-         data-ad-client="ca-pub-2069400533787732"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  </div>
-
   <footer>
     <a href="about.html">About / disclaimer</a> ·
+    <a href="https://hantavirusonline.org/feed.xml">RSS</a> ·
+    <a href="https://hantavirusonline.org/data.json">JSON</a> ·
     Sources: <a href="https://promedmail.org/?s=hantavirus" target="_blank" rel="noopener">ProMED-mail</a>,
     <a href="https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection" target="_blank" rel="noopener">ECDC</a>,
     <a href="https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON599" target="_blank" rel="noopener">WHO DON599</a>,
@@ -1220,10 +1303,11 @@
 <script>
   // Server-rendered data dump for the map.
   window.HANTA = {
-    countries: [{"country": "USA", "lat": 37.1, "lng": -95.7, "count": 5, "latest_title": "Ebola, hantavirus and what these frightening outbreaks really mean", "latest_url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPUWpXa21hMVQxZUh5eUJNN1FkbUZhOFdNd2lYUU5MMXBzRDJTc2txNllQTUk0b0VXOUdwbXEtbEQtdjVGa2wzN1A5M1puT3NRMndwSXdNRkZJMFNMUkNnTTRxZWh1LUY5ZGw1NVZLM3Y0ek54cTlOVFl5NzQzY2stT2lsanQwRG50eWZpWHlmYkpRT1Z0UjRHUzdtMHJVcWFTQ3VPbnF1Ykg0SUlXZkpPMEdn?oc=5", "latest_date": "1h ago", "items": [{"title": "Ebola, hantavirus and what these frightening outbreaks really mean", "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPUWpXa21hMVQxZUh5eUJNN1FkbUZhOFdNd2lYUU5MMXBzRDJTc2txNllQTUk0b0VXOUdwbXEtbEQtdjVGa2wzN1A5M1puT3NRMndwSXdNRkZJMFNMUkNnTTRxZWh1LUY5ZGw1NVZLM3Y0ek54cTlOVFl5NzQzY2stT2lsanQwRG50eWZpWHlmYkpRT1Z0UjRHUzdtMHJVcWFTQ3VPbnF1Ykg0SUlXZkpPMEdn?oc=5", "source": "Google News \u00b7 USA Today", "published": "1h ago"}, {"title": "Douglas County adult dies from hantavirus, health officials say there\u2019s no link to cruise ship outbreak", "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9oN2Y1SlBMb21GRzI3WEFIMFRuUS1NQzVqY1ZtMEswZUluTEExdlZiTkcyYkY3ZGJKaTQzTFZCaTdYVzVpRGNWTGhFUDRxMXY3U1JiUkFiN1lIZWNoaHIxY0FPUFlJa0JJaFBzdENQc0o?oc=5", "source": "Google News \u00b7 Colorado Public Radio", "published": "12h ago"}, {"title": "HANTAVIRUS - USA (06): (WASHINGTON) SIN NOMBRE VIRUS (SNV)", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "2 days ago"}, {"title": "HANTAVIRUS - USA (05): (NEW YORK) SUSPECTED", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "3 days ago"}, {"title": "HANTAVIRUS - USA (04): (ILLINOIS) SUSPECTED, AUTOCHTHONOUS CASE", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "6 days ago"}]}, {"country": "Colorado", "lat": 39.0, "lng": -105.5, "count": 4, "latest_title": "Hantavirus Death Confirmed in Colorado as Health Officials Launch Investigation", "latest_url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE95bWdPV0RJblN6Qkd1ZGJ6a0RhM1RzLXdRY0poNGFaZmZCLUpyLU4zLVphN3pPQThGd1ZvZFU2UFc1NGV0TTB6MlFvRHNuX1dJVnlETGtCd0JyNkowZjUxcWJFZHVWbkxVTWpJQ2UtbW8tSWpS?oc=5", "latest_date": "1h ago", "items": [{"title": "Hantavirus Death Confirmed in Colorado as Health Officials Launch Investigation", "url": "https://news.google.com/rss/articles/CBMidEFVX3lxTE95bWdPV0RJblN6Qkd1ZGJ6a0RhM1RzLXdRY0poNGFaZmZCLUpyLU4zLVphN3pPQThGd1ZvZFU2UFc1NGV0TTB6MlFvRHNuX1dJVnlETGtCd0JyNkowZjUxcWJFZHVWbkxVTWpJQ2UtbW8tSWpS?oc=5", "source": "Google News \u00b7 People.com", "published": "1h ago"}, {"title": "Douglas County adult dies from hantavirus, health officials say there\u2019s no link to cruise ship outbreak", "url": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9oN2Y1SlBMb21GRzI3WEFIMFRuUS1NQzVqY1ZtMEswZUluTEExdlZiTkcyYkY3ZGJKaTQzTFZCaTdYVzVpRGNWTGhFUDRxMXY3U1JiUkFiN1lIZWNoaHIxY0FPUFlJa0JJaFBzdENQc0o?oc=5", "source": "Google News \u00b7 Colorado Public Radio", "published": "12h ago"}, {"title": "Fatal Colorado hantavirus case not linked to cruise ship, officials say", "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxObWpOWGd0ekhGbDhyOE1uNTZQM1FuOHNoeTlKWnQ2ZFJHaGRhczNfUzlhMDVBX2QtRGhtbHM5dEFUb2JCYkhmY1RTRTFmRDIwMWk0MUR3WmhPcF91ZTZ1NUVSWFV2VHJvblg1VkVFSGJvaEhfLVhEZmp2RUQtbE9WOW81NWNoMDlnU2VEY01Vb1RPTUXSAZgBQVVfeXFMT3hrTU8xMlByVHM5d3RNdk9uZUUzX3RVU3g4QWV1eWNpWkRMZGN6SGQySzVVbVFPYzhVYUNCUU9kQXdSRE10S2wwQlFEd25WUEVDb3VZR0t0X2ktU3dGRE9ZM3VtMURfczYxYmZmS3IwaFBDeXM1NjJUeTBZY1BqWlRiUnRmd3dlbmJEcWlNdTB6TnhPUFh5T2k?oc=5", "source": "Google News \u00b7 The Hill", "published": "18h ago"}, {"title": "Colorado records first hantavirus death since 2024. It\u2019s not from the cruise ship.", "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE5YNXEyd0NaWGFHOTJiTFhYS2R6Y2w4NFViQmNXR2V5czdMR2VfeVFraHdTQi0xUWdMVVBuVXRxZV9ENWxaemdhME84OFlEcF96UVZUTW9LTHRDTHlGdnhVejZ3bnhyZmlObERJaTEyVTl1dHpNeGxHMkw5cWx0UQ?oc=5", "source": "Google News \u00b7 The Colorado Sun", "published": "19h ago"}]}, {"country": "Argentina", "lat": -38.4, "lng": -63.6, "count": 3, "latest_title": "HANTAVIRUS - ARGENTINA (22): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED CANADIANS", "latest_url": "https://www.promedmail.org/?s=hantavirus", "latest_date": "1 day ago", "items": [{"title": "HANTAVIRUS - ARGENTINA (22): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED CANADIANS", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "1 day ago"}, {"title": "HANTAVIRUS - ARGENTINA (21): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, WHO SUMMARY", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "4 days ago"}, {"title": "HANTAVIRUS - ARGENTINA (20): CRUISE SHIP, SOUTH ATLANTIC, OUTBREAK, DISEMBARKED PASSENGERS", "url": "https://www.promedmail.org/?s=hantavirus", "source": "ProMED-mail", "published": "5 days ago"}]}, {"country": "Virginia", "lat": 37.9, "lng": -78.0, "count": 1, "latest_title": "Hantavirus: What you need to know", "latest_url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQWmJKQmFMcm1KYVpHZlh6aEd5MnVzLXFvQzJSc1R5UzFTRllDdUZibU8wOW1yYll1b0xncERIX2FHQUk0WWFxaEZrbGZscHVTRHZuWmZtc3ByR2hKRTlNbmZoeEhqVDRkV1JnM0FXVFVNZUxWWE95RDJHai1Qb2RaYlFTY0FhYTdI?oc=5", "latest_date": "4h ago", "items": [{"title": "Hantavirus: What you need to know", "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQWmJKQmFMcm1KYVpHZlh6aEd5MnVzLXFvQzJSc1R5UzFTRllDdUZibU8wOW1yYll1b0xncERIX2FHQUk0WWFxaEZrbGZscHVTRHZuWmZtc3ByR2hKRTlNbmZoeEhqVDRkV1JnM0FXVFVNZUxWWE95RDJHai1Qb2RaYlFTY0FhYTdI?oc=5", "source": "Google News \u00b7 Virginia Department of Health (.gov)", "published": "4h ago"}]}, {"country": "Japan", "lat": 36.2, "lng": 138.3, "count": 1, "latest_title": "Britain gets experimental drug from Japan to bolster hantavirus response", "latest_url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxQS2dnTnV0bXBIXzlYZ0JpRTVrWDBrUG9hVnk3RDJHYUJfdC1wMXcwUkxHc3ZQaVBkNm9LZ2VCbHhHQXVSeF9LNDFBNm5lVEZKQUtsd2R3UFZCOFd3UWIzRW9yc2x1Q2JEYmNNWW9OV0FrS2xyM1JhSmFxbVRsODVDdTlGUEJrck1OamtOVjVpWnVoekp5bExOY2RNeW4xMU1vWEIxMHZlQm5JZ2F0MWswZGNDZWJzNFp6R212MFE4a2xwTDVhbm5tQ2I5cXhTV1NlR0E?oc=5", "latest_date": "21h ago", "items": [{"title": "Britain gets experimental drug from Japan to bolster hantavirus response", "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxQS2dnTnV0bXBIXzlYZ0JpRTVrWDBrUG9hVnk3RDJHYUJfdC1wMXcwUkxHc3ZQaVBkNm9LZ2VCbHhHQXVSeF9LNDFBNm5lVEZKQUtsd2R3UFZCOFd3UWIzRW9yc2x1Q2JEYmNNWW9OV0FrS2xyM1JhSmFxbVRsODVDdTlGUEJrck1OamtOVjVpWnVoekp5bExOY2RNeW4xMU1vWEIxMHZlQm5JZ2F0MWswZGNDZWJzNFp6R212MFE4a2xwTDVhbm5tQ2I5cXhTV1NlR0E?oc=5", "source": "Google News \u00b7 Reuters", "published": "21h ago"}]}, {"country": "Canary Islands", "lat": 28.3, "lng": -15.5, "count": 1, "latest_title": "Andes hantavirus outbreak: ECDC continues working on the frontline to support EU Member States", "latest_url": "https://www.ecdc.europa.eu/en/news-events/andes-hantavirus-outbreak-ecdc-continues-working-frontline-support-eu-member-states", "latest_date": "8 days ago", "items": [{"title": "Andes hantavirus outbreak: ECDC continues working on the frontline to support EU Member States", "url": "https://www.ecdc.europa.eu/en/news-events/andes-hantavirus-outbreak-ecdc-continues-working-frontline-support-eu-member-states", "source": "ECDC", "published": "8 days ago"}]}],
+    countries: [{"country": "France", "lat": 46.6, "lng": 2.2, "count": 1, "latest_title": "Epidemiological update \u2013 11 August 2026: Imported case of Andes hantavirus in the EU/EEA", "latest_url": "https://www.ecdc.europa.eu/en/news-events/epidemiological-update-11-august-2026-imported-case-andes-hantavirus-eueea", "latest_date": "7 days ago", "items": [{"title": "Epidemiological update \u2013 11 August 2026: Imported case of Andes hantavirus in the EU/EEA", "url": "https://www.ecdc.europa.eu/en/news-events/epidemiological-update-11-august-2026-imported-case-andes-hantavirus-eueea", "source": "ECDC", "published": "7 days ago"}]}, {"country": "Argentina", "lat": -38.4, "lng": -63.6, "count": 1, "latest_title": "Epidemiological update \u2013 11 August 2026: Imported case of Andes hantavirus in the EU/EEA", "latest_url": "https://www.ecdc.europa.eu/en/news-events/epidemiological-update-11-august-2026-imported-case-andes-hantavirus-eueea", "latest_date": "7 days ago", "items": [{"title": "Epidemiological update \u2013 11 August 2026: Imported case of Andes hantavirus in the EU/EEA", "url": "https://www.ecdc.europa.eu/en/news-events/epidemiological-update-11-august-2026-imported-case-andes-hantavirus-eueea", "source": "ECDC", "published": "7 days ago"}]}],
     arcs:      [{"from": "Argentina", "to": "Texas", "from_latlng": [-38.4, -63.6], "to_latlng": [31.5, -99.3], "label": "TX residents on cruise, returned"}, {"from": "Argentina", "to": "Nebraska", "from_latlng": [-38.4, -63.6], "to_latlng": [41.5, -99.8], "label": "Federal quarantine \u2014 Nebraska Medicine"}, {"from": "Argentina", "to": "New Jersey", "from_latlng": [-38.4, -63.6], "to_latlng": [40.2, -74.5], "label": "NJDOH monitoring air-travel contacts"}, {"from": "Argentina", "to": "California", "from_latlng": [-38.4, -63.6], "to_latlng": [36.8, -119.4], "label": "Passengers monitored on return"}, {"from": "Argentina", "to": "Arizona", "from_latlng": [-38.4, -63.6], "to_latlng": [34.2, -111.7], "label": "Passengers monitored on return"}, {"from": "Argentina", "to": "Chile", "from_latlng": [-38.4, -63.6], "to_latlng": [-35.7, -71.5], "label": "Cruise stopover"}, {"from": "Argentina", "to": "Brazil", "from_latlng": [-38.4, -63.6], "to_latlng": [-14.2, -51.9], "label": "Cruise stopover"}, {"from": "Argentina", "to": "Canary Islands", "from_latlng": [-38.4, -63.6], "to_latlng": [28.3, -15.5], "label": "Hondius port of disembarkation"}, {"from": "Argentina", "to": "South Africa", "from_latlng": [-38.4, -63.6], "to_latlng": [-30.6, 22.9], "label": "Contacts monitored on stopover"}, {"from": "Argentina", "to": "France", "from_latlng": [-38.4, -63.6], "to_latlng": [46.6, 2.2], "label": "Critical patient on ECMO"}, {"from": "Argentina", "to": "Oregon", "from_latlng": [-38.4, -63.6], "to_latlng": [44.0, -120.5], "label": "Physician case in isolation"}],
-    vessel:    {"name": "MV Hondius", "operator": "Oceanwide Expeditions", "imo": "9818709", "mmsi": "244327000", "flag": "Netherlands", "departed_from": "Ushuaia, Argentina", "departed_at": "2026-04-01", "tracker_url": "https://www.cruisemapper.com/ships/MV-Hondius-1624", "vesselfinder_url": "https://www.vesselfinder.com/vessels/details/9818709", "marinetraffic_url": "https://www.marinetraffic.com/en/ais/details/ships/shipid:5873599/mmsi:244327000/imo:9818709/vessel:HONDIUS", "position": {"lat": 51.95387, "lng": 4.15445, "heading_deg": 0.0, "fetched_at": "2026-05-19T15:05:26Z"}, "counts": {"cases_total": 11, "cases_confirmed": 9, "cases_suspected": 2, "deaths": 3, "critical": 1, "on_board": 147, "passengers": 88, "crew": 59, "as_of": "2026-05-19", "source": "ECDC", "source_url": "https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak", "fetched_at": "2026-05-19T15:05:26Z"}, "track": [{"lat": 18.988, "lng": -21.12, "fetched_at": "2026-05-07T19:34:00Z"}, {"lat": 22.484, "lng": -19.355, "fetched_at": "2026-05-08T15:43:45Z"}, {"lat": 23.331, "lng": -18.926, "fetched_at": "2026-05-08T21:03:33Z"}, {"lat": 23.35961, "lng": -18.91158, "fetched_at": "2026-05-08T21:16:15Z"}, {"lat": 23.51273, "lng": -18.83061, "fetched_at": "2026-05-08T22:08:11Z"}, {"lat": 23.84758, "lng": -18.65935, "fetched_at": "2026-05-09T00:06:01Z"}, {"lat": 24.59444, "lng": -18.27289, "fetched_at": "2026-05-09T04:30:25Z"}, {"lat": 25.10726, "lng": -18.0078, "fetched_at": "2026-05-09T07:17:49Z"}, {"lat": 25.49981, "lng": -17.807568333333332, "fetched_at": "2026-05-09T09:40:51Z"}, {"lat": 25.72282, "lng": -17.69591, "fetched_at": "2026-05-09T11:06:30Z"}, {"lat": 26.19046, "lng": -17.4559, "fetched_at": "2026-05-09T13:46:05Z"}, {"lat": 26.41884, "lng": -17.34315, "fetched_at": "2026-05-09T15:03:57Z"}, {"lat": 26.59258, "lng": -17.25388, "fetched_at": "2026-05-09T16:04:51Z"}, {"lat": 26.76171, "lng": -17.16796, "fetched_at": "2026-05-09T17:08:51Z"}, {"lat": 27.13789, "lng": -16.97533, "fetched_at": "2026-05-09T19:17:02Z"}, {"lat": 27.31942, "lng": -16.88195, "fetched_at": "2026-05-09T20:57:04Z"}, {"lat": 27.4241, "lng": -16.82684, "fetched_at": "2026-05-09T21:56:29Z"}, {"lat": 27.52196, "lng": -16.77905, "fetched_at": "2026-05-09T22:58:14Z"}, {"lat": 27.61851, "lng": -16.72976, "fetched_at": "2026-05-09T23:58:15Z"}, {"lat": 27.99756, "lng": -16.53217, "fetched_at": "2026-05-10T04:07:08Z"}, {"lat": 28.07329, "lng": -16.49035, "fetched_at": "2026-05-10T07:31:04Z"}, {"lat": 28.07362, "lng": -16.49148, "fetched_at": "2026-05-10T09:45:49Z"}, {"lat": 28.07367, "lng": -16.49153, "fetched_at": "2026-05-10T11:07:48Z"}, {"lat": 28.07418, "lng": -16.49112, "fetched_at": "2026-05-10T13:02:36Z"}, {"lat": 28.0739, "lng": -16.49142, "fetched_at": "2026-05-10T13:49:27Z"}, {"lat": 28.0738, "lng": -16.49146, "fetched_at": "2026-05-10T15:04:37Z"}, {"lat": 28.0737, "lng": -16.49159, "fetched_at": "2026-05-10T16:06:01Z"}, {"lat": 28.07279, "lng": -16.49106, "fetched_at": "2026-05-10T17:58:55Z"}, {"lat": 28.0729, "lng": -16.49127, "fetched_at": "2026-05-10T19:18:28Z"}, {"lat": 28.07275, "lng": -16.49102, "fetched_at": "2026-05-10T20:59:55Z"}, {"lat": 28.07276, "lng": -16.49105, "fetched_at": "2026-05-10T21:57:59Z"}, {"lat": 28.07272, "lng": -16.4908, "fetched_at": "2026-05-10T23:00:21Z"}, {"lat": 28.07274, "lng": -16.49044, "fetched_at": "2026-05-11T00:02:14Z"}, {"lat": 28.07274, "lng": -16.49041, "fetched_at": "2026-05-11T04:19:30Z"}, {"lat": 28.07279, "lng": -16.49082, "fetched_at": "2026-05-11T08:31:16Z"}, {"lat": 28.07412, "lng": -16.49057, "fetched_at": "2026-05-11T12:19:53Z"}, {"lat": 28.07473, "lng": -16.48994, "fetched_at": "2026-05-11T16:09:44Z"}, {"lat": 28.07639, "lng": -16.48684, "fetched_at": "2026-05-11T18:06:55Z"}, {"lat": 28.01398, "lng": -16.31723, "fetched_at": "2026-05-11T19:05:15Z"}, {"lat": 28.21373, "lng": -16.04511, "fetched_at": "2026-05-11T20:52:38Z"}, {"lat": 28.43566, "lng": -15.82828, "fetched_at": "2026-05-11T22:16:06Z"}, {"lat": 28.75466, "lng": -15.62808, "fetched_at": "2026-05-12T00:06:54Z"}, {"lat": 29.61057, "lng": -15.34577, "fetched_at": "2026-05-12T04:43:52Z"}, {"lat": 30.20376, "lng": -15.15485, "fetched_at": "2026-05-12T07:50:55Z"}, {"lat": 30.72568, "lng": -14.97996, "fetched_at": "2026-05-12T10:39:52Z"}, {"lat": 31.13528, "lng": -14.8461, "fetched_at": "2026-05-12T13:10:17Z"}, {"lat": 31.73629, "lng": -14.64745, "fetched_at": "2026-05-12T16:28:08Z"}, {"lat": 32.15143, "lng": -14.49682, "fetched_at": "2026-05-12T19:03:55Z"}, {"lat": 32.4434, "lng": -14.37146, "fetched_at": "2026-05-12T20:48:15Z"}, {"lat": 32.74483, "lng": -14.28662, "fetched_at": "2026-05-12T22:20:14Z"}, {"lat": 32.88854, "lng": -14.24041, "fetched_at": "2026-05-12T22:45:20Z"}, {"lat": 33.07237, "lng": -14.1819, "fetched_at": "2026-05-13T00:10:48Z"}, {"lat": 34.00815, "lng": -13.873658333333333, "fetched_at": "2026-05-13T04:55:31Z"}, {"lat": 34.61093, "lng": -13.66529, "fetched_at": "2026-05-13T08:06:50Z"}, {"lat": 34.88568, "lng": -13.57108, "fetched_at": "2026-05-13T09:43:54Z"}, {"lat": 35.22919, "lng": -13.44724, "fetched_at": "2026-05-13T11:34:56Z"}, {"lat": 35.82698, "lng": -13.23812, "fetched_at": "2026-05-13T14:55:20Z"}, {"lat": 36.300578333333334, "lng": -13.07473, "fetched_at": "2026-05-13T17:21:59Z"}, {"lat": 36.80408, "lng": -12.89441, "fetched_at": "2026-05-13T20:06:28Z"}, {"lat": 37.22038, "lng": -12.74776, "fetched_at": "2026-05-13T22:21:12Z"}, {"lat": 37.54509, "lng": -12.63506, "fetched_at": "2026-05-14T00:11:37Z"}, {"lat": 38.38297, "lng": -12.32394, "fetched_at": "2026-05-14T04:54:20Z"}, {"lat": 38.90306, "lng": -12.13637, "fetched_at": "2026-05-14T07:50:56Z"}, {"lat": 39.33382, "lng": -11.98096, "fetched_at": "2026-05-14T10:29:23Z"}, {"lat": 39.76914, "lng": -11.81674, "fetched_at": "2026-05-14T13:00:44Z"}, {"lat": 40.21569, "lng": -11.6526, "fetched_at": "2026-05-14T15:27:35Z"}, {"lat": 40.64668, "lng": -11.47725, "fetched_at": "2026-05-14T18:04:02Z"}, {"lat": 40.97436, "lng": -11.36333, "fetched_at": "2026-05-14T19:59:56Z"}, {"lat": 41.17561, "lng": -11.28754, "fetched_at": "2026-05-14T21:18:46Z"}, {"lat": 41.47375, "lng": -11.175978333333333, "fetched_at": "2026-05-14T23:06:39Z"}, {"lat": 42.26923, "lng": -10.865918333333333, "fetched_at": "2026-05-15T04:12:47Z"}, {"lat": 42.90999, "lng": -10.62276, "fetched_at": "2026-05-15T08:11:59Z"}, {"lat": 43.40264, "lng": -10.43328, "fetched_at": "2026-05-15T11:27:36Z"}, {"lat": 43.801, "lng": -10.2722, "fetched_at": "2026-05-15T13:59:02Z"}, {"lat": 43.87995, "lng": -10.2028, "fetched_at": "2026-05-15T14:29:07Z"}, {"lat": 44.27783, "lng": -9.83642, "fetched_at": "2026-05-15T16:58:12Z"}, {"lat": 44.54574, "lng": -9.59547, "fetched_at": "2026-05-15T18:46:48Z"}, {"lat": 44.81651, "lng": -9.347, "fetched_at": "2026-05-15T20:21:07Z"}, {"lat": 45.08466, "lng": -9.10033, "fetched_at": "2026-05-15T22:08:05Z"}, {"lat": 45.4078, "lng": -8.79304, "fetched_at": "2026-05-16T00:02:00Z"}, {"lat": 46.08669, "lng": -8.14119, "fetched_at": "2026-05-16T03:56:16Z"}, {"lat": 46.49498, "lng": -7.73394, "fetched_at": "2026-05-16T06:30:34Z"}, {"lat": 46.92787, "lng": -7.29346, "fetched_at": "2026-05-16T08:55:30Z"}, {"lat": 47.21289, "lng": -7.03909, "fetched_at": "2026-05-16T10:23:31Z"}, {"lat": 47.50245, "lng": -6.78681, "fetched_at": "2026-05-16T12:00:15Z"}, {"lat": 47.88288, "lng": -6.43373, "fetched_at": "2026-05-16T13:52:50Z"}, {"lat": 48.13491, "lng": -6.19405, "fetched_at": "2026-05-16T15:07:46Z"}, {"lat": 48.51794, "lng": -5.83772, "fetched_at": "2026-05-16T17:10:51Z"}, {"lat": 48.83215, "lng": -5.42085, "fetched_at": "2026-05-16T19:19:32Z"}, {"lat": 48.99949, "lng": -4.99888, "fetched_at": "2026-05-16T21:00:13Z"}, {"lat": 49.08128, "lng": -4.78864, "fetched_at": "2026-05-16T21:58:42Z"}, {"lat": 49.17365, "lng": -4.54931, "fetched_at": "2026-05-16T22:59:09Z"}, {"lat": 49.26484, "lng": -4.2856, "fetched_at": "2026-05-17T00:01:48Z"}, {"lat": 49.72074, "lng": -3.08638, "fetched_at": "2026-05-17T04:16:02Z"}, {"lat": 49.96606, "lng": -1.89838, "fetched_at": "2026-05-17T07:40:10Z"}, {"lat": 50.12549, "lng": -0.95133, "fetched_at": "2026-05-17T09:56:53Z"}, {"lat": 50.21123, "lng": -0.4531, "fetched_at": "2026-05-17T11:20:14Z"}, {"lat": 50.34813, "lng": 0.3042, "fetched_at": "2026-05-17T13:53:05Z"}, {"lat": 50.42666, "lng": 0.67327, "fetched_at": "2026-05-17T15:08:58Z"}, {"lat": 50.56983, "lng": 1.18202, "fetched_at": "2026-05-17T17:09:35Z"}, {"lat": 50.87241, "lng": 1.474, "fetched_at": "2026-05-17T19:22:31Z"}, {"lat": 51.09104, "lng": 1.6819, "fetched_at": "2026-05-17T21:05:01Z"}, {"lat": 51.23267, "lng": 1.83357, "fetched_at": "2026-05-17T22:05:13Z"}, {"lat": 51.36301, "lng": 2.00653, "fetched_at": "2026-05-17T23:09:27Z"}, {"lat": 51.85681, "lng": 3.1141883333333333, "fetched_at": "2026-05-18T04:25:13Z"}, {"lat": 51.95384, "lng": 4.15444, "fetched_at": "2026-05-18T08:51:09Z"}, {"lat": 51.95388, "lng": 4.15448, "fetched_at": "2026-05-18T12:44:50Z"}, {"lat": 51.9539, "lng": 4.15446, "fetched_at": "2026-05-18T16:31:47Z"}, {"lat": 51.95387, "lng": 4.15447, "fetched_at": "2026-05-18T18:58:09Z"}, {"lat": 51.95387, "lng": 4.15447, "fetched_at": "2026-05-18T20:44:42Z"}, {"lat": 51.95387, "lng": 4.15447, "fetched_at": "2026-05-18T22:09:17Z"}, {"lat": 51.95388, "lng": 4.15447, "fetched_at": "2026-05-19T00:16:06Z"}, {"lat": 51.95388, "lng": 4.15447, "fetched_at": "2026-05-19T05:09:48Z"}, {"lat": 51.95388, "lng": 4.15448, "fetched_at": "2026-05-19T10:02:14Z"}, {"lat": 51.95384, "lng": 4.15446, "fetched_at": "2026-05-19T12:50:43Z"}, {"lat": 51.95387, "lng": 4.15445, "fetched_at": "2026-05-19T15:05:26Z"}]},
-    other:     [{"key": "ebola-drc-2026", "name": "Ebola", "region": "DR Congo \u00b7 Ituri province", "started": "2026-05-15", "started_human": "May 15 \u00b7 4d ago", "blurb": "17th Congo outbreak (Bundibugyo virus). DRC + 1 imported case in Uganda.", "color": "#c084fc", "cases": 246, "deaths": 80, "as_of": "2026-05-15", "source": "WHO DON602", "source_url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON602", "status": "live", "locations": [{"name": "Mongwalu (Ituri)", "lat": 1.95, "lng": 30.06}, {"name": "Rwampara (Ituri)", "lat": 1.6, "lng": 30.2}], "news": [{"title": "American infected with Ebola in DRC, as US moves to limit entry from virus-hit region", "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQS2I1NUZ3V3lJbkJfZWhlVE91M3VYSWpkRVlBZ1UxRWg3a1hWRUlldnU2YnBneDMycS1IN2ZidVRvYTAxU3VvUkd5NVpIa0NmUEVKV213M0E3TkFvU2hObEtwc2VZVGozbjM5dG5KOUEzc3BfU1lrVkUwcUJsOG1vbnZtb0VyaGpMdFlZVWk2aw?oc=5", "source": "Google News \u00b7 CNN", "published": "1 day ago"}, {"title": "Aid cuts and war complicate Ebola response in Congo", "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxPM3lHLXlXX0ZuNXhTSTNMZ0JmNEtBMHJkNEFEY0duQW9wNzROUFNwUHhKTnUzOHI2RlNaMFFSaVBfM3lDYm5uYlRlcHhKajNFOUtsVE43cDd6QldWcHRhMENBZUpvTXRFMXB5NEhwakpHazA3NUs2cVdXcGxRVDd2SGxLZ2pYMFlYZjhFTkdmM3piZw?oc=5", "source": "Google News \u00b7 politico.eu", "published": "18h ago"}, {"title": "Epidemic of Ebola Disease caused by Bundibugyo virus in the Democratic Republic of the Congo and Uganda determined a public health emergency of international concern", "url": "https://news.google.com/rss/articles/CBMiiwJBVV95cUxOLWc5YmNSd040d0pkM2czRzRXWmNBdk9NemR2MjE0RFF3eUg4TmpqQWNpYUpvbjdfbXRQVi1LUC1nbWdBQXRJaE9obE9oSGZ4M0lFY0VpOFVwb3ZLWjVnY3BjZkc1eERKOC1IbGt4cXZBX1lXVGxHZ3Q5c0RESnFTelNETGE4VW0tdnNNTjBRMEgzaFAzNVFPZ29INDN1MzN4MmM3SkhWSHJQUENwN21GbDhNLUdUOUhsbEpDS3VJMDhxWHBDZmt1THQwSzg0ZzZIdC0xRnFZT1VRRFNDaFZ1ZjhhR25wTW9jem5nWGJoX0Zzd29Yb3hGUTVaV1lyRVFPc2gwNUxzUVFrME0?oc=5", "source": "Google News \u00b7 World Health Organization (WHO)", "published": "2 days ago"}, {"title": "At least 131 dead in Ebola outbreak in DR Congo, official says", "url": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5LRjRFTldnQmZ6cHcyZjBLeThNMG9fRy1CQWZlaDNzX2pKbTN1dzF2VXA5VVhtb1paVExOVTNPWjlpR2h3ZV9CUmNHQ3p3dGJWc0czTU1OblpMUQ?oc=5", "source": "Google News \u00b7 BBC", "published": "9h ago"}, {"title": "DRC Ebola outbreak: hundreds of suspected cases, no vaccine", "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTFBvaUI1OElRTGtmc3dVOF92YnB0V2Z2bG5lZnBlZnN5OVVLSTA3QThmSnpWOGh0RWNUNnJ2T2YzVW1UcmdvZVhoR05CSkFRLUtrdmRodGNkZw?oc=5", "source": "Google News \u00b7 UN News", "published": "2h ago"}, {"title": "What to Know About the Ebola Outbreak as Cases and Deaths Rise", "url": "https://news.google.com/rss/articles/CBMihAFBVV95cUxNMHV6V1hhbU9LLU1vQVg2a21DRldHRU1ILWpjaEZLcUhpMkhiTnJFaDhPUjAtQ0tPTUpGazdtWUpDWEw2eDFEQmZzRzRfMVB4dVNoTEZmRVRpdVFISmtCNEFqOVEwVnYxM1h6c21DblJkQy04QTV5emFjakFlYWFMa3hSQ1Y?oc=5", "source": "Google News \u00b7 The New York Times", "published": "1h ago"}]}, {"key": "mpox-clade-ib-2024", "name": "Mpox \u00b7 clade Ib", "region": "Central & East Africa", "started": "2024-08-14", "started_human": "Aug 14, 2024", "blurb": "WHO PHEIC since Aug 2024. Clade Ib continues across Central/East Africa.", "color": "#f59e0b", "cases": null, "deaths": null, "as_of": null, "source": null, "source_url": null, "status": "no_counter", "locations": [{"name": "Goma (DRC)", "lat": -1.68, "lng": 29.22}, {"name": "Bujumbura (Burundi)", "lat": -3.38, "lng": 29.36}, {"name": "Kampala (Uganda)", "lat": 0.32, "lng": 32.58}, {"name": "Kigali (Rwanda)", "lat": -1.95, "lng": 30.06}], "news": [{"title": "Clade I Monkeypox Outbreaks", "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9IZXZGczIyczRIMklCMW1aQm1obU53WjlJYUY4bEVBRXJjMHBCcVRtdy1fVk1ZNWg4R3B3ZDNwREQ4TXdvVEw3M1dDZnA4Q0ZPeUtDajBFUGcwTVRObklzbWhzbHM5UQ?oc=5", "source": "Google News \u00b7 Centers for Disease Control and Prevention | CDC (.gov)", "published": "4 days ago"}, {"title": "Dynamic shift in the dominant transmission route of clade Ib monkeypox virus across networks with sexual and nonsexual contacts", "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE5zYl9vQmhQRjFaZzNNX2h5dU85VHZxelh5Z0dlTXFmejFfNkVhWFhlV0tJYzR2aGFrUzRXdGFIOTJYMVA5dEdYZFdxMFlZVllnSk1mM0dzblMteFBSNkVZ?oc=5", "source": "Google News \u00b7 Science | AAAS", "published": "Apr 01, 2026"}, {"title": "Enhanced virulence of mpox virus clade Ib over clade IIb in the CAST/EiJ mouse model | Communications Biology", "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE5kQ085QVJQMlFxbXY3bTZGMEFRZU9scEdpVTBPZWVqcWkwYXFFUXE1dDQ5cTNmaUcxU1V0S3A3STVpTEVvWWFkQldSWXBDX3hpamtCMTk4QTBwT01JUHdB?oc=5", "source": "Google News \u00b7 Nature", "published": "Feb 11, 2026"}, {"title": "Ophthalmic Manifestations of Mpox: An Update for the General Practitioner", "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNYU1uQVNPcHliaklkRVBlLTBHOU83MnhuS2RaY1FPSVBuMm9hQ1J0Nl8xbVFOTTgzRjEyMWRWQmxGMGh5ZkJUcTB0VDZHall4MWc1Q18ydjhyQkZmaHZYTEljRGh5cmQ3Wk5SQlIwbG9WbU1HY20yRm1nWDN0OGxFSnRFblg2bllMN3o3RQ?oc=5", "source": "Google News \u00b7 Ophthalmology Advisor", "published": "Mar 11, 2026"}, {"title": "Canada: Mpox clade Ib reported in Toronto", "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBVcUcwZmpSZS1GTlF1YTlNcXI2aEhxbWNjUXpHcDhpVlc4NklXNFRSVkljVzJ4R1R0SnhUckhqNWlhQWMzaHhUcXFZLW8xeVk2eHgtckl2Z3FJN0x5Y2JUc2J3czd0TWJBdUFteERQM1NkMlNxQ0dhRkpvY2dXZw?oc=5", "source": "Google News \u00b7 Outbreak News Today", "published": "Mar 12, 2026"}, {"title": "Why mpox outbreaks can change course and what we can do about it", "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxNWlFVZGVaTGJyNjZ4WGpVcEFaenpCSVdRdFBNbWNtMm1ZdTlaSS1lSzljQnNUWkRnRWpqVURhTVFPOU5ncTFmYnFBdUpRSjlUN29vVzE5eVJ6b3pOSGtxeEItWlpvM0VIQjZLbXpHcXp5ZFhsa0FwQ1lvaEE3RUpwRVFFSThKWVNvX25hQ1V6OTZNTXBrTG5vWTg5YlRmdXc?oc=5", "source": "Google News \u00b7 Gavi, the Vaccine Alliance", "published": "Apr 09, 2026"}]}, {"key": "h5n1-global-2024", "name": "H5N1 \u00b7 avian flu", "region": "US human cases (CDC)", "started": "2024-03-25", "started_human": "Mar 25, 2024", "blurb": "Ongoing global poultry panzootic; US dairy + farmworker cases.", "color": "#14b8a6", "cases": 71, "deaths": null, "as_of": "2026-03-06", "source": "CDC", "source_url": "https://www.cdc.gov/bird-flu/situation-summary/index.html", "status": "live", "locations": [{"name": "California (US dairy)", "lat": 36.78, "lng": -119.42}, {"name": "Cambodia", "lat": 12.57, "lng": 104.99}, {"name": "Vietnam", "lat": 14.06, "lng": 108.28}, {"name": "UK (poultry)", "lat": 52.35, "lng": -1.17}], "news": [{"title": "A(H5) Bird Flu: Current Situation", "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5maC1Rb3ctQTcxOG5XenBoQzVEa2xNMGpXaEp1c1pVQXo0NnlUVXN3ak9jR05iSnhhVG9fSC1leHdDY1lFS0pPUUZQeXo0R0Rza0g1bkdEbTd0WjJkLW1VSFhtaVprZ1px?oc=5", "source": "Google News \u00b7 Centers for Disease Control and Prevention | CDC (.gov)", "published": "Mar 06, 2026"}, {"title": "US officials note a handful of new avian flu outbreaks at poultry facilities", "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxQSC1taWtsajhJd1ZfbFBnMy1uQ0NGeDhvVk45cV84OUxMejJWT182QVNCcngwOXlpcUh4cEk2UmFaUjZIZUxvU09ZdXc2MFBPX05BamVVX0RjRUdWLVZLNEdoWDlSMVpITnJtODZEdTBRODh5MHlLVEJnZzBhdWh3Wm1IbmlpTVl2cjNGbkQ0cW94dk83YlY0QXNfSkdWVVc4aURCMVJpX3p4Y2VEeUd5QUI1UWxoZ285TkVVRQ?oc=5", "source": "Google News \u00b7 cidrap.umn.edu", "published": "4 days ago"}, {"title": "H5N1 Influenza | Animal and Plant Health Inspection Service", "url": "https://news.google.com/rss/articles/CBMiTEFVX3lxTE92cmpIUXNKa1VLZWNjNlE5SFNhNzNDS2tfTWduQmMya1FiWmZmY0hocHB3MENBMDN1TDQwTUpndTFBQUlSOElqSjQwbXk?oc=5", "source": "Google News \u00b7 aphis.usda.gov", "published": "Jan 20, 2026"}, {"title": "E-News | H5N1 bird flu outbreak enters 4th year in US", "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxQZUFXSGd2LXpjSjJmUklPczRsRnl4YjBPdGVGOGM5dGZUbldMbmtVSmJuWkdtYTh2TWI3OU45dFI3RDcxdV83bXlLWXE4Y1lUdHNjRE1NeVltM3JRY1dqcmZmVFNsYnZhUWVBdnpGbGhRT3RwNkhsajkyWG54X3g5MHNKYWVLRTg5ZnQ2VGkyYw?oc=5", "source": "Google News \u00b7 West Virginia University", "published": "Feb 03, 2026"}, {"title": "H5N1 bird flu spreads to sea otters and sea lions along San Mateo coast, wildlife experts say", "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQM3Z6OVdTSm9NRllrZ2Zja1Y4Q0MzdjB6bHROYVJZOGRhNVJjeU8yYnBuWUN3cjFGcXNxRFJ3N1M2TWxkZENmaldvT0d3dVJfc1ZscUZmamtHdU1pd3g2eHpTR2JsaTY2REpUWUlaZEJFdkotZWhkYWNQOHVQVGViX21LR3Z5SnByb3hmWTlSTERFY191cDFvUDU4VjRWTmtWTmJGODE0djB1SGd1aHNIWHRNNURlSDFDZWo2U3g0YTBlNERPV0c1RVFqTTMxb1hJem1v?oc=5", "source": "Google News \u00b7 Los Angeles Times", "published": "Mar 12, 2026"}, {"title": "Bird Flu Outbreak Among CA Marine Mammals Remains Small But Concerning", "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPSFhTSFhvdWprNXpWc2Zod2tsb1R0UHNkU29admJDSE03MTVuX3FTenRyUDdGRUFycVdwWkl2Z3RXbUtMdnRvbjRBdWFtRk9wSl8xVG92TWtNaFZIX0hQdnl4QXB3RW1pSHhZOFczY2k5a0JQaXlMcW9IYW1JNlFCb3h4X1VWNmh2OFc1bnhjSGdwTkptNkNVc0luZzcwV3FRM3FuV0VB?oc=5", "source": "Google News \u00b7 UC Davis", "published": "Mar 13, 2026"}]}]
+    vessel:    {"name": "MV Hondius", "operator": "Oceanwide Expeditions", "imo": "9818709", "mmsi": "244327000", "flag": "Netherlands", "departed_from": "Ushuaia, Argentina", "departed_at": "2026-04-01", "tracker_url": "https://www.cruisemapper.com/ships/MV-Hondius-1624", "vesselfinder_url": "https://www.vesselfinder.com/vessels/details/9818709", "marinetraffic_url": "https://www.marinetraffic.com/en/ais/details/ships/shipid:5873599/mmsi:244327000/imo:9818709/vessel:HONDIUS", "position": {"lat": 78.21451, "lng": 14.48457, "heading_deg": 72.0, "fetched_at": "2026-08-28T01:55:29Z"}, "counts": {"cases_total": 13, "cases_confirmed": 12, "cases_suspected": 1, "deaths": 3, "critical": 1, "on_board": 147, "passengers": 88, "crew": 59, "as_of": "2026-06-17", "source": "ECDC", "source_url": "https://www.ecdc.europa.eu/en/infectious-disease-topics/hantavirus-infection/surveillance-and-updates/andes-hantavirus-outbreak", "fetched_at": "2026-08-28T01:55:30Z"}, "track": [{"lat": 70.4142, "lng": -23.56388, "fetched_at": "2026-08-14T02:36:23Z"}, {"lat": 70.19922, "lng": -21.84235, "fetched_at": "2026-08-14T04:56:02Z"}, {"lat": 70.19922, "lng": -21.84235, "fetched_at": "2026-08-14T06:21:39Z"}, {"lat": 70.19922, "lng": -21.84235, "fetched_at": "2026-08-14T08:23:22Z"}, {"lat": 70.19922, "lng": -21.84235, "fetched_at": "2026-08-14T10:12:35Z"}, {"lat": 68.50645, "lng": -20.45991, "fetched_at": "2026-08-14T11:51:57Z"}, {"lat": 68.21442, "lng": -20.22292, "fetched_at": "2026-08-14T13:24:57Z"}, {"lat": 67.99844, "lng": -19.918208333333332, "fetched_at": "2026-08-14T15:01:09Z"}, {"lat": 67.87569, "lng": -19.90306, "fetched_at": "2026-08-14T16:00:20Z"}, {"lat": 67.65003, "lng": -19.73155, "fetched_at": "2026-08-14T17:02:08Z"}, {"lat": 67.44632, "lng": -19.52556, "fetched_at": "2026-08-14T17:59:54Z"}, {"lat": 67.35123, "lng": -19.43954, "fetched_at": "2026-08-14T19:06:10Z"}, {"lat": 67.01562, "lng": -19.13716, "fetched_at": "2026-08-14T20:38:09Z"}, {"lat": 66.86492, "lng": -19.00621, "fetched_at": "2026-08-14T21:34:10Z"}, {"lat": 66.71823, "lng": -18.8891, "fetched_at": "2026-08-14T22:32:44Z"}, {"lat": 66.66579, "lng": -18.83603, "fetched_at": "2026-08-14T23:30:13Z"}, {"lat": 66.20191, "lng": -18.45644, "fetched_at": "2026-08-15T01:44:26Z"}, {"lat": 66.01263, "lng": -18.3202, "fetched_at": "2026-08-15T02:59:02Z"}, {"lat": 65.88812, "lng": -18.20026, "fetched_at": "2026-08-15T03:48:08Z"}, {"lat": 65.80206, "lng": -18.11357, "fetched_at": "2026-08-15T04:39:38Z"}, {"lat": 65.7397, "lng": -18.11486, "fetched_at": "2026-08-15T05:33:32Z"}, {"lat": 65.68484, "lng": -18.077368333333332, "fetched_at": "2026-08-15T06:52:02Z"}, {"lat": 65.68486, "lng": -18.07738, "fetched_at": "2026-08-15T07:36:54Z"}, {"lat": 65.68484, "lng": -18.077368333333332, "fetched_at": "2026-08-15T08:39:11Z"}, {"lat": 65.68482, "lng": -18.07733, "fetched_at": "2026-08-15T09:34:23Z"}, {"lat": 65.68485, "lng": -18.07738, "fetched_at": "2026-08-15T10:32:25Z"}, {"lat": 65.68483, "lng": -18.07736, "fetched_at": "2026-08-15T11:28:51Z"}, {"lat": 65.68485, "lng": -18.07736, "fetched_at": "2026-08-15T12:53:30Z"}, {"lat": 65.68484, "lng": -18.07738, "fetched_at": "2026-08-15T13:37:13Z"}, {"lat": 65.68483, "lng": -18.07735, "fetched_at": "2026-08-15T14:32:09Z"}, {"lat": 65.68482, "lng": -18.07734, "fetched_at": "2026-08-15T15:29:34Z"}, {"lat": 65.68482, "lng": -18.07738, "fetched_at": "2026-08-15T16:38:32Z"}, {"lat": 65.68482, "lng": -18.07735, "fetched_at": "2026-08-15T17:29:08Z"}, {"lat": 65.74464, "lng": -18.11271, "fetched_at": "2026-08-15T18:41:04Z"}, {"lat": 65.90354, "lng": -18.20662, "fetched_at": "2026-08-15T19:28:01Z"}, {"lat": 66.0896, "lng": -18.37201, "fetched_at": "2026-08-15T20:32:39Z"}, {"lat": 66.24538, "lng": -18.48324, "fetched_at": "2026-08-15T21:29:30Z"}, {"lat": 66.44319, "lng": -18.64731, "fetched_at": "2026-08-15T22:32:13Z"}, {"lat": 66.60814, "lng": -18.78036, "fetched_at": "2026-08-15T23:28:28Z"}, {"lat": 67.04647, "lng": -19.157608333333332, "fetched_at": "2026-08-16T01:52:22Z"}, {"lat": 67.25682, "lng": -19.35391, "fetched_at": "2026-08-16T03:08:19Z"}, {"lat": 67.53295, "lng": -19.60067, "fetched_at": "2026-08-16T04:44:07Z"}, {"lat": 67.71487, "lng": -19.77389, "fetched_at": "2026-08-16T05:36:09Z"}, {"lat": 67.90539, "lng": -19.93877, "fetched_at": "2026-08-16T06:53:47Z"}, {"lat": 68.04142, "lng": -20.06421, "fetched_at": "2026-08-16T07:38:53Z"}, {"lat": 68.23368, "lng": -20.24069, "fetched_at": "2026-08-16T08:39:59Z"}, {"lat": 68.39362, "lng": -20.383208333333332, "fetched_at": "2026-08-16T09:35:37Z"}, {"lat": 68.54993, "lng": -20.49465, "fetched_at": "2026-08-16T10:32:49Z"}, {"lat": 68.68102, "lng": -20.5919, "fetched_at": "2026-08-16T11:28:27Z"}, {"lat": 68.99937, "lng": -20.82337, "fetched_at": "2026-08-16T12:55:10Z"}, {"lat": 69.10988833333333, "lng": -20.90495, "fetched_at": "2026-08-16T13:38:06Z"}, {"lat": 69.24382, "lng": -21.00488, "fetched_at": "2026-08-16T14:31:54Z"}, {"lat": 69.43809, "lng": -21.1485, "fetched_at": "2026-08-16T15:30:24Z"}, {"lat": 69.59831, "lng": -21.28377, "fetched_at": "2026-08-16T16:35:47Z"}, {"lat": 69.77294, "lng": -21.42482, "fetched_at": "2026-08-16T17:28:10Z"}, {"lat": 69.972, "lng": -21.58398, "fetched_at": "2026-08-16T18:40:12Z"}, {"lat": 70.09203, "lng": -21.68835, "fetched_at": "2026-08-16T19:27:54Z"}, {"lat": 70.22211, "lng": -22.16979, "fetched_at": "2026-08-16T20:32:37Z"}, {"lat": 70.28323, "lng": -22.59486, "fetched_at": "2026-08-16T21:28:27Z"}, {"lat": 70.33976, "lng": -23.02074, "fetched_at": "2026-08-16T22:30:41Z"}, {"lat": 70.38449, "lng": -23.48236, "fetched_at": "2026-08-16T23:31:39Z"}, {"lat": 70.6269, "lng": -24.24536, "fetched_at": "2026-08-17T01:50:03Z"}, {"lat": 70.84459, "lng": -24.51619, "fetched_at": "2026-08-17T03:08:02Z"}, {"lat": 71.06689, "lng": -24.61692, "fetched_at": "2026-08-17T04:52:27Z"}, {"lat": 71.16005, "lng": -24.678158333333332, "fetched_at": "2026-08-17T05:46:04Z"}, {"lat": 71.26397, "lng": -24.86527, "fetched_at": "2026-08-17T07:10:38Z"}, {"lat": 71.29987, "lng": -24.95419, "fetched_at": "2026-08-17T08:54:39Z"}, {"lat": 71.30028, "lng": -24.955748333333332, "fetched_at": "2026-08-17T09:52:12Z"}, {"lat": 71.30024, "lng": -24.95653, "fetched_at": "2026-08-17T10:40:53Z"}, {"lat": 71.30023, "lng": -24.95652, "fetched_at": "2026-08-17T11:34:05Z"}, {"lat": 71.29769, "lng": -24.95294, "fetched_at": "2026-08-17T13:00:23Z"}, {"lat": 71.25295, "lng": -24.96285, "fetched_at": "2026-08-17T13:47:23Z"}, {"lat": 71.21207, "lng": -25.08392, "fetched_at": "2026-08-17T14:36:56Z"}, {"lat": 71.19719, "lng": -25.1524, "fetched_at": "2026-08-17T15:33:51Z"}, {"lat": 71.20549, "lng": -25.334968333333332, "fetched_at": "2026-08-17T16:37:39Z"}, {"lat": 71.15782, "lng": -25.24359, "fetched_at": "2026-08-17T18:52:01Z"}, {"lat": 71.09846, "lng": -25.13391, "fetched_at": "2026-08-17T19:38:16Z"}, {"lat": 71.01972, "lng": -24.97534, "fetched_at": "2026-08-17T20:36:27Z"}, {"lat": 70.97669, "lng": -24.87599, "fetched_at": "2026-08-17T21:33:54Z"}, {"lat": 70.89107, "lng": -24.68368, "fetched_at": "2026-08-17T22:33:43Z"}, {"lat": 70.78561, "lng": -24.5212, "fetched_at": "2026-08-17T23:30:58Z"}, {"lat": 70.539, "lng": -24.10403, "fetched_at": "2026-08-18T01:44:54Z"}, {"lat": 70.45037, "lng": -23.66323, "fetched_at": "2026-08-18T03:03:40Z"}, {"lat": 70.42202, "lng": -23.41587, "fetched_at": "2026-08-18T03:53:36Z"}, {"lat": 70.39877, "lng": -23.16445, "fetched_at": "2026-08-18T04:44:30Z"}, {"lat": 70.40086, "lng": -22.78478, "fetched_at": "2026-08-18T05:37:28Z"}, {"lat": 70.42694, "lng": -22.33601, "fetched_at": "2026-08-18T06:57:59Z"}, {"lat": 70.46064, "lng": -22.05396, "fetched_at": "2026-08-18T07:47:21Z"}, {"lat": 70.4795, "lng": -21.959408333333332, "fetched_at": "2026-08-18T08:48:32Z"}, {"lat": 70.47939, "lng": -21.95727, "fetched_at": "2026-08-18T09:42:09Z"}, {"lat": 70.47984, "lng": -21.95853, "fetched_at": "2026-08-18T10:38:19Z"}, {"lat": 70.47964, "lng": -21.95718, "fetched_at": "2026-08-18T11:34:01Z"}, {"lat": 70.4514, "lng": -22.03975, "fetched_at": "2026-08-18T13:01:48Z"}, {"lat": 70.38242, "lng": -21.95612, "fetched_at": "2026-08-18T13:51:26Z"}, {"lat": 70.39475, "lng": -21.70131, "fetched_at": "2026-08-18T14:43:32Z"}, {"lat": 70.5082, "lng": -21.23426, "fetched_at": "2026-08-18T15:39:45Z"}, {"lat": 70.5082, "lng": -21.23426, "fetched_at": "2026-08-18T16:41:29Z"}, {"lat": 70.78861, "lng": -20.8704, "fetched_at": "2026-08-18T17:35:40Z"}, {"lat": 71.11126, "lng": -20.86381, "fetched_at": "2026-08-18T18:50:35Z"}, {"lat": 71.11126, "lng": -20.86381, "fetched_at": "2026-08-18T19:34:24Z"}, {"lat": 71.39185, "lng": -20.84703, "fetched_at": "2026-08-18T20:33:42Z"}, {"lat": 71.54322, "lng": -20.90289, "fetched_at": "2026-08-18T21:32:13Z"}, {"lat": 71.6703, "lng": -21.1414, "fetched_at": "2026-08-18T22:34:00Z"}, {"lat": 71.77027, "lng": -21.40693, "fetched_at": "2026-08-18T23:30:15Z"}, {"lat": 72.01018, "lng": -22.32161, "fetched_at": "2026-08-19T01:46:38Z"}, {"lat": 72.10574, "lng": -22.77021, "fetched_at": "2026-08-19T03:05:56Z"}, {"lat": 72.23503, "lng": -23.41312, "fetched_at": "2026-08-19T04:45:32Z"}, {"lat": 72.31878, "lng": -23.80763, "fetched_at": "2026-08-19T05:38:50Z"}, {"lat": 72.31878, "lng": -23.80763, "fetched_at": "2026-08-19T06:59:07Z"}, {"lat": 72.31878, "lng": -23.80763, "fetched_at": "2026-08-19T07:47:33Z"}, {"lat": 72.31878, "lng": -23.80763, "fetched_at": "2026-08-19T08:48:54Z"}, {"lat": 72.31878, "lng": -23.80763, "fetched_at": "2026-08-19T09:42:28Z"}, {"lat": 72.31878, "lng": -23.80763, "fetched_at": "2026-08-19T10:38:12Z"}, {"lat": 72.53057, "lng": -24.64818, "fetched_at": "2026-08-19T11:33:47Z"}, {"lat": 72.51212, "lng": -24.62097, "fetched_at": "2026-08-19T13:02:35Z"}, {"lat": 72.44788, "lng": -24.86449, "fetched_at": "2026-08-19T13:52:48Z"}, {"lat": 72.44788, "lng": -24.86449, "fetched_at": "2026-08-19T14:44:19Z"}, {"lat": 72.44788, "lng": -24.86449, "fetched_at": "2026-08-19T15:39:20Z"}, {"lat": 72.42546, "lng": -24.88745, "fetched_at": "2026-08-19T16:40:31Z"}, {"lat": 72.42538833333333, "lng": -24.88795, "fetched_at": "2026-08-19T17:34:35Z"}, {"lat": 72.42538833333333, "lng": -24.88795, "fetched_at": "2026-08-19T18:47:59Z"}, {"lat": 72.42538833333333, "lng": -24.88795, "fetched_at": "2026-08-19T19:33:03Z"}, {"lat": 72.42556, "lng": -24.8885, "fetched_at": "2026-08-19T20:37:59Z"}, {"lat": 72.42561, "lng": -24.88787, "fetched_at": "2026-08-19T21:33:44Z"}, {"lat": 72.42561, "lng": -24.88787, "fetched_at": "2026-08-19T22:34:22Z"}, {"lat": 72.42561, "lng": -24.88787, "fetched_at": "2026-08-19T23:31:09Z"}, {"lat": 72.7977, "lng": -24.63833, "fetched_at": "2026-08-20T01:45:32Z"}, {"lat": 72.98106, "lng": -24.70656, "fetched_at": "2026-08-20T03:05:18Z"}, {"lat": 73.09885, "lng": -25.36445, "fetched_at": "2026-08-20T04:46:28Z"}, {"lat": 73.13122, "lng": -25.62394, "fetched_at": "2026-08-20T05:38:48Z"}, {"lat": 73.23159, "lng": -25.7456, "fetched_at": "2026-08-20T06:59:47Z"}, {"lat": 73.23159, "lng": -25.7456, "fetched_at": "2026-08-20T07:49:42Z"}, {"lat": 73.23159, "lng": -25.7456, "fetched_at": "2026-08-20T08:50:06Z"}, {"lat": 73.23159, "lng": -25.7456, "fetched_at": "2026-08-20T09:44:07Z"}, {"lat": 73.32769, "lng": -25.29231, "fetched_at": "2026-08-20T10:39:45Z"}, {"lat": 73.32769, "lng": -25.29231, "fetched_at": "2026-08-20T11:35:51Z"}, {"lat": 73.34418, "lng": -25.33245, "fetched_at": "2026-08-20T13:04:32Z"}, {"lat": 73.43915, "lng": -25.08988, "fetched_at": "2026-08-20T13:55:43Z"}, {"lat": 73.45216, "lng": -24.51528, "fetched_at": "2026-08-20T14:46:48Z"}, {"lat": 73.45036, "lng": -23.93659, "fetched_at": "2026-08-20T15:42:31Z"}, {"lat": 73.36542, "lng": -23.25492, "fetched_at": "2026-08-20T16:45:05Z"}, {"lat": 73.28158, "lng": -22.78136, "fetched_at": "2026-08-20T17:38:09Z"}, {"lat": 73.2073, "lng": -22.04141, "fetched_at": "2026-08-20T18:52:47Z"}, {"lat": 73.20617, "lng": -21.71739, "fetched_at": "2026-08-20T19:37:57Z"}, {"lat": 73.24951, "lng": -21.0077, "fetched_at": "2026-08-20T20:38:52Z"}, {"lat": 73.30732, "lng": -20.43319, "fetched_at": "2026-08-20T21:36:37Z"}, {"lat": 73.37647, "lng": -19.97679, "fetched_at": "2026-08-20T22:37:20Z"}, {"lat": 73.49495, "lng": -19.62915, "fetched_at": "2026-08-20T23:33:51Z"}, {"lat": 73.7571, "lng": -19.26654, "fetched_at": "2026-08-21T01:50:57Z"}, {"lat": 73.93917, "lng": -19.02544, "fetched_at": "2026-08-21T03:11:19Z"}, {"lat": 74.13097, "lng": -18.75731, "fetched_at": "2026-08-21T04:48:41Z"}, {"lat": 74.2494, "lng": -18.71942, "fetched_at": "2026-08-21T05:40:39Z"}, {"lat": 74.44968, "lng": -18.78524, "fetched_at": "2026-08-21T07:01:21Z"}, {"lat": 74.50401, "lng": -18.84268, "fetched_at": "2026-08-21T07:51:50Z"}, {"lat": 74.52982, "lng": -18.88447, "fetched_at": "2026-08-21T08:52:08Z"}, {"lat": 74.52973, "lng": -18.88267, "fetched_at": "2026-08-21T09:46:53Z"}, {"lat": 74.52986, "lng": -18.88317, "fetched_at": "2026-08-21T10:38:53Z"}, {"lat": 74.52985, "lng": -18.88431, "fetched_at": "2026-08-21T11:34:16Z"}, {"lat": 74.52877, "lng": -18.882738333333332, "fetched_at": "2026-08-21T13:03:54Z"}, {"lat": 74.51193, "lng": -18.85493, "fetched_at": "2026-08-21T13:54:18Z"}, {"lat": 74.48597, "lng": -18.68887, "fetched_at": "2026-08-21T14:45:58Z"}, {"lat": 74.48965, "lng": -18.69879, "fetched_at": "2026-08-21T15:42:02Z"}, {"lat": 74.5406, "lng": -18.61415, "fetched_at": "2026-08-21T16:45:03Z"}, {"lat": 74.5852, "lng": -18.57913, "fetched_at": "2026-08-21T17:37:37Z"}, {"lat": 74.58613, "lng": -18.28283, "fetched_at": "2026-08-21T18:50:02Z"}, {"lat": 74.63085, "lng": -18.15933, "fetched_at": "2026-08-21T19:31:59Z"}, {"lat": 74.72478, "lng": -18.14706, "fetched_at": "2026-08-21T20:34:10Z"}, {"lat": 74.77904, "lng": -18.39444, "fetched_at": "2026-08-21T21:32:51Z"}, {"lat": 74.84076, "lng": -18.69919, "fetched_at": "2026-08-21T22:33:57Z"}, {"lat": 74.89102, "lng": -18.96389, "fetched_at": "2026-08-21T23:32:14Z"}, {"lat": 75.01756, "lng": -19.58466, "fetched_at": "2026-08-22T01:44:14Z"}, {"lat": 75.09654833333333, "lng": -19.95103, "fetched_at": "2026-08-22T03:05:34Z"}, {"lat": 75.14156, "lng": -20.1639, "fetched_at": "2026-08-22T03:51:25Z"}, {"lat": 75.19022, "lng": -20.38138, "fetched_at": "2026-08-22T04:42:10Z"}, {"lat": 75.25473, "lng": -20.687258333333332, "fetched_at": "2026-08-22T05:35:33Z"}, {"lat": 75.25473, "lng": -20.687258333333332, "fetched_at": "2026-08-22T06:53:56Z"}, {"lat": 75.25473, "lng": -20.687258333333332, "fetched_at": "2026-08-22T07:38:38Z"}, {"lat": 75.25473, "lng": -20.687258333333332, "fetched_at": "2026-08-22T08:40:28Z"}, {"lat": 75.25473, "lng": -20.687258333333332, "fetched_at": "2026-08-22T09:36:11Z"}, {"lat": 75.25473, "lng": -20.687258333333332, "fetched_at": "2026-08-22T10:33:15Z"}, {"lat": 75.25473, "lng": -20.687258333333332, "fetched_at": "2026-08-22T11:29:14Z"}, {"lat": 75.36991833333333, "lng": -21.3272, "fetched_at": "2026-08-22T12:54:49Z"}, {"lat": 75.37317, "lng": -21.31605, "fetched_at": "2026-08-22T13:38:32Z"}, {"lat": 75.37317, "lng": -21.31605, "fetched_at": "2026-08-22T14:33:52Z"}, {"lat": 75.61395, "lng": -21.95042, "fetched_at": "2026-08-22T15:29:44Z"}, {"lat": 75.6403, "lng": -22.09733, "fetched_at": "2026-08-22T16:34:41Z"}, {"lat": 75.6403, "lng": -22.09733, "fetched_at": "2026-08-22T17:29:23Z"}, {"lat": 75.63861, "lng": -22.088628333333332, "fetched_at": "2026-08-22T18:42:31Z"}, {"lat": 75.63861, "lng": -22.088628333333332, "fetched_at": "2026-08-22T19:29:30Z"}, {"lat": 75.34166, "lng": -21.02399, "fetched_at": "2026-08-22T20:33:27Z"}, {"lat": 75.22059, "lng": -20.49624, "fetched_at": "2026-08-22T21:29:54Z"}, {"lat": 75.09378, "lng": -19.62646, "fetched_at": "2026-08-22T22:31:51Z"}, {"lat": 75.21062, "lng": -19.218978333333332, "fetched_at": "2026-08-22T23:28:55Z"}, {"lat": 75.55635, "lng": -18.85395, "fetched_at": "2026-08-23T01:54:22Z"}, {"lat": 75.9177, "lng": -18.33932, "fetched_at": "2026-08-23T03:11:21Z"}, {"lat": 76.11417, "lng": -17.87302, "fetched_at": "2026-08-23T04:47:05Z"}, {"lat": 76.11417, "lng": -17.87302, "fetched_at": "2026-08-23T05:37:56Z"}, {"lat": 76.34291, "lng": -18.34853, "fetched_at": "2026-08-23T06:55:05Z"}, {"lat": 76.34291, "lng": -18.34853, "fetched_at": "2026-08-23T07:40:39Z"}, {"lat": 76.34291, "lng": -18.34853, "fetched_at": "2026-08-23T08:41:24Z"}, {"lat": 76.52867, "lng": -18.6153, "fetched_at": "2026-08-23T09:36:30Z"}, {"lat": 76.54031, "lng": -18.69053, "fetched_at": "2026-08-23T10:33:27Z"}, {"lat": 76.54031, "lng": -18.69053, "fetched_at": "2026-08-23T11:32:05Z"}, {"lat": 76.54031, "lng": -18.69053, "fetched_at": "2026-08-23T12:56:26Z"}, {"lat": 76.55761, "lng": -18.62184, "fetched_at": "2026-08-23T13:39:07Z"}, {"lat": 76.55761, "lng": -18.62184, "fetched_at": "2026-08-23T14:32:23Z"}, {"lat": 76.58857833333333, "lng": -17.11723, "fetched_at": "2026-08-23T15:31:05Z"}, {"lat": 76.61682, "lng": -15.77847, "fetched_at": "2026-08-23T16:36:09Z"}, {"lat": 76.61682, "lng": -15.77847, "fetched_at": "2026-08-23T17:28:27Z"}, {"lat": 76.65331833333333, "lng": -14.29462, "fetched_at": "2026-08-23T18:41:33Z"}, {"lat": 76.65331833333333, "lng": -14.29462, "fetched_at": "2026-08-23T19:28:41Z"}, {"lat": 76.4822, "lng": -13.12876, "fetched_at": "2026-08-23T20:33:39Z"}, {"lat": 76.34412, "lng": -12.38958, "fetched_at": "2026-08-23T21:29:41Z"}, {"lat": 76.26768, "lng": -11.97866, "fetched_at": "2026-08-23T22:32:06Z"}, {"lat": 76.05035, "lng": -10.96841, "fetched_at": "2026-08-23T23:29:26Z"}, {"lat": 75.64138, "lng": -9.9681, "fetched_at": "2026-08-24T01:51:52Z"}, {"lat": 75.64138, "lng": -9.9681, "fetched_at": "2026-08-24T03:12:13Z"}, {"lat": 75.4585, "lng": -10.41641, "fetched_at": "2026-08-24T04:55:08Z"}, {"lat": 75.4585, "lng": -10.41641, "fetched_at": "2026-08-24T05:47:36Z"}, {"lat": 75.4585, "lng": -10.41641, "fetched_at": "2026-08-24T07:13:55Z"}, {"lat": 75.69205, "lng": -8.21578, "fetched_at": "2026-08-24T08:58:18Z"}, {"lat": 75.65968, "lng": -7.36451, "fetched_at": "2026-08-24T09:57:04Z"}, {"lat": 75.74417, "lng": -6.89902, "fetched_at": "2026-08-24T10:47:07Z"}, {"lat": 75.87414, "lng": -6.47145, "fetched_at": "2026-08-24T11:37:14Z"}, {"lat": 76.01752833333333, "lng": -5.46791, "fetched_at": "2026-08-24T13:06:30Z"}, {"lat": 76.31999833333333, "lng": -4.08467, "fetched_at": "2026-08-24T14:52:38Z"}, {"lat": 76.3646, "lng": -3.91518, "fetched_at": "2026-08-24T15:49:25Z"}, {"lat": 76.51978, "lng": -2.80737, "fetched_at": "2026-08-24T16:49:20Z"}, {"lat": 76.65817, "lng": -2.40994, "fetched_at": "2026-08-24T17:38:25Z"}, {"lat": 76.79295, "lng": -2.13706, "fetched_at": "2026-08-24T18:52:48Z"}, {"lat": 76.94311833333333, "lng": -1.80241, "fetched_at": "2026-08-24T19:36:51Z"}, {"lat": 76.95138, "lng": -1.78526, "fetched_at": "2026-08-24T20:40:34Z"}, {"lat": 77.2353, "lng": -1.2261883333333334, "fetched_at": "2026-08-24T21:37:40Z"}, {"lat": 77.5391, "lng": -0.61594, "fetched_at": "2026-08-24T22:36:36Z"}, {"lat": 77.62949833333333, "lng": -0.42695, "fetched_at": "2026-08-24T23:29:36Z"}, {"lat": 77.71218, "lng": -0.25779, "fetched_at": "2026-08-25T01:45:56Z"}, {"lat": 77.71218, "lng": -0.25779, "fetched_at": "2026-08-25T03:07:22Z"}, {"lat": 78.38307, "lng": 1.18471, "fetched_at": "2026-08-25T04:48:10Z"}, {"lat": 78.69572, "lng": 1.85796, "fetched_at": "2026-08-25T05:39:38Z"}, {"lat": 78.78648, "lng": 2.10894, "fetched_at": "2026-08-25T07:01:48Z"}, {"lat": 78.78648, "lng": 2.10894, "fetched_at": "2026-08-25T07:52:46Z"}, {"lat": 79.24479, "lng": 3.58865, "fetched_at": "2026-08-25T08:53:18Z"}, {"lat": 79.36427, "lng": 3.4138, "fetched_at": "2026-08-25T09:45:35Z"}, {"lat": 79.41082, "lng": 3.25074, "fetched_at": "2026-08-25T10:42:07Z"}, {"lat": 79.42773, "lng": 3.01545, "fetched_at": "2026-08-25T11:36:22Z"}, {"lat": 79.44702, "lng": 2.72611, "fetched_at": "2026-08-25T13:04:09Z"}, {"lat": 79.46006, "lng": 2.55774, "fetched_at": "2026-08-25T13:59:24Z"}, {"lat": 79.47181, "lng": 2.53613, "fetched_at": "2026-08-25T14:55:24Z"}, {"lat": 79.42874833333333, "lng": 2.86722, "fetched_at": "2026-08-25T15:52:52Z"}, {"lat": 79.40632, "lng": 2.97514, "fetched_at": "2026-08-25T16:48:40Z"}, {"lat": 79.34888, "lng": 3.2655, "fetched_at": "2026-08-25T17:39:04Z"}, {"lat": 79.33995, "lng": 4.20712, "fetched_at": "2026-08-25T18:51:07Z"}, {"lat": 79.32908, "lng": 5.17039, "fetched_at": "2026-08-25T20:38:46Z"}, {"lat": 79.35293, "lng": 5.69674, "fetched_at": "2026-08-25T21:36:37Z"}, {"lat": 79.3941, "lng": 6.3651, "fetched_at": "2026-08-25T22:37:00Z"}, {"lat": 79.4334, "lng": 7.01056, "fetched_at": "2026-08-25T23:32:31Z"}, {"lat": 79.52573, "lng": 8.55638, "fetched_at": "2026-08-26T01:51:32Z"}, {"lat": 79.55327, "lng": 9.3626, "fetched_at": "2026-08-26T03:13:55Z"}, {"lat": 79.59001, "lng": 10.46687, "fetched_at": "2026-08-26T04:49:55Z"}, {"lat": 79.56914833333333, "lng": 11.02698, "fetched_at": "2026-08-26T05:42:30Z"}, {"lat": 79.55849, "lng": 11.06129, "fetched_at": "2026-08-26T07:02:18Z"}, {"lat": 79.55875, "lng": 11.06117, "fetched_at": "2026-08-26T07:57:39Z"}, {"lat": 79.55884, "lng": 11.06108, "fetched_at": "2026-08-26T08:55:12Z"}, {"lat": 79.55904, "lng": 11.06064, "fetched_at": "2026-08-26T09:51:55Z"}, {"lat": 79.57283, "lng": 10.87311, "fetched_at": "2026-08-26T10:45:07Z"}, {"lat": 79.62906, "lng": 10.88995, "fetched_at": "2026-08-26T11:37:44Z"}, {"lat": 79.71973, "lng": 11.15102, "fetched_at": "2026-08-26T13:09:08Z"}, {"lat": 79.71901, "lng": 11.15053, "fetched_at": "2026-08-26T14:54:04Z"}, {"lat": 79.74516, "lng": 11.06534, "fetched_at": "2026-08-26T16:24:31Z"}, {"lat": 79.90245, "lng": 11.48021, "fetched_at": "2026-08-26T19:13:38Z"}, {"lat": 79.58381, "lng": 9.48318, "fetched_at": "2026-08-26T23:20:55Z"}, {"lat": 79.27146, "lng": 11.562848333333333, "fetched_at": "2026-08-27T09:27:38Z"}, {"lat": 78.49067, "lng": 9.87808, "fetched_at": "2026-08-27T20:18:52Z"}, {"lat": 78.21451, "lng": 14.48457, "fetched_at": "2026-08-28T01:55:29Z"}]},
+    other:     [{"key": "ebola-drc-2026", "name": "Ebola", "region": "DR Congo \u00b7 Ituri province", "started": "2026-05-15", "started_human": "May 15, 2026", "blurb": "17th Congo outbreak (Bundibugyo virus). DRC + 1 imported case in Uganda.", "color": "#c084fc", "cases": 246, "deaths": 80, "as_of": "2026-05-15", "source": "WHO DON602", "source_url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON602", "status": "live", "locations": [{"name": "Mongwalu (Ituri)", "lat": 1.95, "lng": 30.06}, {"name": "Rwampara (Ituri)", "lat": 1.6, "lng": 30.2}], "news": [{"title": "Fastest-growing Ebola outbreak on record threatens to become worst in history", "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPcXRpTkZCc2ZJQ2VpbUpQRXpnanYzeVZEQk51V0lCMUJRLXlSMHJabmRfWEZRa0g2MXlWMk03dFp6SlRySUxteDMxbW9mTXZSZVZ4TmdYWng3S1F4NWRsNHFVb2xCcjR2RGZidmlvYTJ3X1BhcWkyMkhuMFdGQnUzUFlSSXMzazV1Ykczd3NMb0xmYzJ5UF8wTm5pSU1PcFNUU2pHNmlaYVdiQnluYnBiWVhn?oc=5", "source": "Google News \u00b7 The Washington Post", "published": "1 day ago"}, {"title": "WHO says Ebola outbreak in Uganda is over, as cases rise in Congo", "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxObDI2WC1VMnZ0RWIxcEVPMFRkZ3RkR19UbVREQTN1MmZkaTBuSzdTbFlyOFFkOF9naWpmeHhFbDVxaTBnbEdTZUV6Q09zcUQ4eGF4VEV5R3JyRlB3a3o1ckpIX3QwSVRLWVhreDZhZ2l0UUJMbUUyOW9TYk9PZXpoeU9JWEZCRXRTYmg3ZVRlX2t3MjNDaTNrZ1I2bS1QWTNYRzVaQWhMRjgtT0trTUdIU1J4ZU9zb196OFJhTi1EZy0ySFpQbngtWGR0U0UxUQ?oc=5", "source": "Google News \u00b7 Reuters", "published": "1 day ago"}, {"title": "World Health Organization says Ebola outbreak in Uganda is over", "url": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPQVdRVVJsQU96Wk5lUGxWcjQ3eWQ4V05JdUFUNXRWT3NSRVl6Sm5zcVZpYnlvUUtubUVmZTZkNEp0R0t3dlpYRTNoWmw2QmdsSTMzMHI5SUZKdHo1N1piZDUyU3JuVDNaV19DdUcyMnNycUJUZmlmeTNaeFFLZ3ZyUVRjQklzeWZxQ3FEZDhMSElGSnpGU2xaOHNMMmo5Z2xfQ0MwRldVNNIBrAFBVV95cUxQeEl3bkx5ZEpsbWdjdUptS1hBWVdTT0JMLUwxSzVKc1U4YUFGZEVOSklsU2Y5NXZtMU0xMDh6QnUyRTFVNDRET0RoTm93MWJlem5wUzBYM19aakxVUS1sTVd0UmpaVzMzZWdHT2R1MUJyMEJJR3VRbVA1LW5EMW1XZkpjdzBGcWdFWlA2WVF2NGYtODBlU3lCWUwyaGQxSXBzZTMwbmk5RmQ4RjQ5?oc=5", "source": "Google News \u00b7 Al Jazeera", "published": "1 day ago"}, {"title": "Parents and Teachers in Congo Urge Delay of School Resumption as Ebola Outbreak Rages On", "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxOMlRpWDBMdF9RZThsR2M2WV9XMU52QVJfbDBra0NCVmxtdW8taXY2OUpqc1JaXy1GSzdWTl9JejU3a0NTN2RjUFl0b1piYVk5eDExUFNWWWlhTG9Lb3RvZnhfQnV2VnNMV3ZmeXR0WEp0SVFSSzFTclNQSkJRQ2V4dDEzTE9abk51VFdiZE9hV0ZzSXd1UndlRjdfOWdxZXJHMkYzTWhWX3B2aDVFNkx0ZmZqTWdQeUhzR2JCRTVES1ZwdXRIcGZLWXFxS011VkJmTWk5UTJ4Q2VLcHUzUnhDWXZB?oc=5", "source": "Google News \u00b7 U.S. News & World Report", "published": "8h ago"}, {"title": "100 days of Ebola and the race to stop the spread", "url": "https://news.google.com/rss/articles/CBMiV0FVX3lxTE41WHl0aFBWc3hKMlNwUEY4WkdqM3VtcHdCTFJ3QkNiNldtWHROX0RDSUU4SHlmaUNmVU45X19JRG5Jc0syZEZmckQtbkhyRHl4bU9FUnRPUQ?oc=5", "source": "Google News \u00b7 UN News", "published": "3 days ago"}, {"title": "Parents and teachers in Congo urge delay of school resumption as Ebola outbreak rages on", "url": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1jbzdsd1dIQzRRd2kyRjFzQlctYzdIQmhjb3kya2JwSzhWSWc3Z1JNbHpXZC1JM3lqUjZrZDVSdzV5aU9YN1ktNjBBc2EyTTVGRXhROXFvaXhvWTlteHFibGEzYXRQajBHWkl4VQ?oc=5", "source": "Google News \u00b7 CBC", "published": "5h ago"}]}, {"key": "mpox-clade-ib-2024", "name": "Mpox \u00b7 clade Ib", "region": "Central & East Africa", "started": "2024-08-14", "started_human": "Aug 14, 2024", "blurb": "WHO PHEIC since Aug 2024. Clade Ib continues across Central/East Africa.", "color": "#f59e0b", "cases": null, "deaths": null, "as_of": null, "source": null, "source_url": null, "status": "no_counter", "locations": [{"name": "Goma (DRC)", "lat": -1.68, "lng": 29.22}, {"name": "Bujumbura (Burundi)", "lat": -3.38, "lng": 29.36}, {"name": "Kampala (Uganda)", "lat": 0.32, "lng": 32.58}, {"name": "Kigali (Rwanda)", "lat": -1.95, "lng": 30.06}], "news": [{"title": "Clinical Overview of Clade I and Clade II Monkeypox", "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTE1OT3MxdWVXTVlHdEU1MVZNT1NDSjNhWkRyeHEyTUgyazBIcnRzY0tkcDl0N3k3QVJhWTRoa1YxX3MzbVlvLXNIMUYySUxReUZNVW5faFhCRWtnWW5FaEt3SWJsbm1pa1hSN1Q5ZGFqOA?oc=5", "source": "Google News \u00b7 Centers for Disease Control and Prevention | CDC (.gov)", "published": "8 days ago"}, {"title": "Detection of Community Transmission of Clade Ib Mpox Virus in the United States", "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFAtWl9TTThEZjQ2b0lRSWZXcWM2ck9PcGltcjJXOFBsR0swZ01sYnpWSjQyd2JZX2hCREp1UWNocGlFcDdwSldrSzF5M2dxUUx4dDItRW1fVnQ3OWZuVlFCdmJGdnlObDFs?oc=5", "source": "Google News \u00b7 NEJM Evidence", "published": "Dec 17, 2025"}, {"title": "Dynamic shift in the dominant transmission route of clade Ib monkeypox virus across networks with sexual and nonsexual contacts", "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE5zYl9vQmhQRjFaZzNNX2h5dU85VHZxelh5Z0dlTXFmejFfNkVhWFhlV0tJYzR2aGFrUzRXdGFIOTJYMVA5dEdYZFdxMFlZVllnSk1mM0dzblMteFBSNkVZ?oc=5", "source": "Google News \u00b7 Science | AAAS", "published": "Apr 01, 2026"}, {"title": "Evidence of monkeypox virus clade IIb lineage A.2.2 in the Republic of the Congo and co-circulation of clade Ia, Ib and clade IIb", "url": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE1oYk5yQnJJeFNlcTU0TFN5Z2Zia25QRnVqNE0xZ0xhaU5wVnNBVHQ2emoyMkFxajRQb18wTTZfMW1tY1FPcWNhWGdIanB3dWxiOWoxcm91R18tOXNiaGow?oc=5", "source": "Google News \u00b7 nature.com", "published": "Apr 03, 2026"}, {"title": "Public Health Alerts: Public health response to clade Ib mpox with multiple exposures in congregate living settings\u2014New Hampshire, February 2025", "url": "https://news.google.com/rss/articles/CBMixAFBVV95cUxPQm5penJlb2k4N1pyM3RDZHd3bGJzal9Ocjg3M2hFT2czclpLQTd3bk9YYVFZZU4zMTJORnZGd2VXa3BNVlpBcjVLSmZqeTFvemJQVVRraGg3TkpSODBaMzlzRWYzc0JPbnUtZ2lhUVBycDNzV3FuQ0tPVlFLNzBnVW0yblc3bnRKdDRKeGhoeUxXcElZUVdVRno0c1hVVXdGQ0c5R3FXZ1ZNZmV3UGtJU3JVeEdsM3VXMlh5M3RwbDBHbmpR?oc=5", "source": "Google News \u00b7 CIDRAP", "published": "Jun 26, 2026"}, {"title": "A combined ELISA for infection-induced and vaccine-induced mpox antibodies during the clade Ib outbreak in Rwanda: an observational, cross-sectional, clinical validation study", "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxPQndzZEFOZVNpdDFfVERYVlppc1RmS2F1YVdyMk1SbU9jUW1KanNwSzQ2cDkxaVBjWHdQc2RpRW1JZEppM0lfYlRyMS1aVmhtbC1FUVNFNTMxWHNVcERMUEkzNmFQa2dxamZIY0NleGdoTklkWFp0ckNIVXVOSElHVmJqNmZLWnZ2UnFF?oc=5", "source": "Google News \u00b7 The Lancet", "published": "Mar 09, 2026"}]}, {"key": "h5n1-global-2024", "name": "H5N1 \u00b7 avian flu", "region": "US human cases (CDC)", "started": "2024-03-25", "started_human": "Mar 25, 2024", "blurb": "Ongoing global poultry panzootic; US dairy + farmworker cases.", "color": "#14b8a6", "cases": null, "deaths": null, "as_of": null, "source": null, "source_url": null, "status": "no_counter", "locations": [{"name": "California (US dairy)", "lat": 36.78, "lng": -119.42}, {"name": "Cambodia", "lat": 12.57, "lng": 104.99}, {"name": "Vietnam", "lat": 14.06, "lng": 108.28}, {"name": "UK (poultry)", "lat": 52.35, "lng": -1.17}], "news": [{"title": "USDA confirms new H5N1 avian flu cases in poultry, dairy cattle", "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxQcXYxY0FhOHMya2F5YVg2ZG5DaC1Oa1YyUGQyMGlLM05GVEhzeld3Y2h3V0VYZkRNbVhxUlY1QXpjRDNDblphSkc2elRxSE1KYzAyUzNGenZFckpXVHRUTFFHeGhpMDBOVVdJYzVnWjR0YUI5M0FSOTFqWi1NTFd4YjJLcWh3WHlwekZqQ3ZFMXBaMy1LSUVCV0hUcHdkd2J4eUozTkdQQVdOVmZuOHdhNg?oc=5", "source": "Google News \u00b7 CIDRAP", "published": "6h ago"}, {"title": "Australia confirms first H5N1 bird flu case in local mammal", "url": "https://news.google.com/rss/articles/CBMixwFBVV95cUxOZWh5WlZuNmNtbG9VdDBoc3pIdVUwa3NaWmZCU2dSLXVRdUhHSUZpVWlYR3lhc09MV2ZlZ3NZdWZoajNPUWxRdXBCeDdTSHUxb3RxYzZoSlhKMmpTb2dFSE9Sc0lNXzQybDRrXzdTVHgxdF8ycVZLdjllem55QkJKQnRxRDlqRllFN096VWk2QXpTUlB5MzVST1BJT1ZDRjlBaERjeXZ4UGh3NVBxVUlINWF2WnhzN0JKSTNlSnJfSmJrcllCWWZV?oc=5", "source": "Google News \u00b7 Reuters", "published": "4 days ago"}, {"title": "Bird flu is spreading. Your backyard feeder could make it worse", "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBRWjFJTllnZzVCVWhpenJBNjBQN19EM2Y0X1RnbEtYOVhoMGxkcG0yTmlNMjBiaG85YXdYZmx0b0tkV3JGRUF1bi01MTgycEp0WEJhOEN3dnBGMUVEMzVYUnppQWJ2NEJHSkdvNUhDWQ?oc=5", "source": "Google News \u00b7 Science Daily", "published": "3 days ago"}, {"title": "What does bird flu do to humans and does it have pandemic potential?", "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQVXN5ZWhtVDRiM2d0NjlOZkFHeEZKaThHRlFKa3l3R21pT19MQzJhc0J0MDBiZ2tqOWE2cnpIbm1NT0thTTdWNHdUYzd1VHFsOUNxNm9HemRVNWtsS0RwOFlWNERXVEUwak9OMlRxZjE1X0VWMm9nSl9jVld1U3pBZzVMV0NNbTlEa01DOEdlWXBHRHlWb3g0YlRhSXVfMmdvQ3JPdmVna0dlSTQ?oc=5", "source": "Google News \u00b7 ABC News & Headlines \u2013 Australian Broadcasting Corporation", "published": "3 days ago"}, {"title": "First bird flu death in an Australian mainland mammal is a grim milestone. We know how bad this can get", "url": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxOenQwUzVfR2xGbUcyYllnTThIX0c3REtoM3J4Z1owcy1iaUI5QVFET1c1QnlEY2hRWU9pVkF6QmtQbFVEczZIRE45dTBoWmpFNGp5VjZrWWZkOHhyU2Y1V0stcl90NDAtelNzVXlDZktJLVRzUGdQMkFxNTljMWVuNHJOd0VUYXZQWTZQbGtpYmpJWWxWUnpiT1N5RTI1Vkg5dkZheE1TeEIzMzNIZUNBQVNEbDZkQjJOUHZBeWx4ZFhEM0tjRWV5bnBDNmdpYm5ZY2hJ?oc=5", "source": "Google News \u00b7 The Conversation", "published": "4 days ago"}, {"title": "Australia confirms H5N1 bird flu case in fur seal", "url": "https://news.google.com/rss/articles/CBMieEFVX3lxTE5CenMxWjlEczFrbmE4QlhxSFdvZk50cDd3aFdzcnFRaGRuQWxEcmFaR0ppc3I2T3hKM1M2eUNwb2QzYXVJYnpvMDU1YUQwaWlxOTdZdWVDd1A1OUlRbmRTVUdrQ2NwWnBOVWxxOFdQYjZmMEZHM0FhMQ?oc=5", "source": "Google News \u00b7 Taipei Times", "published": "4 days ago"}]}],
+    hero:      {"key": "cyclospora-us-2026", "name": "Cyclosporiasis", "pathogen": "Cyclospora cayetanensis (parasite)", "region": "United States \u00b7 multistate", "started": "2026-05-01", "started_human": "May 1, 2026", "blurb": "Explosive multistate cyclosporiasis surge. Epidemiologic and traceback data link a cluster to iceberg lettuce from Taylor Farms de Mexico served at Taco Bell locations.", "color": "#84cc16", "confirmed": 1645, "pending": 5100, "hospitalized": 141, "deaths": 0, "states": 31, "vehicle": "Iceberg lettuce \u00b7 Taylor Farms de Mexico", "as_of": "2026-07-13", "data_age": {"days": 46, "human": "Jul 13, 2026 \u00b7 46 days ago", "status": "dormant"}, "source": "CDC", "source_url": "https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/investigation.html", "outbreak_url": "https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/index.html", "locations": [{"name": "Michigan", "lat": 43.33, "lng": -84.54}, {"name": "Ohio", "lat": 40.42, "lng": -82.91}, {"name": "Kentucky", "lat": 37.84, "lng": -84.27}, {"name": "West Virginia", "lat": 38.6, "lng": -80.45}, {"name": "Indiana", "lat": 39.85, "lng": -86.26}, {"name": "North Carolina", "lat": 35.63, "lng": -79.81}], "news": [{"title": "Cyclospora outbreak linked to recalled iceberg lettuce tied to 3 more states, FDA says", "url": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNNjdXdXVES0l1TnBNVlhySHVsaVhjdVkzRGJLZk42a2g4OFRNWmhBR0p3TlNIV2tIb0QwNHZObWptWUxRNFp0YmQ3cEY2R3NHR2tJY2hXM2p4T2dGeVlrN1FCUVRiWC1POGJBZU5SdEgzZWE4OTNpQWw2VWhmaGkzMjVOM0N5c3E2cy1UZDdTYw?oc=5", "source": "Google News \u00b7 CBS News", "published": "2h ago"}, {"title": "State investigates first potential local Cyclospora infection on Oahu", "url": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQazZ4bGcxdjRxdW9BRmlUU3dRd3BNV0xUVjZ2MVZvWHd1WUI5VzdSdndUaVgwdm1tOXpSY09pSWJOZlY1dFlTNHpzb09kODZta1N2aThYclZYb0M3Mlc1cWZYWDBYRzFzOGNXeE1fMHZvT1VUT2Z3OFA2Zlh2SlZ3NkJ3N2hoWHc2NUFnelpKX21sNnpZWHpabkZYYi01SU1SU0NvZ1BVdkEyTFFH0gHAAUFVX3lxTE53blBjRTBBSDhDSXR2cGhHVlVJMFZqNlFKNmRsUUdndnByejdFaTMwRUV6c3J0SzBCaG0yeHVUdF9LNklpamJqYU5TVkNkNFZTRm04ZXJ5ZjR2a0ZRQVBfNGRzYi1mTVVOZUFBLUt3Ml9oY0lGb2JidDNHT1RHSGFIeENkYy1JV1o4UjYwUGN6NlAxeTVEQjdZVXFMZi1meGI4ZUdzVTM5TDVtSmJnUGxTeTIwV25ESlU0Yk1iZUM4Mg?oc=5", "source": "Google News \u00b7 Hawaii News Now", "published": "1 day ago"}, {"title": "Texas cyclospora cases jump past 500, with 71 total hospitalizations", "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxPN2w5VWNVMFNfV2Vxd3o2cmk5VllCWEh1c25NNkNITUhFLWZzV25lTDIzQ3ZaNXUtd3NRc1V6eEJFTFh1UzUtYjJ3SWtrb2pFVFdSdjVONU5HU0otUTFqXzRqMDFRZmsyQXBWNkpBZHdzTDhLbmpGaTBxR3dXX2ZQMjh6Y1htNG5ONFVZM1IzRUt4VWtW?oc=5", "source": "Google News \u00b7 Dallas News", "published": "1 day ago"}, {"title": "940 cases of cyclosporiasis now confirmed in North Carolina: What to know", "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxQa0VtRDZHOHNMM01IVW1pTlVweUhkYS02YWNtY0FnekNVMGxQelRqMWZmT09qLVFiR01zQUJRN1ZaMzF4cjZiaWNPMEdmTnhRS3ptZTRaaXBPc05JZGE1cDFVWnp6T0VoLVhHbFFiM2NnTm1KXzl1MVpfU1NwODNrUUtPRjV2RWM3b1FTWlBnajl4Q0JqSWJ3?oc=5", "source": "Google News \u00b7 WBTV", "published": "1 day ago"}, {"title": "Ohio sees largest decrease in new cases of illness caused by cyclospora", "url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxNd2VDczlvd1pJV3lHWG9UVEx2RndqaWZNVi1rb3pLQlMtb3FkQXU4cml6ZlhZRE11UFFvaC05LXRhOVBCb0tvVEF5UUVyQlFoTHJBMVktN2tvMlZ1Q29YTUowUklEQkdPQkNSZ0lKY0F5WlliOG9KZkFaRE1maFI1ZjRUMzV1YnE4SVRGX012WUFvX1FUMUc0MThXa0hua25PWXF3SWJhdktGUUx5RkpHMkdqdzkyX2szbWZPczVoeXVHdEJ4dWw0WEUzc1lobGdfQ1RqbkpYN2lRdFF6ZlY2RTVxdw?oc=5", "source": "Google News \u00b7 The Columbus Dispatch", "published": "7h ago"}, {"title": "New Hawai\u02bbi case points to local cyclosporiasis infection", "url": "https://news.google.com/rss/articles/CBMijAFBVV95cUxNNld4QzZGc0dLQ2hiRGw1YndlYWlyZkJxVzJDQ2xjbTFmSkhPbkVxY1czcnVtYWsxcGl2dDJEdWh5aUJlUlJUWkV0ZkZ6bHJxcmdQS001SklOVDZVRHFYOWlxODRFNnlSTFlaVHdTSkFTX3h5QzdyaWNyekFoRHBDQnhoT0VVMUNMOVZoM9IBkgFBVV95cUxOS0pWeWdaU2N2M1pRajlpc2xwTHBLNUU4MXlHNGlkQk5CcGpzUUJNU3RJdzd6cldMSVFkUEZrblJDbXNnWklSSktoU2h0SXVla2NBR2Juc1Bha0F4TlZhZUZWYUgxc1pNQ1hhTHZwX1Q1M2dEMjNaMlBoQk5KcjB2Vk5FWFNWblR5Vk1Gb0hFWHozdw?oc=5", "source": "Google News \u00b7 KHON2", "published": "1 day ago"}, {"title": "Cyclospora Cases Are Starting to Trend Down: See States Still Impacted, Foods to Avoid and More", "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxPVDlYSjVYUWZ6N015T0RjTWRYYkhHOGxTM3N4Y2hheVM4bjV3V3lFY01ZODBrSGxrUVNUNjVhNHBYZmFMSTJpS1QwU3hDdFEybHZUekt5b2JHQmtwUnB3VlNQbXBabHlFS2dKOG5qaE9DZmJuQmU4aWlxbjFDNGYyTmozbnNKYTUtYUl2eWNZS3dKUVVUdTlHM3E3cGlkT19hYTljWlVMTFZUZw?oc=5", "source": "Google News \u00b7 TODAY.com", "published": "8 days ago"}, {"title": "Cyclospora Case Data | Cyclosporiasis", "url": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE50eUpPeURQbVFaUVdiWk42RHhxLTRNZ1RwYkFZaUgwU0pGN3Vsek5IelJJd0tlbnIzYlZINDFjV0JZTzZ2R1FXN2RQaURwRE5aeFI3MmF6M3g4M1lrTFlTbg?oc=5", "source": "Google News \u00b7 Centers for Disease Control and Prevention | CDC (.gov)", "published": "2 days ago"}]}
   };
 </script>
 <script>
@@ -1390,6 +1474,42 @@
         </div>
       `, { maxWidth: 320 })
       .addTo(map);
+  }
+
+  // ----- Hero outbreak map markers (cyclosporiasis US states) -----
+  const hero = window.HANTA.hero;
+  if (hero && Array.isArray(hero.locations)) {
+    const hColor = hero.color || '#84cc16';
+    const heroNews = (hero.news || []).slice(0, 3).map(i => `
+      <li>
+        <div class="src" style="color:${hColor}">${escape(i.source)}${i.published ? ' · ' + escape(i.published) : ''}</div>
+        <a href="${escape(i.url)}" target="_blank" rel="noopener">${escape(i.title)}</a>
+      </li>`).join('');
+    const heroAge = hero.data_age && hero.data_age.human ? hero.data_age.human : '';
+    hero.locations.forEach(loc => {
+      const icon = L.divIcon({
+        className: '',
+        html: `<div class="pulse-marker large" style="--pc: ${hColor}">
+                 <div class="ring"></div><div class="core"></div>
+               </div>`,
+        iconSize: [14, 14],
+        iconAnchor: [7, 7],
+      });
+      L.marker([loc.lat, loc.lng], { icon, title: `${hero.name} · ${loc.name}` })
+        .bindPopup(`
+          <div class="popup-title" style="color:${hColor}">${escape(hero.name)} — ${escape(loc.name)}</div>
+          <div class="popup-meta">${escape(hero.region)}${heroAge ? ' · ' + escape(heroAge) : ''}</div>
+          <div style="display:flex; gap:14px; align-items:baseline; margin:4px 0 8px;">
+            <div><span style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:${hColor}">${(hero.confirmed || 0).toLocaleString()}</span>
+              <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em"> confirmed (US)</span></div>
+            <div><span style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent-2)">${(hero.hospitalized || 0).toLocaleString()}</span>
+              <span style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em"> hospitalized</span></div>
+          </div>
+          <div style="font-size:12px; color: var(--muted); margin-bottom: 6px;">${escape(hero.blurb || '')}</div>
+          ${heroNews ? `<ul class="popup-list">${heroNews}</ul>` : ''}
+        `, { maxWidth: 320 })
+        .addTo(map);
+    });
   }
 
   // ----- Other-outbreak map markers (colored pulses per disease) -----

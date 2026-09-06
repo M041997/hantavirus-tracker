@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>Outbreak Monitor — alerts</title>
+<link>https://hantavirusonline.org/</link>
+<atom:link href="https://hantavirusonline.org/feed.xml" rel="self" type="application/rss+xml"/>
+<description>New outbreaks, new reporting clusters, and material changes in case and death counts — one entry per event, not a news firehose.</description>
+<language>en-us</language>
+<lastBuildDate>Fri, 28 Aug 2026 01:55:30 +0000</lastBuildDate>
+<ttl>60</ttl>
+</channel>
+</rss>

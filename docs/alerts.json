@@ -1,0 +1,35 @@
+{
+  "alerts": [],
+  "state": {
+    "hero:cyclospora-us-2026": {
+      "name": "Cyclosporiasis",
+      "region": "United States \u00b7 multistate",
+      "cases": 1645,
+      "deaths": 0,
+      "url": "https://www.cdc.gov/cyclosporiasis/outbreaks/07-26/index.html"
+    },
+    "outbreak:ebola-drc-2026": {
+      "name": "Ebola",
+      "region": "DR Congo \u00b7 Ituri province",
+      "cases": 246,
+      "deaths": 80,
+      "url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON602"
+    },
+    "outbreak:mpox-clade-ib-2024": {
+      "name": "Mpox \u00b7 clade Ib",
+      "region": "Central & East Africa",
+      "cases": null,
+      "deaths": null,
+      "url": "https://hantavirusonline.org"
+    },
+    "outbreak:h5n1-global-2024": {
+      "name": "H5N1 \u00b7 avian flu",
+      "region": "US human cases (CDC)",
+      "cases": null,
+      "deaths": null,
+      "url": "https://hantavirusonline.org"
+    },
+    "_countries": []
+  },
+  "generated_at": "2026-08-28T01:55:30Z"
+}

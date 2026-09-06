@@ -17,11 +17,12 @@ import datetime as dt
 import hashlib
 import html as ihtml
 import json
+import os
 import pathlib
 import re
 import sys
 import time
-from email.utils import parsedate_to_datetime
+from email.utils import format_datetime, parsedate_to_datetime
 from urllib.parse import quote_plus
 
 import feedparser
@@ -35,6 +36,24 @@ from urllib3.util.retry import Retry
 ROOT = pathlib.Path(__file__).resolve().parent
 TEMPLATES = ROOT / "templates"
 OUT = ROOT / "docs"
+
+# ----- Site config -----
+# Site URL for canonical/OG/sitemap/feed. Override via SITE_URL env var when
+# DNS moves to a custom domain. Defined up here because the alert ledger reads
+# its own previously deployed state back off this origin.
+SITE_URL = os.environ.get(
+    "SITE_URL", "https://m041997.github.io/hantavirus-tracker"
+).rstrip("/")
+# GoatCounter analytics code; set GOATCOUNTER_CODE env var after signing up
+# at goatcounter.com to enable the snippet.
+ANALYTICS_CODE = os.environ.get("GOATCOUNTER_CODE", "").strip()
+# Newsletter form action (e.g. https://buttondown.com/api/emails/embed-subscribe/<user>).
+# The subscribe form renders only when this is set, so the UI never shows a
+# form that posts nowhere.
+NEWSLETTER_URL = os.environ.get("NEWSLETTER_URL", "").strip()
+# Bluesky handle whose profile the "follow" link points at. Posting itself is
+# gated separately on BLUESKY_APP_PASSWORD (see post_alerts_to_bluesky).
+BLUESKY_HANDLE = os.environ.get("BLUESKY_HANDLE", "").strip().lstrip("@")
 
 UA = (
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -1263,16 +1282,389 @@ def build_spread_arcs(country_index: list[dict]) -> list[dict]:
     return arcs
 
 
-# ----- Site config -----
-# Site URL for canonical/OG/sitemap. Override via SITE_URL env var when DNS
-# moves to a custom domain (e.g. https://hantavirus.live).
-import os
-SITE_URL = os.environ.get(
-    "SITE_URL", "https://m041997.github.io/hantavirus-tracker"
-).rstrip("/")
-# GoatCounter analytics code; set GOATCOUNTER_CODE env var after signing up
-# at goatcounter.com to enable the snippet.
-ANALYTICS_CODE = os.environ.get("GOATCOUNTER_CODE", "").strip()
+# ----- Push layer: alert ledger -----
+# The site is a push product first: the thing worth subscribing to is "something
+# changed", not "here is a page of news". Every build flattens the current
+# outbreak picture into a comparable snapshot, diffs it against the previously
+# deployed snapshot, and appends any material change to an append-only ledger.
+# The ledger backs both outputs — feed.xml for RSS/email, and the Bluesky bot —
+# so an alert fires exactly once no matter how many surfaces render it.
+#
+# Persistence follows the Hondius-track trick: CI never commits generated files
+# back, so the deployed site *is* the database. Each run pulls its own last
+# alerts.json over HTTP.
+ALERTS_FILENAME = "alerts.json"
+
+# Noise control. Builds run hourly, so a bare "number changed" test would emit
+# alerts all day. A case count must move by both an absolute and a relative
+# margin to qualify; deaths are material at any increase.
+ALERT_MIN_CASE_DELTA = 10
+ALERT_MIN_CASE_PCT = 0.05
+# Escape hatch for large outbreaks: at 5,000 cases the percentage gate would
+# demand +250 before saying anything, which silences real weekly agency
+# updates. A jump this size is material regardless of the base.
+ALERT_ALWAYS_CASE_DELTA = 50
+ALERT_MAX_LEDGER = 200       # entries retained in alerts.json
+ALERT_FEED_LIMIT = 50        # entries rendered into feed.xml
+
+# Bluesky guardrails. The ledger's posted flag only persists if the build
+# deploys, so a failed deploy after a successful post could double-post; the
+# per-run cap bounds that blast radius, and the age window stops a lost ledger
+# from replaying weeks of history into the timeline.
+BLUESKY_MAX_POSTS_PER_RUN = 3
+BLUESKY_MAX_ALERT_AGE_HOURS = 6
+BLUESKY_PDS = "https://bsky.social"
+
+
+def load_ledger(local_path: pathlib.Path) -> dict:
+    """Load the previously deployed alert ledger.
+
+    Prefers the live site (freshest — CI doesn't commit generated files back),
+    falls back to the local file for offline dev. A ledger with no `state` key
+    means "never run before"; update_ledger treats that as a bootstrap and
+    seeds state without emitting a backlog of alerts.
+    """
+    try:
+        r = http_get(f"{SITE_URL}/{ALERTS_FILENAME}")
+        if r.ok:
+            data = r.json()
+            if isinstance(data, dict) and isinstance(data.get("alerts"), list):
+                return data
+    except (requests.RequestException, json.JSONDecodeError, ValueError):
+        pass
+    if local_path.exists():
+        try:
+            data = json.loads(local_path.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and isinstance(data.get("alerts"), list):
+                return data
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {"alerts": []}
+
+
+def snapshot_state(hero: dict, other_outbreaks: list[dict],
+                   outbreaks: list[dict]) -> dict:
+    """Flatten this build into the comparable snapshot the ledger diffs against.
+
+    Keys are stable across builds so a value can be compared to its own past.
+    Counter fields are None when no live figure exists this run — the diff
+    treats None as "no observation", never as zero.
+    """
+    state: dict = {}
+    if hero and hero.get("key"):
+        state[f"hero:{hero['key']}"] = {
+            "name": hero.get("name", ""),
+            "region": hero.get("region", ""),
+            "cases": hero.get("confirmed"),
+            "deaths": hero.get("deaths"),
+            "url": hero.get("outbreak_url") or hero.get("source_url") or SITE_URL,
+        }
+    for o in other_outbreaks:
+        state[f"outbreak:{o['key']}"] = {
+            "name": o.get("name", ""),
+            "region": o.get("region", ""),
+            # Only a live scrape counts as an observation; a missing counter
+            # must not read as a drop to zero on the next build.
+            "cases": o.get("cases") if o.get("status") == "live" else None,
+            "deaths": o.get("deaths") if o.get("status") == "live" else None,
+            "url": o.get("source_url") or SITE_URL,
+        }
+    state["_countries"] = sorted({o["country"] for o in outbreaks})
+    return state
+
+
+def _alert(kind: str, key: str, title: str, summary: str, url: str,
+           created_at: str, fingerprint: str) -> dict:
+    """Build one ledger entry. `fingerprint` distinguishes repeat events on the
+    same key (a count that returns to a previous value must not reuse a guid an
+    RSS reader has already shown)."""
+    ident = hashlib.sha1(
+        f"{kind}|{key}|{fingerprint}|{created_at}".encode()
+    ).hexdigest()[:16]
+    return {
+        "id": ident,
+        "kind": kind,
+        "key": key,
+        "title": title,
+        "summary": summary,
+        "url": url,
+        "created_at": created_at,
+        "posted_bluesky": False,
+    }
+
+
+def _count_change_alert(key: str, prev: dict, cur: dict,
+                        created_at: str) -> dict | None:
+    """Emit an alert when a tracked outbreak's counters move materially.
+
+    Cases must clear ALERT_MIN_CASE_DELTA and then either ALERT_MIN_CASE_PCT
+    or the absolute ALERT_ALWAYS_CASE_DELTA; any increase in deaths qualifies on
+    its own. Decreases are ignored — agencies revise counts downward during
+    reconciliation and that isn't news.
+    """
+    name = cur.get("name") or key
+    region = cur.get("region") or ""
+    p_cases, c_cases = prev.get("cases"), cur.get("cases")
+    p_deaths, c_deaths = prev.get("deaths"), cur.get("deaths")
+
+    parts, notable = [], False
+    if isinstance(p_cases, int) and isinstance(c_cases, int) and c_cases > p_cases:
+        delta = c_cases - p_cases
+        if delta >= ALERT_MIN_CASE_DELTA and (
+            delta >= p_cases * ALERT_MIN_CASE_PCT
+            or delta >= ALERT_ALWAYS_CASE_DELTA
+        ):
+            notable = True
+        parts.append(f"cases {p_cases:,} → {c_cases:,} (+{delta:,})")
+    if isinstance(p_deaths, int) and isinstance(c_deaths, int) and c_deaths > p_deaths:
+        notable = True
+        parts.append(f"deaths {p_deaths:,} → {c_deaths:,} (+{c_deaths - p_deaths:,})")
+
+    if not (notable and parts):
+        return None
+    where = f" · {region}" if region else ""
+    return _alert(
+        kind="count_change",
+        key=key,
+        title=f"{name}{where}: {parts[0]}",
+        summary=f"{name}{where} — " + "; ".join(parts) + ".",
+        url=cur.get("url") or SITE_URL,
+        created_at=created_at,
+        fingerprint=f"{c_cases}|{c_deaths}",
+    )
+
+
+def diff_alerts(prev_state: dict, cur_state: dict, created_at: str) -> list[dict]:
+    """Compare two snapshots and return the alerts the change warrants."""
+    out: list[dict] = []
+    prev_countries = set(prev_state.get("_countries") or [])
+
+    for key, cur in cur_state.items():
+        if key == "_countries":
+            continue
+        prev = prev_state.get(key)
+        if prev is None:
+            name = cur.get("name") or key
+            region = cur.get("region") or ""
+            where = f" · {region}" if region else ""
+            out.append(_alert(
+                kind="new_outbreak",
+                key=key,
+                title=f"Now tracking: {name}{where}",
+                summary=f"{name}{where} has been added to Outbreak Monitor.",
+                url=cur.get("url") or SITE_URL,
+                created_at=created_at,
+                fingerprint="added",
+            ))
+            continue
+        changed = _count_change_alert(key, prev, cur, created_at)
+        if changed:
+            out.append(changed)
+
+    for country in cur_state.get("_countries") or []:
+        if country in prev_countries:
+            continue
+        out.append(_alert(
+            kind="new_cluster",
+            key=f"country:{country}",
+            title=f"New reporting cluster: {country}",
+            summary=(f"Multiple independent reports are now clustering in "
+                     f"{country}."),
+            url=f"{SITE_URL}/",
+            created_at=created_at,
+            fingerprint="cluster",
+        ))
+    return out
+
+
+def update_ledger(ledger: dict, hero: dict, other_outbreaks: list[dict],
+                  outbreaks: list[dict], created_at: str) -> tuple[dict, list[dict]]:
+    """Diff the current build against the ledger and append any new alerts.
+
+    Returns (ledger, newly_added). On the very first run there is nothing to
+    diff against, so state is seeded silently — otherwise every outbreak the
+    site already tracks would fire as "new" at once.
+    """
+    cur_state = snapshot_state(hero, other_outbreaks, outbreaks)
+    prev_state = ledger.get("state")
+    if prev_state is None:
+        print("[alerts] no prior state — seeding ledger without alerts",
+              file=sys.stderr)
+        new_alerts: list[dict] = []
+    else:
+        new_alerts = diff_alerts(prev_state, cur_state, created_at)
+
+    ledger["state"] = cur_state
+    ledger["generated_at"] = created_at
+    # Newest first; the ledger is the feed's backing store.
+    ledger["alerts"] = (new_alerts + ledger.get("alerts", []))[:ALERT_MAX_LEDGER]
+    return ledger, new_alerts
+
+
+# ----- Push layer: RSS feed -----
+def _rfc822(value: str | None) -> str:
+    d = _parse_iso(value or "") or dt.datetime.now(dt.timezone.utc)
+    if d.tzinfo is None:
+        d = d.replace(tzinfo=dt.timezone.utc)
+    return format_datetime(d)
+
+
+def alert_age_human(created_at: str | None) -> str:
+    """Render an alert timestamp as 'just now' / '3h ago' / 'Aug 12'."""
+    d = _parse_iso(created_at or "")
+    if d is None:
+        return ""
+    delta = dt.datetime.now(dt.timezone.utc) - d
+    minutes = int(delta.total_seconds() // 60)
+    if minutes < 5:
+        return "just now"
+    if minutes < 60:
+        return f"{minutes}m ago"
+    if delta.days < 1:
+        return f"{minutes // 60}h ago"
+    if delta.days == 1:
+        return "1 day ago"
+    if delta.days < 30:
+        return f"{delta.days} days ago"
+    return d.strftime("%b %-d")
+
+
+def render_feed(alerts: list[dict], build_time_iso: str) -> str:
+    """Render the alert ledger as RSS 2.0.
+
+    guids are the ledger ids and non-permalinks, so a reader (or an RSS-to-email
+    bridge) shows each alert exactly once even though the file is rewritten
+    hourly.
+    """
+    esc = lambda s: ihtml.escape(str(s or ""), quote=False)  # noqa: E731
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+        "<channel>",
+        "<title>Outbreak Monitor — alerts</title>",
+        f"<link>{esc(SITE_URL)}/</link>",
+        f'<atom:link href="{esc(SITE_URL)}/feed.xml" rel="self" '
+        'type="application/rss+xml"/>',
+        "<description>New outbreaks, new reporting clusters, and material "
+        "changes in case and death counts — one entry per event, not a news "
+        "firehose.</description>",
+        "<language>en-us</language>",
+        f"<lastBuildDate>{_rfc822(build_time_iso)}</lastBuildDate>",
+        "<ttl>60</ttl>",
+    ]
+    for a in alerts[:ALERT_FEED_LIMIT]:
+        lines += [
+            "<item>",
+            f"<title>{esc(a.get('title'))}</title>",
+            f"<link>{esc(a.get('url') or SITE_URL)}</link>",
+            f'<guid isPermaLink="false">{esc(a.get("id"))}</guid>',
+            f"<pubDate>{_rfc822(a.get('created_at'))}</pubDate>",
+            f"<category>{esc(a.get('kind'))}</category>",
+            f"<description>{esc(a.get('summary'))}</description>",
+            "</item>",
+        ]
+    lines += ["</channel>", "</rss>", ""]
+    return "\n".join(lines)
+
+
+def write_feed(path: pathlib.Path, alerts: list[dict],
+               build_time_iso: str) -> None:
+    path.write_text(render_feed(alerts, build_time_iso), encoding="utf-8")
+
+
+# ----- Push layer: Bluesky bot -----
+def _bsky_facets(text: str, url: str) -> list[dict]:
+    """Mark the URL inside `text` as a link facet. Bluesky indexes by UTF-8
+    byte offset, not character offset, so measure in bytes."""
+    if not url:
+        return []
+    blob, target = text.encode("utf-8"), url.encode("utf-8")
+    start = blob.find(target)
+    if start < 0:
+        return []
+    return [{
+        "index": {"byteStart": start, "byteEnd": start + len(target)},
+        "features": [{"$type": "app.bsky.richtext.facet#link", "uri": url}],
+    }]
+
+
+def format_bsky_post(alert: dict) -> tuple[str, list[dict]]:
+    """Compose the post body for one alert. Bluesky caps posts at 300
+    graphemes; the title is trimmed so the link always survives."""
+    url = alert.get("url") or SITE_URL
+    title = (alert.get("title") or "").strip()
+    if len(title) > 240:
+        title = title[:239].rstrip() + "…"
+    text = f"{title}\n\n{url}"
+    return text, _bsky_facets(text, url)
+
+
+def post_alerts_to_bluesky(alerts: list[dict]) -> int:
+    """Post unposted, recent alerts to Bluesky. Returns the number posted.
+
+    No-ops silently when credentials are absent, so local builds and forks work
+    unchanged. Mutates `posted_bluesky` on the alerts it posts — the caller must
+    write the ledger afterwards for that flag to persist.
+    """
+    password = os.environ.get("BLUESKY_APP_PASSWORD", "").strip()
+    if not (BLUESKY_HANDLE and password):
+        return 0
+
+    cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(
+        hours=BLUESKY_MAX_ALERT_AGE_HOURS
+    )
+    pending = [
+        a for a in alerts
+        if not a.get("posted_bluesky")
+        and (d := _parse_iso(a.get("created_at", ""))) and d >= cutoff
+    ][:BLUESKY_MAX_POSTS_PER_RUN]
+    if not pending:
+        return 0
+
+    try:
+        r = SESSION.post(
+            f"{BLUESKY_PDS}/xrpc/com.atproto.server.createSession",
+            json={"identifier": BLUESKY_HANDLE, "password": password},
+            timeout=TIMEOUT,
+        )
+        r.raise_for_status()
+        session = r.json()
+    except (requests.RequestException, ValueError) as exc:
+        print(f"[bluesky] login failed: {exc}", file=sys.stderr)
+        return 0
+
+    headers = {"Authorization": f"Bearer {session['accessJwt']}"}
+    posted = 0
+    # Oldest first so the timeline reads chronologically.
+    for alert in reversed(pending):
+        text, facets = format_bsky_post(alert)
+        record = {
+            "$type": "app.bsky.feed.post",
+            "text": text,
+            "createdAt": dt.datetime.now(dt.timezone.utc).strftime(
+                "%Y-%m-%dT%H:%M:%SZ"
+            ),
+            "langs": ["en"],
+        }
+        if facets:
+            record["facets"] = facets
+        try:
+            r = SESSION.post(
+                f"{BLUESKY_PDS}/xrpc/com.atproto.repo.createRecord",
+                headers=headers,
+                json={"repo": session["did"],
+                      "collection": "app.bsky.feed.post",
+                      "record": record},
+                timeout=TIMEOUT,
+            )
+            r.raise_for_status()
+        except requests.RequestException as exc:
+            print(f"[bluesky] post failed for {alert['id']}: {exc}",
+                  file=sys.stderr)
+            continue
+        alert["posted_bluesky"] = True
+        posted += 1
+    return posted
 
 
 # ----- Render -----
@@ -1520,8 +1912,24 @@ def main() -> int:
     )
 
     now = dt.datetime.now(dt.timezone.utc)
+    build_time_iso = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    print("[build] diffing alert ledger...", file=sys.stderr)
+    alerts_path = OUT / ALERTS_FILENAME
+    ledger, new_alerts = update_ledger(
+        load_ledger(alerts_path), hero, other_outbreaks, outbreaks, build_time_iso
+    )
+    for a in new_alerts:
+        print(f"[alerts]   + {a['kind']}: {a['title']}", file=sys.stderr)
+    print(f"[build]   {len(new_alerts)} new alert(s), "
+          f"{len(ledger['alerts'])} in ledger", file=sys.stderr)
+
+    posted = post_alerts_to_bluesky(ledger["alerts"])
+    if posted:
+        print(f"[build]   posted {posted} alert(s) to Bluesky", file=sys.stderr)
+
     context = {
-        "build_time_iso": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "build_time_iso": build_time_iso,
         "build_time_human": now.strftime("%Y-%m-%d %H:%M UTC"),
         "promed_items": promed[:15],
         "ecdc_items": ecdc[:10],
@@ -1542,6 +1950,13 @@ def main() -> int:
         "active_country_count": len(country_index),
         "site_url": SITE_URL,
         "analytics_code": ANALYTICS_CODE,
+        "alerts": [
+            {**a, "when": alert_age_human(a.get("created_at"))}
+            for a in ledger["alerts"][:12]
+        ],
+        "feed_url": f"{SITE_URL}/feed.xml",
+        "newsletter_url": NEWSLETTER_URL,
+        "bluesky_handle": BLUESKY_HANDLE,
         "vessel": HONDIUS_VESSEL,
         "vessel_position": hondius_pos,
         "vessel_counts": hondius_counts,
@@ -1565,6 +1980,8 @@ def main() -> int:
     write_og_image(OUT / "og.png", country_index, outbreaks, reports_today, hero)
     write_sitemap(OUT / "sitemap.xml", context["build_time_iso"])
     write_robots(OUT / "robots.txt")
+    write_feed(OUT / "feed.xml", ledger["alerts"], build_time_iso)
+    alerts_path.write_text(json.dumps(ledger, indent=2), encoding="utf-8")
     # Also write a JSON dump alongside for anyone who wants the raw data.
     payload = {
         "generated_at": context["build_time_iso"],
@@ -1592,7 +2009,8 @@ def main() -> int:
     }
     (OUT / "data.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
     track_path.write_text(json.dumps(hondius_track), encoding="utf-8")
-    print(f"[build] wrote {OUT/'index.html'} and {OUT/'data.json'}", file=sys.stderr)
+    print(f"[build] wrote {OUT/'index.html'}, {OUT/'data.json'} and "
+          f"{OUT/'feed.xml'}", file=sys.stderr)
     return 0
 
 
