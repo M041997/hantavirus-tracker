@@ -2,11 +2,26 @@ name: build
 
 on:
   schedule:
-    # Hourly at :05 to avoid the top-of-hour cron stampede on GitHub.
-    - cron: "5 * * * *"
+    # Daily at 06:05 UTC, not hourly.
+    #
+    # This was `5 * * * *`. Each run is two jobs (build + deploy) and each job
+    # rounds up to a full billed minute, so ~6 runs a day cost ~12-15 billed
+    # minutes a day and roughly 400 a month -- measurably the largest single
+    # line on the account's usage page on days when no CI ran at all (12 min on
+    # 2026-09-01, 15 on the 2nd, 15 on the 3rd, all of it this workflow).
+    #
+    # Nothing here publishes hourly. ProMED, Google News and the CDC do not
+    # update on an hourly cadence, and the build re-derives the whole site from
+    # source each time, so a daily pass loses no data. The workflow is
+    # currently disabled; this is so re-enabling it cannot reintroduce the
+    # drain. Drop to hourly only if the site is being actively watched during
+    # an outbreak.
+    - cron: "5 6 * * *"
   workflow_dispatch:
   push:
     branches: [main]
+    paths-ignore:
+      - "**.md"
 
 permissions:
   contents: write
